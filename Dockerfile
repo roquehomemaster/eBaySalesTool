@@ -1,17 +1,18 @@
-FROM node:14
+# Use Node.js as the base image for the backend
+FROM node:16-alpine
 
 # Set the working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy package.json and install dependencies
-COPY package*.json ./
+COPY backend/package*.json ./
 RUN npm install
 
 # Copy the rest of the backend code
-COPY ./src ./src
+COPY backend/ ./
 
 # Expose the backend port
-EXPOSE 3000
+EXPOSE 5000
 
 # Start the backend server
-CMD ["node", "src/app.js"]
+CMD ["npm", "start"]

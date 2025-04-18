@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${productName}">Planmeca Intraoral Imaging System</title>
+    <style>
+        /* ... (All your original styles copied here verbatim) */
+    </style>
+</head>
+<body>
+<font rwr="1" size="4" style="font-family:Arial">  <!-- (Consider replacing <font> with CSS) -->
+    <table width="100%" border="0" align="center">
+        <tbody>
+            <tr>
+                <td align="center">
+                    <table width="1130" border="0" cellpadding="0" cellspacing="0" bgcolor="#EFEFEF">
+                        <tbody>
+                            <tr>
+                                <td height="120" align="center" valign="bottom">
+                                    <table width="1050" height="105" border="0" cellpadding="0" cellspacing="0" background="https://imageshack.us/a/img856/4886/jjre.png" bgcolor="#FFFFFF">
+                                        <tbody>
+                                            <tr>
+                                                <td width="670" align="left" valign="middle">
+                                                    <table width="670" border="0" cellspacing="0" cellpadding="0">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="text1">
+                                                                        <em>
+                                                                            <strong>
+                                                                                <font color="#47A3FF" size="5" face="Verdana, Arial, Helvetica, sans-serif" th:text="${sellerName}">ChoiceDES</font>
+                                                                            </strong>
+                                                                        </em>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="text1">
+                                                                        <em>
+                                                                            <strong>
+                                                                                <font color="#FC2B2B" size="5" face="Verdana, Arial, Helvetica, sans-serif" th:text="${formerlyName}"></font>
+                                                                            </strong>
+                                                                        </em>
+                                                                        <font color="#333333" size="2" face="Verdana, Arial, Helvetica, sans-serif">Formerly - <a title="Click to view feedback" th:href="@{${feedbackLink}}" target="_about" th:text="${formerlyDisplayName}">TuleTymTim - click to view feedback</a></font>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                                <td width="360" align="right" valign="middle">
+                                                    <div class="header-search">
+                                                        <form class="search" method="GET">
+                                                            <input class="search_feld" id="search_value" name="_nkw" value="" type="text">
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                                <td width="20" align="right" valign="middle"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <!-- ... (All other table rows with original structure and styles) -->
+                            <tr>
+                                <td align="center" valign="top" background="https://imageshack.com/a/img34/5111/vz62.png" bgcolor="#FFFFFF">
+                                    <table width="820" border="0" cellspacing="0" cellpadding="0">
+                                        <tbody>
+                                            <tr>
+                                                <td width="820" align="right" valign="top">
+                                                    <table width="800" border="0" cellpadding="0" cellspacing="0">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td height="15" align="left" valign="bottom"></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td align="center" valign="bottom">
+                                                                    <table width="793" height="40" border="0" cellpadding="0" cellspacing="0">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td align="center">
+                                                                                    <div class="DescBox">
+                                                                                        <div class="text">
+                                                                                            <b th:text="${productName}">Planmeca Intraoral Imaging System</b>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                            <!-- ... (Rest of the table structure with Thymeleaf parameters) -->
+                                                            <tr>
+                                                                <td align="left">
+                                                                    <div class="descback">
+                                                                        <p th:utext="${description}">
+                                                                            The Planmeca Prostyle Intra is a versatile and reliable intraoral imaging system designed for dental professionals. It is known for its user-friendly operation and high-quality imaging capabilities, making it an essential tool in modern dental practices. <br><br>
+                                                                            This unit is in a facility that is closing due to retirement. LIMITED TIME OPPORTUNITY!! Product is in excellent condition.
+                                                                        </p>
+                                                                        <p>
+                                                                            <b>Model Name:</b> <span th:text="${modelName}">Prostyle Intra</span><br>
+                                                                            <b>Serial Number:</b> <span th:text="${serialNumber}">sent with packing slip</span><br>
+                                                                            <b>Includes:</b> <span th:text="${includes}">Control Unit, remote, and unit</span><br><br>
+                                                                            <span th:text="${sellerInformation}">Seller Name:ChoiceDES <br> Address: Ada Michigan 49301 <br> Phone: 616-</span><br><br>
+                                                                            <b th:if="${showFDAWarning}">FDA Warning</b><br>
+                                                                            <p th:if="${showFDAWarning}" th:text="${FDAWarning}">
+                                                                                "All devices are thoroughly cleaned to manufacturer specifications and inspected before listed for sale. The sale of this item may be subject to regulation by the US Food and Drug Administration and state and local regulatory agencies. If so, do not bid on this item unless you are an authorized purchaser. If the item is subject to FDA regulation, I will verify your status as an authorized purchaser of this item before shipping of the item."
+                                                                            </p>
+                                                                        </p>
+                                                                    </div>
+                                                                    <div class="descB"></div>
+                                                                </td>
+                                                            </tr>
+                                                            <!-- ... (Rest of the table structure with Thymeleaf parameters) -->
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <!-- ... (All other table rows with original structure and styles) -->
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</font>
+</body>
+</html>

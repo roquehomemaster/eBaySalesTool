@@ -8,14 +8,49 @@
     "dev": "nodemon src/app.js"
   },
   "dependencies": {
-    "express": "^4.17.1",
-    "mongoose": "^5.10.9",
+    "axios": "^0.21.1",
     "dotenv": "^8.2.0",
-    "axios": "^0.21.1"
+    "express": "^4.21.2",
+    "mongoose": "^5.10.9"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
   },
   "author": "Your Name",
-  "license": "MIT"
+  "license": "MIT",
+  "services": {
+    "backend": {
+      "build": {
+        "context": ".",
+        "dockerfile": "./Dockerfile"
+      },
+      "ports": [
+        "5000:5000"
+      ],
+      "volumes": [
+        "./backend:/app",
+        "/app/node_modules"
+      ],
+      "environment": [
+        "NODE_ENV=development"
+      ]
+    },
+    "frontend": {
+      "build": {
+        "context": "./frontend",
+        "dockerfile": "./Dockerfile"
+      },
+      "ports": [
+        "3000:3000"
+      ],
+      "volumes": [
+        "./frontend:/app",
+        "/app/node_modules"
+      ],
+      "environment": [
+        "REACT_APP_API_URL=http://localhost:5000"
+      ]
+    }
+  },
+  "keywords": []
 }

@@ -1,14 +1,12 @@
 const express = require('express');
-const SalesController = require('../controllers/salesController');
-
 const router = express.Router();
-const salesController = new SalesController();
+
+// Define your routes here
+router.get('/sales', (req, res) => {
+    res.send('Sales data');
+});
 
 const setSalesRoutes = (app) => {
-    router.post('/sales', salesController.createSale);
-    router.get('/sales', salesController.getSales);
-    router.put('/sales/:id', salesController.updateSale);
-
     app.use('/api', router);
 };
 

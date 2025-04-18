@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{productName}}</title>
+    <style>
+        div.thumbImage img { /* Original styles */ }
+        #mainImage img { /* Original styles */ }
+        #images { /* Original styles */ }
+        #mainImage { /* Original styles */ }
+        .thumbImage { /* Original styles */ }
+        div.transboxD { /* Original styles */ }
+        p { /* Original styles */ }
+        h4 { /* Original styles */ }
+        div.transboxD li { /* Original styles */ }
+        /* Add all other original styles here */
+    </style>
+</head>
+<body>
+    <font rwr="1" size="4" style="font-family:Arial">
+        <table width="100%" border="0" align="center">
+            <tbody>
+                <tr>
+                    <td>
+                        <h1>{{productName}}</h1>
+                        <p>{{description}}</p>
+                        <p>{{salesVerbiage}}</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h2>Details</h2>
+                        <ul>
+                            <li><strong>Model Name:</strong> {{modelName}}</li>
+                            <li><strong>Serial Number:</strong> {{serialNumber}}</li>
+                            <li><strong>Includes:</strong> {{includes}}</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h2>Seller Information</h2>
+                        <p>{{sellerInformation}}</p>
+                    </td>
+                </tr>
+                {{#if showFDAWarning}}
+                <tr>
+                    <td>
+                        <h2>FDA Warning</h2>
+                        <p>{{FDAWarning}}</p>
+                    </td>
+                </tr>
+                {{/if}}
+                <tr>
+                    <td>
+                        <h2>Warranty</h2>
+                        <p>{{warranty}}</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h2>Other Information</h2>
+                        <p>{{otherInformation}}</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </font>
+</body>
+</html>
