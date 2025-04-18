@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eBay Listing Data Entry</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            max-width: 600px;
+            margin: auto;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        input, textarea, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>eBay Listing Data Entry</h1>
+    <form id="listingForm" action="/generate-listing" method="POST">
+        <label for="productName">Product Name</label>
+        <input type="text" id="productName" name="productName" required>
+
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="4" required></textarea>
+
+        <label for="salesVerbiage">Sales Verbiage</label>
+        <textarea id="salesVerbiage" name="salesVerbiage" rows="4" required></textarea>
+
+        <label for="modelName">Model Name</label>
+        <input type="text" id="modelName" name="modelName" required>
+
+        <label for="serialNumber">Serial Number</label>
+        <input type="text" id="serialNumber" name="serialNumber" required>
+
+        <label for="includes">Includes</label>
+        <textarea id="includes" name="includes" rows="2" required></textarea>
+
+        <label for="sellerInformation">Seller Information</label>
+        <textarea id="sellerInformation" name="sellerInformation" rows="3" required></textarea>
+
+        <label for="showFDAWarning">Show FDA Warning</label>
+        <select id="showFDAWarning" name="showFDAWarning">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+
+        <label for="FDAWarning">FDA Warning</label>
+        <textarea id="FDAWarning" name="FDAWarning" rows="3"></textarea>
+
+        <label for="warranty">Warranty</label>
+        <textarea id="warranty" name="warranty" rows="3" required></textarea>
+
+        <label for="otherInformation">Other Information</label>
+        <textarea id="otherInformation" name="otherInformation" rows="3" required></textarea>
+
+        <button type="submit">Generate Listing</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "ebaysalestool",
+  "version": "1.0.0",
+  "description": "## Overview The eBay Sales Tool is a web-based application designed to assist businesses in selling and tracking items on eBay. This tool provides functionalities for managing sales, tracking profits, conducting product research, and integrating with QuickBooks for financial management.",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm start --prefix backend\" \"npm start --prefix frontend\"",
+    "install": "npm install --prefix backend && npm install --prefix frontend",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/roquehomemaster/eBaySalesTool.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/roquehomemaster/eBaySalesTool/issues"
+  },
+  "homepage": "https://github.com/roquehomemaster/eBaySalesTool#readme",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

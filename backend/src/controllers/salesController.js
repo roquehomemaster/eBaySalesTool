@@ -36,4 +36,4 @@ class SalesController {
     }
 }
 
-export default SalesController;
+module.exports = SalesController;

@@ -1,33 +1,36 @@
-version: '3.8'
-
 services:
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./Dockerfile
     ports:
       - "5000:5000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules # Prevents overwriting node_modules
     environment:
-      - NODE_ENV=production
-      - DATABASE_URL=mongodb://mongo:27017/ebay_sales_tool
-    depends_on:
-      - mongo
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://database:27017/ebay-sales-tool # Update MongoDB URI
 
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: ./Dockerfile
     ports:
       - "3000:3000"
-    depends_on:
-      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules # Prevents overwriting node_modules
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
 
-  mongo:
+  database:
     image: mongo:latest
+    container_name: mongodb
     ports:
       - "27017:27017"
     volumes:
-      - mongo_data:/data/db
+      - mongodb_data:/data/db
 
 volumes:
-  mongo_data:
+  mongodb_data:
