@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "ebay-sales-tool-backend": "file:..",
+    "nodemon": "^3.1.9"
+  }
+}

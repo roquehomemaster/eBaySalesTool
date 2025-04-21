@@ -12,6 +12,34 @@ router.get('/data-entry', (req, res) => {
     res.sendFile(path.join(__dirname, '../templates/dataEntry.html'));
 });
 
+/**
+ * @swagger
+ * /api/listings:
+ *   get:
+ *     summary: Retrieve all listings
+ *     responses:
+ *       200:
+ *         description: A list of all listings
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     description: The listing ID
+ *                   title:
+ *                     type: string
+ *                     description: The title of the listing
+ *                   price:
+ *                     type: number
+ *                     description: The price of the listing
+ *       500:
+ *         description: Error retrieving listings
+ */
+
 router.post('/generate-listing', (req, res) => {
     const {
         productName,

@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 const setSalesRoutes = require('./routes/salesRoutes');
 const listingRoutes = require('./routes/listingRoutes');
 const itemRoutes = require('./routes/itemRoutes');
+const ownershipRoutes = require('./routes/ownershipRoutes');
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -11,6 +14,29 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(listingRoutes);
 app.use('/api', itemRoutes);
+app.use('/api', ownershipRoutes);
+
+// Swagger configuration
+const swaggerOptions = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'eBay Sales Tool API',
+            version: '1.0.0',
+            description: 'API documentation for the eBay Sales Tool',
+        },
+        servers: [
+            {
+                url: 'http://localhost:5000',
+                description: 'Local server',
+            },
+        ],
+    },
+    apis: ['./src/routes/*.js'], // Path to the API docs
+};
+
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Serve the index.html file for the root URL
 app.get('/', (req, res) => {

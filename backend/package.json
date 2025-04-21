@@ -5,13 +5,16 @@
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
-    "dev": "nodemon src/app.js"
+    "dev": "nodemon src/app.js",
+    "build": "echo 'No build step required for backend'"
   },
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^1.8.4",
     "dotenv": "^8.2.0",
     "express": "^4.21.2",
-    "mongoose": "^5.10.9"
+    "mongoose": "^8.13.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
