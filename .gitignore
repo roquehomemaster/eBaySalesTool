@@ -1,1 +1,4 @@
 node_modules
+
+# Ignore the create_github_issues.py script
+scripts/create_github_issues.py
