@@ -22,3 +22,18 @@ CREATE TABLE product_research (
     research_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     user_id INT REFERENCES users(id)
 );
+
+-- Create the items table to store item information
+CREATE TABLE items (
+    id SERIAL PRIMARY KEY,
+    description TEXT NOT NULL,
+    manufacturer_info VARCHAR(255),
+    size VARCHAR(100),
+    weight DECIMAL(10, 2),
+    condition VARCHAR(50),
+    category VARCHAR(100),
+    sku_barcode VARCHAR(100) UNIQUE,
+    images TEXT[],
+    specifications TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

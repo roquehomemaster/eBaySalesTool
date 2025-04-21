@@ -1,0 +1,87 @@
+{
+  "itemsRequirementDocument": {
+    "itemInformation": {
+      "description": "Detailed description of the item.",
+      "manufacturerInformation": "Brand and manufacturer details.",
+      "size": "Dimensions of the item.",
+      "weight": "Weight of the item.",
+      "condition": "New, used, refurbished, etc.",
+      "categoryType": "Classification of the item.",
+      "skuBarcode": "Stock Keeping Unit or barcode for inventory management.",
+      "images": "High-quality images of the item from multiple angles.",
+      "specifications": "Detailed technical specifications (e.g., dimensions, materials)."
+    },
+    "itemOwnership": {
+      "currentOwner": "Who owns the item being sold.",
+      "transferHistory": "Records of any transfers between owners.",
+      "currentOwnerContactInfo": "Phone number, email, etc."
+    },
+    "ownershipAgreementDetails": {
+      "negotiatedTerms": {
+        "commissionPercentage": "Percentage of net proceeds retained.",
+        "minimumSalePrice": "Agreed minimum price for the item.",
+        "durationOfAgreement": "Length of time the item will be listed.",
+        "renewalTerms": "Conditions for renewing the agreement."
+      }
+    },
+    "itemHistoryLog": {
+      "changeType": "Type of change made (e.g., price change, description update).",
+      "timestamp": "Date and time of each change."
+    },
+    "itemSalesHistory": {
+      "salesChannels": "Breakdown of sales channels (e.g., website, eBay).",
+      "returnHistory": "Records of any returns and reasons.",
+      "customerFeedbackRatings": "Feedback received from customers."
+    },
+    "eBayInformation": {
+      "listingStatus": "Active, ended, or removed.",
+      "watchers": "Number of users watching the item.",
+      "itemConditionDescription": "Detailed description complying with eBay's requirements.",
+      "paymentMethod": "Accepted payment methods through eBay.",
+      "shippingMethod": "Details about shipping options offered."
+    },
+    "additionalConsiderations": {
+      "warrantyInformation": "Details on warranties or guarantees.",
+      "complianceAndCertifications": "Legal or safety certifications.",
+      "promotionalInformation": "Current promotions or discounts.",
+      "inventoryLevels": "Real-time inventory levels to prevent overselling.",
+      "relatedItems": "Suggestions for similar items or accessories."
+    },
+    "customerDetails": {
+      "purchaseDate": "Date when the item was purchased.",
+      "purchaseMethod": "How the customer paid (credit card, PayPal, etc.).",
+      "shippingPreferences": "Customer's preferred shipping method and delivery instructions."
+    },
+    "financialTracking": {
+      "netProceedsCalculation": {
+        "salePrice": "Sale price.",
+        "eBayFees": "eBay fees.",
+        "shippingCosts": "Shipping costs.",
+        "otherDeductions": "Any other deductions (e.g., promotional costs)."
+      }
+    },
+    "communicationLog": {
+      "ownerCommunicationHistory": "Record of all communications with item owners.",
+      "approvalProcess": "Document how approvals are obtained for changes."
+    },
+    "performanceMetrics": {
+      "salesPerformance": {
+        "totalSales": "Total sales.",
+        "numberOfItemsSold": "Number of items sold.",
+        "averageSalePrice": "Average sale price."
+      },
+      "ownerReports": "Regular reports to item owners detailing performance."
+    },
+    "platformExpansionConsiderations": {
+      "platformSpecificTerms": "Different terms for different platforms.",
+      "listingCompliance": "Ensure compliance with the policies of each platform."
+    },
+    "itemOwnershipDocumentation": {
+      "signedAgreements": "Digital copies of signed agreements with item owners.",
+      "taxInformation": "Required tax documents from item owners for commission payments."
+    },
+    "customTerms": {
+      "specialAgreements": "Document any unique terms or agreements."
+    }
+  }
+}
