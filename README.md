@@ -1,68 +1,86 @@
 # eBay Sales Tool
 
-## Overview
-The eBay Sales Tool is a web-based application designed to assist businesses in selling and tracking items on eBay. This tool provides functionalities for managing sales, tracking profits, conducting product research, and integrating with QuickBooks for financial management.
+## Project Overview
+The eBay Sales Tool is a full-stack web application designed to assist users in managing eBay sales, tracking items, and conducting product research. It includes a backend API, a frontend user interface, and a database for storing sales and product data.
 
 ## Features
-- **Sales Management**: Create, edit, and track sales entries.
-- **Profit Tracking**: Calculate profits based on sales data.
-- **Product Research**: Monitor sold pricing on eBay for various products.
-- **QuickBooks Integration**: Record sales and generate payout records.
-- **User Authentication**: Manage user logins and permissions.
+- **Backend**: Built with Node.js and Express, providing RESTful APIs for managing sales, items, and ownership.
+- **Frontend**: Developed with React, offering a user-friendly interface for data entry, sales tracking, and product research.
+- **Database**: Uses MongoDB for storing sales and item data.
+- **Dockerized**: Fully containerized setup for easy deployment and development.
+- **Swagger Documentation**: API documentation available at `/api-docs`.
 
-## Architecture
-The application is structured into three main components:
-1. **Backend**: Built with Node.js and Express, handling API requests and database interactions.
-2. **Frontend**: Developed using React, providing a user-friendly interface for managing sales and product research.
-3. **Database**: Utilizes a relational database to store sales data and user information.
+## Project Structure
+```
+backend/
+  Dockerfile
+  package.json
+  src/
+    app.js
+    controllers/
+    models/
+    routes/
+    templates/
+frontend/
+  Dockerfile
+  package.json
+  src/
+    App.js
+    components/
+    context/
+    services/
+database/
+  migrations/
+  seeds/
+scripts/
+  docker_build.bat
+  npm_cleanup_and_install.bat
+```
 
-## Development Setup
-### Prerequisites
-- Node.js
-- Docker
-- Docker Compose
+## Prerequisites
+- **Node.js**: v16 or higher
+- **Docker**: Installed and running
+- **MongoDB**: Running instance or Dockerized
 
-### Installation
+## Setup Instructions
 1. Clone the repository:
-   ```
+   ```bash
    git clone <repository-url>
-   cd ebay-sales-tool
+   cd eBaySalesTool
    ```
 
-2. Set up the backend:
-   - Navigate to the `backend` directory.
-   - Install dependencies:
-     ```
-     npm install
-     ```
-
-3. Set up the frontend:
-   - Navigate to the `frontend` directory.
-   - Install dependencies:
-     ```
-     npm install
-     ```
-
-4. Set up the database:
-   - Navigate to the `database` directory.
-   - Initialize the database schema and seed data:
-     ```
-     mysql -u <username> -p < database/migrations/init.sql
-     mysql -u <username> -p < database/seeds/sampleData.sql
-     ```
-
-5. Run the application using Docker Compose:
-   ```
-   docker-compose up
+2. Install dependencies:
+   ```bash
+   cd backend
+   npm install
+   cd ../frontend
+   npm install
    ```
 
-## Usage
-- Access the frontend application at `http://localhost:3000`.
-- Use the provided forms to create and manage sales entries.
-- Monitor product pricing and track sales data effectively.
+3. Start the application using Docker:
+   ```bash
+   .\scripts\docker_build.bat
+   ```
+
+4. Access the application:
+   - Frontend: [http://localhost:3000](http://localhost:3000)
+   - Backend API: [http://localhost:5000](http://localhost:5000)
 
 ## Contributing
-Contributions are welcome! Please submit a pull request or open an issue for any enhancements or bug fixes.
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix:
+   ```bash
+   git checkout -b feature-name
+   ```
+3. Commit your changes:
+   ```bash
+   git commit -m "Description of changes"
+   ```
+4. Push to your branch:
+   ```bash
+   git push origin feature-name
+   ```
+5. Open a pull request.
 
 ## License
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License.

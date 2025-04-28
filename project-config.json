@@ -1,0 +1,6 @@
+{
+  "os": "Windows 11",
+  "docker": true,
+  "docker_compose": true,
+  "notes": "This project runs in Docker containers. Use 'docker-compose down -v' and 'docker-compose up -d' for changes."
+}

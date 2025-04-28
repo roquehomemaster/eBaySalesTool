@@ -1,5 +1,9 @@
 @echo off
 
+:: This project runs in a Windows 11 environment with Docker.
+echo Remember to use 'docker-compose down -v' and 'docker-compose up -d' after changes.
+pause
+
 :: Navigate to the root directory of the project
 cd /d %~dp0..
 
@@ -63,6 +67,21 @@ if %ERRORLEVEL% neq 0 (
     echo Failed to install backend dependencies. Exiting...
     exit /b %ERRORLEVEL%
 )
+
+:: Update dependencies for backend
+echo Updating backend dependencies...
+call npm update
+if %ERRORLEVEL% neq 0 (
+    echo Failed to update backend dependencies. Exiting...
+    exit /b %ERRORLEVEL%
+)
+
+:: Run npm audit and fix vulnerabilities for backend
+echo Auditing and fixing backend vulnerabilities...
+call npm audit fix --force
+if %ERRORLEVEL% neq 0 (
+    echo Warning: Failed to fix backend vulnerabilities. Continuing...
+)
 cd ..
 
 :: Install dependencies for frontend
@@ -73,6 +92,28 @@ if %ERRORLEVEL% neq 0 (
     echo Failed to install frontend dependencies. Exiting...
     exit /b %ERRORLEVEL%
 )
+
+:: Update dependencies for frontend
+echo Updating frontend dependencies...
+call npm update
+if %ERRORLEVEL% neq 0 (
+    echo Failed to update frontend dependencies. Exiting...
+    exit /b %ERRORLEVEL%
+)
+
+:: Explicitly update known problematic dependencies
+echo Updating react-scripts and resolve-url-loader...
+call npm install react-scripts@latest resolve-url-loader@latest
+if %ERRORLEVEL% neq 0 (
+    echo Warning: Failed to update react-scripts or resolve-url-loader. Continuing...
+)
+
+:: Run npm audit and fix vulnerabilities for frontend
+echo Auditing and fixing frontend vulnerabilities...
+call npm audit fix --force
+if %ERRORLEVEL% neq 0 (
+    echo Warning: Failed to fix frontend vulnerabilities. Continuing...
+)
 cd ..
 
 :: Set NODE_OPTIONS to use OpenSSL legacy provider
@@ -80,7 +121,14 @@ echo Setting NODE_OPTIONS for OpenSSL legacy provider...
 set NODE_OPTIONS=--openssl-legacy-provider
 
 :: Build backend (if applicable)
-echo Skipping backend build as no build step is required.
+echo Building backend...
+cd backend
+call npm run build
+if %ERRORLEVEL% neq 0 (
+    echo Failed to build backend. Exiting...
+    exit /b %ERRORLEVEL%
+)
+cd ..
 
 :: Build frontend
 echo Building frontend...

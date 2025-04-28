@@ -1,4 +1,5 @@
-FROM node:14
+# Use a compatible Node.js version
+FROM node:16-alpine
 
 # Set the working directory
 WORKDIR /usr/src/app
@@ -11,7 +12,7 @@ RUN npm install
 COPY ./src ./src
 
 # Expose the backend port
-EXPOSE 3000
+EXPOSE 5000
 
 # Start the backend server
 CMD ["node", "src/app.js"]

@@ -1,0 +1,64 @@
+/* Styles for the ItemPage component */
+
+.item-page {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+.item-page-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.item-page-header nav a {
+    margin: 0 10px;
+    text-decoration: none;
+    color: #007bff;
+}
+
+.item-page-header nav a:hover {
+    text-decoration: underline;
+}
+
+.item-page-content {
+    display: flex;
+    gap: 20px;
+}
+
+.item-list {
+    flex: 1;
+    border-right: 1px solid #ccc;
+    padding-right: 20px;
+}
+
+.item-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.item-list li {
+    cursor: pointer;
+    padding: 5px 0;
+}
+
+.item-list li:hover {
+    text-decoration: underline;
+}
+
+.item-details {
+    flex: 2;
+}
+
+.item-details button {
+    margin-right: 10px;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.item-details button:hover {
+    background-color: #0056b3;
+}

@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "ebay-sales-tool-frontend": "file:.."
+  }
+}
