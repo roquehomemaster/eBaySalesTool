@@ -50,20 +50,53 @@ if %ERRORLEVEL% neq 0 (
     echo "Please address deprecated packages and vulnerabilities manually." >> %LOG_FILE%
 )
 
-:: Ensure the script continues execution after Step 4
+:: Ensure the script explicitly continues after Step 4
 if %ERRORLEVEL% neq 0 (
     echo "Warning: Issues detected during Step 4, but continuing..." >> %LOG_FILE%
     echo "Warning: Issues detected during Step 4, but continuing..."
 )
 
-:: Proceed to Step 5 and beyond
+:: Proceed to Step 5
+call :step5
 
+:step5
 :: Step 5: Install dependencies for backend and frontend
+:: Navigate to backend and install dependencies
+echo "Navigating to backend directory..." >> %LOG_FILE%
+echo "Current directory: %CD%" >> %LOG_FILE%
 call cd ../backend
+if not exist package.json (
+    echo "Error: backend/package.json not found. Exiting..." >> %LOG_FILE%
+    exit /b 1
+)
 call npm install >> %LOG_FILE% 2>&1
+if %ERRORLEVEL% neq 0 (
+    echo "Failed to install backend dependencies. Exiting..." >> %LOG_FILE%
+    exit /b %ERRORLEVEL%
+)
+
+:: Navigate to frontend and install dependencies
+echo "Navigating to frontend directory..." >> %LOG_FILE%
+echo "Current directory: %CD%" >> %LOG_FILE%
 call cd ../frontend
+if not exist package.json (
+    echo "Error: frontend/package.json not found. Exiting..." >> %LOG_FILE%
+    exit /b 1
+)
 call npm install >> %LOG_FILE% 2>&1
+if %ERRORLEVEL% neq 0 (
+    echo "Failed to install frontend dependencies. Exiting..." >> %LOG_FILE%
+    exit /b %ERRORLEVEL%
+)
+
+:: Return to scripts directory
+echo "Returning to scripts directory..." >> %LOG_FILE%
+echo "Current directory: %CD%" >> %LOG_FILE%
 call cd ../scripts
+if not exist build_and_deploy.bat (
+    echo "Error: scripts/build_and_deploy.bat not found. Exiting..." >> %LOG_FILE%
+    exit /b 1
+)
 
 :: Step 6: Continue with the build process
 echo "Step 6 - Cleaning up and installing dependencies..." >> %LOG_FILE%
