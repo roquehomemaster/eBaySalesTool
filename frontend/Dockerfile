@@ -11,6 +11,11 @@ RUN npm install
 COPY . /app
 RUN rm -rf node_modules
 
+RUN apk add --no-cache curl
+
+# Ensure dependencies are installed before starting the application
+RUN npm install react-router-dom axios
+
 # Expose the frontend port
 EXPOSE 3000
 

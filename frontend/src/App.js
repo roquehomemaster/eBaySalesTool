@@ -1,21 +1,17 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import SalesForm from './components/SalesForm';
-import SalesTable from './components/SalesTable';
-import ProductResearch from './components/ProductResearch';
+import { BrowserRouter } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
+import ItemList from './components/ItemList';
 
 function App() {
-  return (
-    <Router>
-      <div className="App">
-        <Routes>
-          <Route path="/" element={<SalesTable />} />
-          <Route path="/add-sale" element={<SalesForm />} />
-          <Route path="/product-research" element={<ProductResearch />} />
-        </Routes>
-      </div>
-    </Router>
-  );
+    return (
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <div className="App">
+                <Routes>
+                    <Route path="/" element={<ItemList />} />
+                </Routes>
+            </div>
+        </BrowserRouter>
+    );
 }
 
 export default App;

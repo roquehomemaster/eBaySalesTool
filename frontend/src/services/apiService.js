@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000/api'; // Adjust the base URL as needed
+const API_BASE_URL = 'http://backend:5000/api'; // Updated to use the backend service in Docker network
 
 const apiService = {
     createSale: async (saleData) => {
@@ -24,6 +24,15 @@ const apiService = {
     updateSale: async (saleId, saleData) => {
         try {
             const response = await axios.put(`${API_BASE_URL}/sales/${saleId}`, saleData);
+            return response.data;
+        } catch (error) {
+            throw error.response ? error.response.data : error.message;
+        }
+    },
+
+    getItems: async () => {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/items`);
             return response.data;
         } catch (error) {
             throw error.response ? error.response.data : error.message;

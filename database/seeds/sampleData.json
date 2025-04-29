@@ -1,0 +1,36 @@
+[
+  {
+    "name": "Vintage Camera",
+    "price": 150.00,
+    "description": "A classic vintage camera",
+    "manufacturer": "Canon",
+    "model": "AE-1",
+    "serial_number": "12345",
+    "product_page_link": "http://example.com/camera",
+    "dimension": { "x": 10, "y": 5, "z": 3 },
+    "weight": 1.2,
+    "condition": "Used",
+    "category": "Electronics",
+    "sku_barcode": "CAM12345",
+    "images": ["http://example.com/camera.jpg"],
+    "specifications": "35mm film camera",
+    "created_at": "2023-10-01"
+  },
+  {
+    "name": "Antique Vase",
+    "price": 75.00,
+    "description": "A beautiful antique vase",
+    "manufacturer": "Unknown",
+    "model": "N/A",
+    "serial_number": "67890",
+    "product_page_link": "http://example.com/vase",
+    "dimension": { "x": 8, "y": 8, "z": 12 },
+    "weight": 2.5,
+    "condition": "Good",
+    "category": "Home Decor",
+    "sku_barcode": "VAS67890",
+    "images": ["http://example.com/vase.jpg"],
+    "specifications": "Porcelain vase from the 19th century",
+    "created_at": "2023-10-05"
+  }
+]

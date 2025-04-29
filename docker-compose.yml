@@ -1,35 +1,27 @@
 services:
   backend:
     build:
-      context: ./backend
+      context: ./
       dockerfile: Dockerfile
     ports:
       - "5000:5000"
     volumes:
-      - type: bind
-        source: /mnt/f/Dev/eBaySalesTool/backend/src
-        target: /app/src
-      - type: bind
-        source: /mnt/f/Dev/eBaySalesTool/backend/models
-        target: /app/models
-      - type: bind
-        source: /mnt/f/Dev/eBaySalesTool/backend/package.json
-        target: /app/package.json
-      # Updated to use absolute paths for WSL compatibility
+      - ./backend:/app
+    networks:
+      - app_network
     environment:
-      - NODE_ENV=development
-      - MONGODB_URI=mongodb://database:27017/ebay-sales-tool # Update MongoDB URI
+      - MONGODB_URI=mongodb://database:27017/ebay-sales-tool
 
   frontend:
     build:
       context: ./frontend
-      dockerfile: ./Dockerfile
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     volumes:
       - ./frontend:/app
-    environment:
-      - REACT_APP_API_URL=http://localhost:5000
+    networks:
+      - app_network
 
   database:
     image: mongo:latest
@@ -38,6 +30,14 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+      - f:/Dev/eBaySalesTool/database/seeds:/data/seeds
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
 
 volumes:
   mongodb_data:
+    driver: local

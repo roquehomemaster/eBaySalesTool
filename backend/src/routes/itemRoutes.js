@@ -104,6 +104,46 @@ const router = express.Router();
  *         description: Error creating item
  */
 
+/**
+ * @swagger
+ * /api/items:
+ *   get:
+ *     summary: Fetch all items
+ *     responses:
+ *       200:
+ *         description: A list of items
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     description: The ID of the item
+ *                   name:
+ *                     type: string
+ *                     description: The name of the item
+ *                   price:
+ *                     type: number
+ *                     description: The price of the item
+ *                   description:
+ *                     type: string
+ *                     description: A description of the item
+ *                   manufacturer:
+ *                     type: string
+ *                     description: The manufacturer of the item
+ *                   model:
+ *                     type: string
+ *                     description: The model of the item
+ *                   serial_number:
+ *                     type: string
+ *                     description: The serial number of the item
+ *       500:
+ *         description: Error fetching items
+ */
+
 // Create a new item
 router.post('/items', async (req, res) => {
     console.log('POST /items endpoint hit with body:', req.body);
@@ -114,6 +154,18 @@ router.post('/items', async (req, res) => {
     } catch (error) {
         console.error('Error creating item:', error);
         res.status(500).json({ message: 'Error creating item', error });
+    }
+});
+
+// Fetch all items
+router.get('/items', async (req, res) => {
+    console.log('GET /items endpoint hit');
+    try {
+        const items = await Item.find();
+        res.status(200).json(items);
+    } catch (error) {
+        console.error('Error fetching items:', error);
+        res.status(500).json({ message: 'Error fetching items', error });
     }
 });
 

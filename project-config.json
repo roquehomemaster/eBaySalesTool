@@ -1,6 +1,20 @@
 {
-  "os": "Windows 11",
-  "docker": true,
-  "docker_compose": true,
-  "notes": "This project runs in Docker containers. Use 'docker-compose down -v' and 'docker-compose up -d' for changes."
+  "testData": {
+    "description": "Configuration for managing test data in the project.",
+    "enabled": true,
+    "dataSources": [
+      {
+        "name": "sampleData.json",
+        "path": "database/seeds/sampleData.json",
+        "type": "json"
+      },
+      {
+        "name": "sampleData.sql",
+        "path": "database/seeds/sampleData.sql",
+        "type": "sql"
+      }
+    ],
+    "defaultSource": "sampleData.json",
+    "loadOnStartup": false
+  }
 }
