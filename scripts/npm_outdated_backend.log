@@ -1,0 +1,2 @@
+Package  Current  Wanted  Latest  Location              Depended by
+nodemon   2.0.22  2.0.22  3.1.10  node_modules/nodemon  backend
