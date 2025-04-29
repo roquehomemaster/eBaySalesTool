@@ -1,0 +1,2 @@
+Package    Current  Wanted  Latest  Location                Depended by
+react-dom   18.3.1  18.3.1  19.1.0  node_modules/react-dom  frontend
