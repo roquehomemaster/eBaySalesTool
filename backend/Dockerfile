@@ -1,18 +1,21 @@
-# Use a compatible Node.js version
-FROM node:16-alpine
+# Use Node.js 18 as the base image
+FROM node:18-alpine
 
 # Set the working directory
 WORKDIR /usr/src/app
 
-# Copy package.json and install dependencies
-COPY package*.json ./
+# Copy package.json and package-lock.json
+COPY package*.json ./ 
+
+# Install dependencies
 RUN npm install
 
-# Copy the rest of the backend code
-COPY ./src ./src
+# Copy only necessary files
+COPY package*.json ./
+COPY src ./src
 
-# Expose the backend port
-EXPOSE 5000
+# Expose the application port
+EXPOSE 3000
 
-# Start the backend server
+# Start the application
 CMD ["node", "src/app.js"]

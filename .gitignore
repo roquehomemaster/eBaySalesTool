@@ -1,4 +1,30 @@
-node_modules
+# Ignore node_modules folders
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+frontend/frontend/node_modules/
 
-# Ignore the create_github_issues.py script
-scripts/create_github_issues.py
+# Ignore build artifacts
+frontend/build/
+backend/backend/build/
+
+# Ignore logs
+*.log
+scripts/*.log
+
+# Ignore temporary files
+*.tmp
+*.temp
+
+# Ignore IDE-specific files
+.vscode/
+.idea/
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore other unnecessary files
+scripts/npm_cleanup_and_install.bat
+scripts/docker_prune.bat
+scripts/npm_warnings.log
