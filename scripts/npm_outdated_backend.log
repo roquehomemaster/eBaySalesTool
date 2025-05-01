@@ -1,7 +1,2 @@
-Package             Current  Wanted  Latest  Location  Depended by
-axios               MISSING   1.9.0   1.9.0  -         backend
-dotenv              MISSING  16.5.0  16.5.0  -         backend
-express             MISSING   5.1.0   5.1.0  -         backend
-mongoose            MISSING  8.14.1  8.14.1  -         backend
-swagger-jsdoc       MISSING   6.2.8   6.2.8  -         backend
-swagger-ui-express  MISSING   5.0.1   5.0.1  -         backend
+Package  Current  Wanted  Latest  Location              Depended by
+nodemon   2.0.22  2.0.22  3.1.10  node_modules/nodemon  backend

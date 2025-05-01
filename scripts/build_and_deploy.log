@@ -1,17 +1,32 @@
 Clearing previous log... 
 "Step 1 - Checking for running Docker containers..." 
-"No running Docker containers found." 
+"Stopping running Docker containers..." 
+ Container postgres_db  Stopping
+ Container ebaysalestool-backend-1  Stopping
+ Container ebaysalestool-frontend-1  Stopping
+ Container ebaysalestool-backend-1  Stopped
+ Container ebaysalestool-backend-1  Removing
+ Container ebaysalestool-backend-1  Removed
+ Container postgres_db  Stopped
+ Container postgres_db  Removing
+ Container postgres_db  Removed
+ Container ebaysalestool-frontend-1  Stopped
+ Container ebaysalestool-frontend-1  Removing
+ Container ebaysalestool-frontend-1  Removed
+ Network ebaysalestool_default  Removing
+ Network ebaysalestool_default  Removed
 "Debug: Completed Step 1 - Checking for running Docker containers." 
 "Step 2 - NPM Cache Cleanup" 
 Cache verified and compressed (~\AppData\Local\npm-cache\_cacache)
-Content verified: 2495 (415047994 bytes)
-Index entries: 2495
-Finished in 9.931s
+Content verified: 2560 (423650017 bytes)
+Index entries: 2560
+Finished in 10.477s
 "Debug: Completed Step 2 - NPM Cache Cleanup." 
 "Step 3A - Checking for outdated backend dependencies..." 
 "Warning: NPM outdated check encountered an issue but continuing..." 
 "Debug: Completed Step 3A - Checking for outdated backend dependencies." 
 "Step 3B - Checking for outdated frontend dependencies..." 
+"Warning: NPM outdated check encountered an issue but continuing..." 
 "Debug: Completed Step 3B - Checking for outdated frontend dependencies." 
 "Step 4 - Logging warnings about deprecated packages and vulnerabilities..." 
 # npm audit report
@@ -76,14 +91,10 @@ To address all issues (including breaking changes), run:
 "Debug: Completed Step 4 - Logging warnings about deprecated packages and vulnerabilities." 
 "Debug: Starting Step 5 - Installing dependencies for backend and frontend." 
 "Step 5 - Installing dependencies for backend and frontend..." 
-npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
-npm warn deprecated lodash.get@4.4.2: This package is deprecated. Use the optional chaining (?.) operator instead.
-npm warn deprecated lodash.isequal@4.5.0: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.
-npm warn deprecated glob@7.1.6: Glob versions prior to v9 are no longer supported
 
-added 154 packages, and audited 155 packages in 7s
+up to date, audited 186 packages in 1s
 
-23 packages are looking for funding
+24 packages are looking for funding
   run `npm fund` for details
 
 3 high severity vulnerabilities
@@ -122,7 +133,7 @@ Compiled successfully.
 
 File sizes after gzip:
 
-  24.17 kB  build\static\js\main.83b9a248.js
+  65.3 kB  build\static\js\main.0309cd44.js
 
 The project was built assuming it is hosted at /.
 You can control this with the homepage field in your package.json.
@@ -141,113 +152,117 @@ Find out more about deployment here:
 "Step 8 - Building Docker images and restarting containers..." 
 Compose can now delegate builds to bake for better performance.
  To do so, set COMPOSE_BAKE=true.
-2025/04/29 19:59:29 http2: server: error reading preface from client //./pipe/dockerDesktopLinuxEngine: file has already been closed
+2025/04/30 21:40:17 http2: server: error reading preface from client //./pipe/dockerDesktopLinuxEngine: file has already been closed
 #0 building with "desktop-linux" instance using docker driver
 
-#1 [frontend internal] load build definition from Dockerfile
-#1 transferring dockerfile: 362B done
+#1 [backend internal] load build definition from Dockerfile
+#1 transferring dockerfile: 430B 0.0s done
 #1 DONE 0.0s
 
-#2 [backend internal] load build definition from Dockerfile
-#2 transferring dockerfile: 430B done
+#2 [frontend internal] load build definition from Dockerfile
+#2 transferring dockerfile: 362B done
 #2 DONE 0.0s
 
-#3 [frontend auth] library/node:pull token for registry-1.docker.io
-#3 DONE 0.0s
+#3 [frontend internal] load metadata for docker.io/library/node:16-alpine
+#3 ...
 
-#4 [backend internal] load metadata for docker.io/library/node:18-alpine
-#4 ...
+#4 [frontend auth] library/node:pull token for registry-1.docker.io
+#4 DONE 0.0s
 
-#5 [frontend internal] load metadata for docker.io/library/node:16-alpine
-#5 DONE 0.6s
+#5 [backend internal] load metadata for docker.io/library/node:18-alpine
+#5 ...
 
-#4 [backend internal] load metadata for docker.io/library/node:18-alpine
-#4 DONE 0.6s
+#3 [frontend internal] load metadata for docker.io/library/node:16-alpine
+#3 DONE 0.6s
 
 #6 [frontend internal] load .dockerignore
 #6 transferring context: 71B done
 #6 DONE 0.0s
 
-#7 [backend internal] load .dockerignore
-#7 transferring context: 91B done
+#7 [frontend 1/6] FROM docker.io/library/node:16-alpine@sha256:a1f9d027912b58a7c75be7716c97cfbc6d3099f3a97ed84aa490be9dee20e787
 #7 DONE 0.0s
 
-#8 [frontend 1/6] FROM docker.io/library/node:16-alpine@sha256:a1f9d027912b58a7c75be7716c97cfbc6d3099f3a97ed84aa490be9dee20e787
-#8 DONE 0.0s
+#8 [frontend internal] load build context
+#8 transferring context: 1.87MB 0.1s done
+#8 DONE 0.1s
 
-#9 [backend 1/6] FROM docker.io/library/node:18-alpine@sha256:8d6421d663b4c28fd3ebc498332f249011d118945588d0a35cb9bc4b8ca09d9e
-#9 DONE 0.0s
+#9 [frontend 4/6] RUN npm install
+#9 CACHED
 
-#10 [backend internal] load build context
-#10 transferring context: 68.72kB done
-#10 DONE 0.0s
+#10 [frontend 2/6] WORKDIR /app
+#10 CACHED
 
-#11 [backend 4/6] RUN npm install
+#11 [frontend 5/6] COPY . /app
 #11 CACHED
 
-#12 [backend 3/6] COPY package*.json ./
+#12 [frontend 3/6] COPY package*.json ./
 #12 CACHED
 
-#13 [backend 2/6] WORKDIR /usr/src/app
+#13 [frontend 6/6] RUN rm -rf node_modules
 #13 CACHED
 
-#14 [backend 5/6] COPY package*.json ./
-#14 CACHED
+#14 [frontend] exporting to image
+#14 exporting layers done
+#14 writing image sha256:a66778ddc6c7e25f2b3903c68c28c42458599f0a16f3749c2f018263e489f5a2 done
+#14 naming to docker.io/library/ebaysalestool-frontend
+#14 naming to docker.io/library/ebaysalestool-frontend done
+#14 DONE 0.0s
 
-#15 [backend 6/6] COPY src ./src
-#15 CACHED
+#5 [backend internal] load metadata for docker.io/library/node:18-alpine
+#5 DONE 0.7s
 
-#16 [backend] exporting to image
-#16 exporting layers done
-#16 writing image sha256:b7ce34b95151580912b3770def4cd548e8c85534f6f0ff5669070fdd3fc26c30 done
-#16 naming to docker.io/library/ebaysalestool-backend done
+#15 [backend internal] load .dockerignore
+#15 transferring context: 91B done
+#15 DONE 0.0s
+
+#16 [backend 1/6] FROM docker.io/library/node:18-alpine@sha256:8d6421d663b4c28fd3ebc498332f249011d118945588d0a35cb9bc4b8ca09d9e
 #16 DONE 0.0s
 
-#17 [frontend internal] load build context
-#17 transferring context: 1.44MB 0.0s done
-#17 DONE 0.1s
+#17 [backend internal] load build context
+#17 transferring context: 81.41kB done
+#17 DONE 0.0s
 
-#18 [frontend 4/6] RUN npm install
-#18 CACHED
+#18 [frontend] resolving provenance for metadata file
+#18 DONE 0.0s
 
-#19 [frontend 3/6] COPY package*.json ./
+#19 [backend 5/6] COPY package*.json ./
 #19 CACHED
 
-#20 [frontend 5/6] COPY . /app
+#20 [backend 2/6] WORKDIR /usr/src/app
 #20 CACHED
 
-#21 [frontend 2/6] WORKDIR /app
+#21 [backend 3/6] COPY package*.json ./
 #21 CACHED
 
-#22 [frontend 6/6] RUN rm -rf node_modules
+#22 [backend 4/6] RUN npm install
 #22 CACHED
 
-#23 [frontend] exporting to image
-#23 exporting layers done
-#23 writing image sha256:4c417da2ce2c19a3b2f18756406e6d6529fd3c399ffe304d40e66a980a38165a done
-#23 naming to docker.io/library/ebaysalestool-frontend
-#23 naming to docker.io/library/ebaysalestool-frontend done
-#23 DONE 0.0s
+#23 [backend 6/6] COPY src ./src
+#23 CACHED
 
-#24 [backend] resolving provenance for metadata file
+#24 [backend] exporting to image
+#24 exporting layers done
+#24 writing image sha256:fe48530a212a8768fc4fedb6e2fddbeeb42736189d610d8de8958a162cf89ab7 done
+#24 naming to docker.io/library/ebaysalestool-backend
+#24 naming to docker.io/library/ebaysalestool-backend done
 #24 DONE 0.0s
 
-#25 [frontend] resolving provenance for metadata file
+#25 [backend] resolving provenance for metadata file
 #25 DONE 0.0s
  backend  Built
  frontend  Built
  Network ebaysalestool_default  Creating
  Network ebaysalestool_default  Created
  Container ebaysalestool-backend-1  Creating
- Container mongodb  Creating
+ Container postgres_db  Creating
  Container ebaysalestool-frontend-1  Creating
+ Container postgres_db  Created
  Container ebaysalestool-frontend-1  Created
  Container ebaysalestool-backend-1  Created
- Container mongodb  Created
- Container mongodb  Starting
- Container ebaysalestool-backend-1  Starting
  Container ebaysalestool-frontend-1  Starting
- Container mongodb  Started
- Container ebaysalestool-backend-1  Started
+ Container ebaysalestool-backend-1  Starting
+ Container postgres_db  Starting
  Container ebaysalestool-frontend-1  Started
+ Container postgres_db  Started
+ Container ebaysalestool-backend-1  Started
 "Build and deploy process completed successfully." 
