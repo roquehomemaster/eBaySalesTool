@@ -17,6 +17,7 @@
 - Always reference this file before making changes.
 - Break down tasks into smaller, verifiable steps.
 - Test changes incrementally to ensure they work as expected.
+- **Avoid Using `&&` in Batch Scripts or Commands**: Use sequential commands instead to ensure compatibility with all systems.
 
 ## Known Issues
 - Node.js and `npm` must be properly configured in the system PATH.

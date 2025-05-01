@@ -1,32 +1,29 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../utils/database');
 
-const ownershipSchema = new mongoose.Schema({
+const Ownership = sequelize.define('Ownership', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
     ownershipType: {
-        type: String,
-        enum: ['Self', 'Company'],
-        required: true
+        type: DataTypes.ENUM('Self', 'Company'),
+        allowNull: false
     },
-    contact: {
-        firstName: String,
-        lastName: String,
-        address: String,
-        telephone: String,
-        email: String
-    },
-    companyDetails: {
-        companyName: String,
-        companyAddress: String,
-        companyTelephone: String,
-        companyEmail: String,
-        assignedContact: {
-            firstName: String,
-            lastName: String,
-            telephone: String,
-            email: String
-        }
-    }
+    contact_firstName: DataTypes.STRING,
+    contact_lastName: DataTypes.STRING,
+    contact_address: DataTypes.STRING,
+    contact_telephone: DataTypes.STRING,
+    contact_email: DataTypes.STRING,
+    companyDetails_companyName: DataTypes.STRING,
+    companyDetails_companyAddress: DataTypes.STRING,
+    companyDetails_companyTelephone: DataTypes.STRING,
+    companyDetails_companyEmail: DataTypes.STRING,
+    companyDetails_assignedContact_firstName: DataTypes.STRING,
+    companyDetails_assignedContact_lastName: DataTypes.STRING,
+    companyDetails_assignedContact_telephone: DataTypes.STRING,
+    companyDetails_assignedContact_email: DataTypes.STRING
 });
-
-const Ownership = mongoose.model('Ownership', ownershipSchema);
 
 module.exports = Ownership;

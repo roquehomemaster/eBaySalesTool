@@ -172,6 +172,42 @@ This ensures that the exact HTML used for listing items is preserved for auditin
 
 ---
 
+## **Application Configuration Table**
+
+### Overview
+The `AppConfig` table is designed to store application-wide configuration settings in a flexible and scalable manner. It uses a key-value pair structure to accommodate various types of configuration data, including booleans, strings, numbers, and JSON objects. This table supports global and page-specific configurations, as well as environment-specific overrides.
+
+### Table Schema
+- **id**: A unique identifier for each configuration entry.
+- **config_key**: A unique key representing the configuration setting.
+- **config_value**: The value of the configuration, stored as text for flexibility.
+- **data_type**: The data type of the configuration value (e.g., boolean, string, number, JSON).
+- **scope**: The scope of the configuration (e.g., global, page-specific).
+- **environment**: The environment for which the configuration applies (e.g., development, production).
+- **updated_at**: A timestamp indicating the last update to the configuration.
+
+### Example Configurations
+| config_key       | config_value | data_type | scope       | environment   | updated_at          |
+|------------------|--------------|-----------|-------------|---------------|---------------------|
+| testdata         | true         | boolean   | global      | development   | 2025-05-01 10:00:00 |
+| max_items_per_page | 50         | number    | item_page   | all           | 2025-05-01 10:00:00 |
+| theme_color      | "#FFFFFF"    | string    | global      | all           | 2025-05-01 10:00:00 |
+| feature_flags    | {"beta":true}| JSON      | global      | production    | 2025-05-01 10:00:00 |
+
+### Usage
+1. **Global Configurations**: Use the `scope` column to define settings that apply to the entire application.
+2. **Page-Specific Configurations**: Use the `scope` column to specify settings for individual pages or components.
+3. **Environment-Specific Overrides**: Use the `environment` column to define different values for development, testing, and production environments.
+4. **Dynamic Updates**: The `updated_at` column helps track changes and ensures that the latest configurations are applied.
+
+### Benefits
+- **Flexibility**: Easily add new configuration settings without altering the database schema.
+- **Scalability**: Supports a wide range of data types and scopes.
+- **Environment-Specific**: Enables different configurations for various environments.
+- **Future-Proof**: Accommodates complex configurations like feature flags or JSON objects.
+
+---
+
 ## **Development Goals**
 
 ### **1. API-Driven Architecture**

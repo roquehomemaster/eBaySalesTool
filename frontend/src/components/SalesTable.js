@@ -39,16 +39,22 @@ const SalesTable = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {sales.map(sale => (
-                        <tr key={sale.id}>
-                            <td>{sale.item}</td>
-                            <td>{sale.price}</td>
-                            <td>{new Date(sale.soldDate).toLocaleDateString()}</td>
-                            <td>
-                                <button onClick={() => handleDelete(sale.id)}>Delete</button>
-                            </td>
+                    {sales.length > 0 ? (
+                        sales.map(sale => (
+                            <tr key={sale.id}>
+                                <td>{sale.item}</td>
+                                <td>{sale.price}</td>
+                                <td>{new Date(sale.soldDate).toLocaleDateString()}</td>
+                                <td>
+                                    <button onClick={() => handleDelete(sale.id)}>Delete</button>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="4" style={{ textAlign: 'center' }}>No sales data available</td>
                         </tr>
-                    ))}
+                    )}
                 </tbody>
             </table>
         </div>

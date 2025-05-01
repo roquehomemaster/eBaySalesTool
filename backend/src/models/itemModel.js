@@ -1,49 +1,49 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../utils/database');
 
-const itemSchema = new mongoose.Schema({
-    description: {
-        type: String,
-        required: true
+const Item = sequelize.define('Item', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
     },
-    manufacturer_info: String,
+    description: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    manufacturer_info: DataTypes.STRING,
     manufacturer: {
-        type: String,
-        required: true,
-        default: 'Unknown'
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'Unknown'
     },
     model: {
-        type: String,
-        required: true,
-        default: 'Unknown'
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'Unknown'
     },
     serial_number: {
-        type: String,
-        required: true,
-        default: 'Unknown'
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'Unknown'
     },
-    product_page_link: {
-        type: String
-    },
-    dimension: {
-        x: Number,
-        y: Number,
-        z: Number
-    },
-    weight: Number,
-    condition: String,
-    category: String,
+    product_page_link: DataTypes.STRING,
+    dimension_x: DataTypes.FLOAT,
+    dimension_y: DataTypes.FLOAT,
+    dimension_z: DataTypes.FLOAT,
+    weight: DataTypes.FLOAT,
+    condition: DataTypes.STRING,
+    category: DataTypes.STRING,
     sku_barcode: {
-        type: String,
+        type: DataTypes.STRING,
         unique: true
     },
-    images: [String],
-    specifications: String,
+    images: DataTypes.ARRAY(DataTypes.STRING),
+    specifications: DataTypes.STRING,
     created_at: {
-        type: Date,
-        default: Date.now
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
     }
 });
-
-const Item = mongoose.model('Item', itemSchema);
 
 module.exports = Item;

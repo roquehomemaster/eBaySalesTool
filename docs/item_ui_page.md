@@ -158,6 +158,12 @@ A **Listing Item** is the top-level entity representing an item being listed for
 
 ---
 
+## Default Table Behavior
+
+When the database is empty, the Sales Table will display the table headers along with a default row containing the message "No sales data available." This ensures that the table structure is always visible to the user, even when no data is present.
+
+---
+
 # Item Page Wireframe
 
 ## Header Section

@@ -1,28 +1,29 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../utils/database');
 
-const salesSchema = new mongoose.Schema({
+const Sales = sequelize.define('Sales', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
     item: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
     price: {
-        type: Number,
-        required: true
+        type: DataTypes.FLOAT,
+        allowNull: false
     },
     soldDate: {
-        type: Date,
-        default: Date.now
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
     },
     owner: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-    negotiatedTerms: {
-        type: String,
-        required: false
-    }
+    negotiatedTerms: DataTypes.STRING
 });
-
-const Sales = mongoose.model('Sales', salesSchema);
 
 module.exports = Sales;

@@ -1,14 +1,26 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const { Pool } = require('pg');
 const setSalesRoutes = require('./routes/salesRoutes');
 const listingRoutes = require('./routes/listingRoutes');
 const itemRoutes = require('./routes/itemRoutes');
 const ownershipRoutes = require('./routes/ownershipRoutes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
+const sequelize = require('./utils/database');
+const Item = require('./models/itemModel');
+const Ownership = require('./models/ownershipModel');
+const Sales = require('./models/salesModel');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Removed MongoDB-specific environment variable
+// Updated environment variables for PostgreSQL
+process.env.PG_USER = process.env.PG_USER || 'postgres';
+process.env.PG_PASSWORD = process.env.PG_PASSWORD || 'password';
+process.env.PG_DATABASE = process.env.PG_DATABASE || 'ebay_sales_tool';
+process.env.PG_HOST = process.env.PG_HOST || 'database';
+process.env.PG_PORT = process.env.PG_PORT || 5432;
 
 // Middleware
 app.use(express.json());
@@ -44,9 +56,22 @@ app.get('/', (req, res) => {
 });
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/ebay-sales-tool')
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.error('MongoDB connection error:', err));
+const pool = new Pool({
+    user: process.env.PG_USER || 'postgres',
+    host: process.env.PG_HOST || 'localhost',
+    database: process.env.PG_DATABASE || 'ebay_sales_tool',
+    password: process.env.PG_PASSWORD || 'password',
+    port: process.env.PG_PORT || 5432,
+});
+
+pool.connect()
+    .then(() => console.log('PostgreSQL connected'))
+    .catch(err => console.error('PostgreSQL connection error:', err));
+
+// Sync models with the database
+sequelize.sync({ alter: true })
+    .then(() => console.log('Database synchronized'))
+    .catch(err => console.error('Database synchronization error:', err));
 
 // Set up routes
 setSalesRoutes(app);

@@ -1,0 +1,20 @@
+{
+  "environment": "development", // Options: development, testing, production
+  "testdata": true,             // Whether to seed the database with test data
+  "frontend": {
+    "build": true,              // Whether to build the frontend
+    "minify": true              // Whether to minify frontend assets
+  },
+  "backend": {
+    "build": true,              // Whether to build the backend
+    "run_migrations": true      // Whether to run database migrations
+  },
+  "docker": {
+    "use_compose": true,        // Whether to use Docker Compose
+    "compose_file": "docker-compose.yml" // Docker Compose file to use
+  },
+  "logging": {
+    "enabled": true,            // Whether to enable logging
+    "log_file": "build_and_deploy.log" // Log file path
+  }
+}

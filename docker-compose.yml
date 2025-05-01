@@ -19,6 +19,7 @@ services:
     environment:
       - NODE_ENV=development
       - MONGODB_URI=mongodb://database:27017/ebay-sales-tool # Update MongoDB URI
+      - PG_HOST=database
 
   frontend:
     build:
@@ -32,12 +33,16 @@ services:
       - REACT_APP_API_URL=http://localhost:5000
 
   database:
-    image: mongo:latest
-    container_name: mongodb
+    image: postgres:latest
+    container_name: postgres_db
     ports:
-      - "27017:27017"
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ebay_sales_tool
     volumes:
-      - mongodb_data:/data/db
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  mongodb_data:
+  postgres_data:
