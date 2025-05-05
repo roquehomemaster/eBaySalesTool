@@ -284,6 +284,38 @@ async function waitForAllContainersHealth() {
     }
 }
 
+async function verifyContainerHealth(containerName) {
+    log(`Verifying health of container: ${containerName}`);
+    for (let attempt = 1; attempt <= healthCheckRetries; attempt++) {
+        try {
+            const healthStatus = execSync(`docker inspect --format="{{json .State.Health.Status}}" ${containerName}`, { encoding: 'utf-8' }).trim();
+            if (healthStatus === '"healthy"') {
+                log(`Container ${containerName} is healthy.`);
+                return;
+            } else {
+                log(`Attempt ${attempt}: Container ${containerName} is not healthy. Status: ${healthStatus}`);
+            }
+        } catch (error) {
+            log(`Attempt ${attempt} failed: ${error.message}`);
+        }
+
+        if (attempt === healthCheckRetries) {
+            log(`Container ${containerName} did not become healthy after ${healthCheckRetries} attempts. Exiting...`);
+            process.exit(1);
+        }
+
+        log(`Retrying in ${healthCheckDelay / 1000} seconds...`);
+        await new Promise(resolve => setTimeout(resolve, healthCheckDelay));
+    }
+}
+
+async function verifyAllContainersHealth() {
+    const containers = ['postgres_db', 'ebaysalestool-backend-1', 'ebaysalestool-frontend-1'];
+    for (const container of containers) {
+        await verifyContainerHealth(container);
+    }
+}
+
 function ensureNpmInPath() {
     try {
         const npmPath = execSync('where npm', { encoding: 'utf-8' }).trim();
@@ -375,15 +407,18 @@ async function main() {
     buildFrontend(config);
 
     // Step 8: Start Docker containers
-    startDockerContainers(config);
+    await startDockerContainers(config);
 
-    // Step 9: Wait for the database to be ready
+    // Step 9: Verify container health
+    await verifyAllContainersHealth();
+
+    // Step 10: Wait for the database to be ready
     await waitForDatabaseReadiness(config);
 
-    // Step 10: Seed the database if the testdata flag is true
+    // Step 11: Seed the database if the testdata flag is true
     seedDatabase(config);
 
-    // Step 11: Log completion of the build process
+    // Step 12: Log completion of the build process
     log('Build process completed successfully.');
 }
 
