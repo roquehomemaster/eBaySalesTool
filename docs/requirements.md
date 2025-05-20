@@ -79,3 +79,10 @@
 
 ## 14. Custom Terms
 - **Special Agreements**: Document any unique terms or agreements.
+
+# Requirements (May 2025 Update)
+
+- All instrumentation, diagnostics, and test code must be placed in the appropriate helpers, not in production files.
+- See `backend/src/utils/backendInstrumentation.js` and `frontend/src/frontendInstrumentation.js` for details.
+- For debugging and troubleshooting, consult the logs in the `logs/` directory.
+- [ ] Implement user management and authentication (users table and related features) in a future release. (Table definition removed from schema on 2025-05-20; see migration file for details.)

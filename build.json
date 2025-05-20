@@ -1,20 +1,36 @@
 {
-  "environment": "development", // Options: development, testing, production
-  "testdata": true,             // Whether to seed the database with test data
+  "environment": "development",
+  "testdata": true,
   "frontend": {
-    "build": true,              // Whether to build the frontend
-    "minify": true              // Whether to minify frontend assets
+    "build": true,
+    "minify": true
   },
   "backend": {
-    "build": true,              // Whether to build the backend
-    "run_migrations": true      // Whether to run database migrations
+    "build": true,
+    "run_migrations": true
   },
   "docker": {
-    "use_compose": true,        // Whether to use Docker Compose
-    "compose_file": "docker-compose.yml" // Docker Compose file to use
+    "use_compose": true,
+    "compose_file": "docker-compose.yml"
   },
   "logging": {
-    "enabled": true,            // Whether to enable logging
-    "log_file": "build_and_deploy.log" // Log file path
+    "enabled": true,
+    "log_file": "build_and_deploy.log"
+  },
+  "paths": {
+    "backend": "backend/",
+    "frontend": "frontend/",
+    "buildScripts": "build/scripts/",
+    "database": "database/",
+    "logs": "logs/",
+    "dockerComposeFile": "docker-compose.yml"
+  },
+  "constants": {
+    "maxRetries": 5,
+    "retryDelay": 10000
+  },
+  "network": {
+    "subnet": "192.168.1.0/24",
+    "host": "192.168.1.1"
   }
 }

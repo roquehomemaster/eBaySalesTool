@@ -6,21 +6,39 @@ const itemRoutes = require('./routes/itemRoutes');
 const ownershipRoutes = require('./routes/ownershipRoutes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
-const sequelize = require('./utils/database');
+const { sequelize } = require('./utils/database');
 const Item = require('./models/itemModel');
 const Ownership = require('./models/ownershipModel');
 const Sales = require('./models/salesModel');
+const fs = require('fs');
+const path = require('path');
+const winston = require('winston');
+
+// Ensure the logs directory exists BEFORE logger is created
+const logDir = '/usr/src/app/logs';
+if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+    console.log(`Created logs directory at ${logDir}`);
+} else {
+    console.log(`Logs directory already exists at ${logDir}`);
+}
+
+// Now configure winston logger for structured logging
+const logger = winston.createLogger({
+    level: 'debug',
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.printf(({ timestamp, level, message }) => {
+            return `${timestamp} [${level.toUpperCase()}]: ${message}`;
+        })
+    ),
+    transports: [
+        new winston.transports.Console({ level: 'debug' })
+    ],
+});
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
-// Removed MongoDB-specific environment variable
-// Updated environment variables for PostgreSQL
-process.env.PG_USER = process.env.PG_USER || 'postgres';
-process.env.PG_PASSWORD = process.env.PG_PASSWORD || 'password';
-process.env.PG_DATABASE = process.env.PG_DATABASE || 'ebay_sales_tool';
-process.env.PG_HOST = process.env.PG_HOST || 'database';
-process.env.PG_PORT = process.env.PG_PORT || 5432;
 
 // Middleware
 app.use(express.json());
@@ -58,12 +76,17 @@ app.get('/', (req, res) => {
 // Database connection
 const pool = new Pool({
     user: process.env.PG_USER || 'postgres',
-    host: process.env.PG_HOST || 'localhost',
+    host: process.env.PG_HOST || 'database',
     database: process.env.PG_DATABASE || 'ebay_sales_tool',
     password: process.env.PG_PASSWORD || 'password',
     port: process.env.PG_PORT || 5432,
 });
 
+// Replace console.log and console.error with logger for structured logs
+console.log = (...args) => process.stdout.write(args.join(' ') + '\n');
+console.error = (...args) => process.stderr.write(args.join(' ') + '\n');
+
+// Update pool connection logging
 pool.connect()
     .then(() => console.log('PostgreSQL connected'))
     .catch(err => console.error('PostgreSQL connection error:', err));
@@ -76,7 +99,44 @@ sequelize.sync({ alter: true })
 // Set up routes
 setSalesRoutes(app);
 
-// Start the server
+/**
+ * @swagger
+ * /api/populate-database:
+ *   post:
+ *     summary: Populate the database with seed data
+ *     description: Executes the SQL seed script to populate the database. Intended for development and testing environments only.
+ *     responses:
+ *       200:
+ *         description: Database populated successfully
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Database populated successfully.
+ *       500:
+ *         description: Failed to populate the database
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Failed to populate the database: <error message>
+ */
+
+// Add a new route to populate the database
+app.post('/api/populate-database', async (req, res) => {
+    try {
+        const seedFilePath = path.join(__dirname, '../database/seeds/sampleData.sql');
+        const seedSQL = fs.readFileSync(seedFilePath, 'utf-8');
+        await pool.query(seedSQL);
+        res.status(200).send('Database populated successfully.');
+    } catch (error) {
+        console.error('Error populating the database:', error);
+        // Return the error message in the response for better diagnostics
+        res.status(500).send(`Failed to populate the database: ${error.message}`);
+    }
+});
+
+// Update server start logging
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

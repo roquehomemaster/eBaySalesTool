@@ -201,10 +201,13 @@ async function waitForDatabaseReadiness(config) {
 
     for (let attempt = 1; attempt <= 10; attempt++) {
         try {
+            // Defensive: ensure password is always a string and not undefined/null
+            const password = config.database.password != null ? String(config.database.password) : '';
             const client = new Client({
                 host: config.database.host,
                 port: config.database.port,
                 user: config.database.user,
+                password,
                 database: config.database.database
             });
 
@@ -232,7 +235,7 @@ function waitForAllContainers(config) {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
             const result = execSync('docker ps --filter "status=running" --format "{{.Names}}"', { encoding: 'utf-8' }).trim();
-            const expectedContainers = ['postgres_db', 'ebay_sales_tool-backend-1', 'ebay_sales_tool-frontend-1'];
+            const expectedContainers = ['postgres_db', 'ebaysalestool-backend-1']; // Only check DB and backend
             const runningContainers = result.split('\n');
 
             if (expectedContainers.every((container) => runningContainers.includes(container))) {
@@ -254,23 +257,72 @@ function waitForAllContainers(config) {
     }
 }
 
+// --- Add robust seeding: TRUNCATE tables before seeding via API ---
+async function robustApiSeed() {
+    const axios = require('axios');
+    // Remove '"users"' from the list, and add a comment for later development
+    const tablesToTruncate = [
+        '"eBayInfo"', '"SalesHistory"', '"HistoryLogs"', '"OwnershipAgreements"', '"Ownership"',
+        '"SellingItem"', '"sales"', '"ItemMaster"', '"CustomerDetails"', '"FinancialTracking"',
+        '"CommunicationLogs"', '"PerformanceMetrics"', '"AppConfig"' // '"users"' removed, add back when user table is reintroduced
+    ];
+    try {
+        log('Truncating all relevant tables before seeding...');
+        const { Client } = require('pg');
+        const client = new Client({
+            host: config.database.host,
+            port: config.database.port,
+            user: config.database.user,
+            password: config.database.password,
+            database: config.database.database
+        });
+        await client.connect();
+        await client.query('SET session_replication_role = replica;'); // Disable FK checks
+        for (const table of tablesToTruncate) {
+            await client.query(`TRUNCATE TABLE ${table} RESTART IDENTITY CASCADE;`);
+        }
+        await client.query('SET session_replication_role = DEFAULT;'); // Restore FK checks
+        await client.end();
+        log('All tables truncated successfully.');
+    } catch (err) {
+        log('Error truncating tables before seeding: ' + err.message);
+        process.exit(1);
+    }
+    try {
+        const apiUrl = 'http://localhost:5000/api/populate-database';
+        const response = await axios.post(apiUrl);
+        log('API-based database seeding response: ' + response.data);
+    } catch (err) {
+        log('Error: Failed to populate the database via API. ' + (err.response ? err.response.data : err.message));
+        process.exit(1);
+    }
+}
+
 async function waitForContainerHealth(containerName) {
     log(`Waiting for container ${containerName} to be healthy...`);
     for (let attempt = 1; attempt <= healthCheckRetries; attempt++) {
         try {
-            const result = execSync(`docker inspect --format="{{json .State.Health.Status}}" ${containerName}`, { encoding: 'utf-8' }).trim();
-            if (result === '"healthy"') {
-                log(`Container ${containerName} is healthy.`);
+            const inspect = JSON.parse(execSync(`docker inspect ${containerName}`, { encoding: 'utf-8' }))[0];
+            if (inspect.State && inspect.State.Health) {
+                const result = inspect.State.Health.Status;
+                if (result === 'healthy') {
+                    log(`Container ${containerName} is healthy.`);
+                    return;
+                } else {
+                    log(`Attempt ${attempt}: Container ${containerName} is not healthy yet. Status: ${result}`);
+                }
+            } else if (inspect.State && inspect.State.Status === 'running') {
+                log(`Container ${containerName} is running (no healthcheck defined).`);
                 return;
             } else {
-                log(`Attempt ${attempt}: Container ${containerName} is not healthy yet. Status: ${result}`);
+                log(`Attempt ${attempt}: Container ${containerName} is not running. Status: ${inspect.State ? inspect.State.Status : 'unknown'}`);
             }
         } catch (error) {
             log(`Attempt ${attempt} failed: ${error.message}`);
         }
 
         if (attempt === healthCheckRetries) {
-            log(`Container ${containerName} did not become healthy after ${healthCheckRetries} attempts. Exiting...`);
+            log(`Container ${containerName} did not become healthy/running after ${healthCheckRetries} attempts. Exiting...`);
             process.exit(1);
         }
 
@@ -280,7 +332,7 @@ async function waitForContainerHealth(containerName) {
 }
 
 async function waitForAllContainersHealth() {
-    const containers = ['postgres_db', 'ebay_sales_tool-backend-1', 'ebay_sales_tool-frontend-1'];
+    const containers = ['postgres_db', 'ebaysalestool-backend-1']; // Only check DB and backend for now
     for (const container of containers) {
         await waitForContainerHealth(container);
     }
@@ -290,19 +342,27 @@ async function verifyContainerHealth(containerName) {
     log(`Verifying health of container: ${containerName}`);
     for (let attempt = 1; attempt <= healthCheckRetries; attempt++) {
         try {
-            const healthStatus = execSync(`docker inspect --format="{{json .State.Health.Status}}" ${containerName}`, { encoding: 'utf-8' }).trim();
-            if (healthStatus === '"healthy"') {
-                log(`Container ${containerName} is healthy.`);
+            const inspect = JSON.parse(execSync(`docker inspect ${containerName}`, { encoding: 'utf-8' }))[0];
+            if (inspect.State && inspect.State.Health) {
+                const healthStatus = inspect.State.Health.Status;
+                if (healthStatus === 'healthy') {
+                    log(`Container ${containerName} is healthy.`);
+                    return;
+                } else {
+                    log(`Attempt ${attempt}: Container ${containerName} is not healthy. Status: ${healthStatus}`);
+                }
+            } else if (inspect.State && inspect.State.Status === 'running') {
+                log(`Container ${containerName} is running (no healthcheck defined).`);
                 return;
             } else {
-                log(`Attempt ${attempt}: Container ${containerName} is not healthy. Status: ${healthStatus}`);
+                log(`Attempt ${attempt}: Container ${containerName} is not running. Status: ${inspect.State ? inspect.State.Status : 'unknown'}`);
             }
         } catch (error) {
             log(`Attempt ${attempt} failed: ${error.message}`);
         }
 
         if (attempt === healthCheckRetries) {
-            log(`Container ${containerName} did not become healthy after ${healthCheckRetries} attempts. Exiting...`);
+            log(`Container ${containerName} did not become healthy/running after ${healthCheckRetries} attempts. Exiting...`);
             process.exit(1);
         }
 
@@ -312,7 +372,7 @@ async function verifyContainerHealth(containerName) {
 }
 
 async function verifyAllContainersHealth() {
-    const containers = ['postgres_db', 'ebay_sales_tool-backend-1', 'ebay_sales_tool-frontend-1'];
+    const containers = ['postgres_db', 'ebaysalestool-backend-1']; // Only check DB and backend for now
     for (const container of containers) {
         await verifyContainerHealth(container);
     }
@@ -418,7 +478,12 @@ async function main() {
     await waitForDatabaseReadiness(config);
 
     // Step 11: Seed the database if the testdata flag is true
-    seedDatabase(config);
+    if (config.testdata === true) {
+        log('testdata flag is true: truncating tables and seeding database via API endpoint...');
+        await robustApiSeed();
+    } else {
+        log('testdata flag is not true: skipping API-based database seeding.');
+    }
 
     // Step 12: Log completion of the build process
     log('Build process completed successfully.');

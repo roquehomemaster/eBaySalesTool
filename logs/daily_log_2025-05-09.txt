@@ -1,0 +1,22 @@
+# Daily Log - May 9, 2025
+
+## Actions Performed:
+
+1. **Investigated Backend Connectivity Issue**:
+   - Verified that the database is at `192.168.0.220`, the backend at `192.168.0.221`, and the frontend at `192.168.0.222`.
+   - Updated the backend's `Dockerfile` to use the database's static IP (`192.168.0.220`) in the `wait-for-it.sh` script invocation.
+
+2. **Rebuilt Docker Compose Services**:
+   - Ran the build process using the updated batch script location.
+   - Verified the build process logs and container statuses.
+
+3. **Checked Docker Container Statuses**:
+   - Frontend container exited with status `0`.
+   - PostgreSQL container is running and healthy.
+   - Backend container is running but marked as unhealthy.
+
+4. **Next Steps**:
+   - Inspect backend container logs to identify the issue.
+   - Restart the frontend container if necessary.
+
+---

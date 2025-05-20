@@ -321,3 +321,18 @@ Contributions are welcome! Please submit a pull request or open an issue for any
 
 ## **License**
 This project is licensed under the MIT License. See the LICENSE file for details.
+
+---
+
+# Application Overview
+
+This project uses Docker Compose for backend, frontend, and database orchestration. Instrumentation, diagnostics, and test code are now consolidated in dedicated helpers for maintainability and production safety.
+
+## Instrumentation and Diagnostics (May 2025 Update)
+- All backend and database instrumentation code is in `backend/src/utils/backendInstrumentation.js`.
+- All frontend instrumentation code is in `frontend/src/frontendInstrumentation.js`.
+- See `logs/backend_docker_debugging_notes.md` and `logs/mount-issue.log` for a full record of debugging, issues, and resolutions.
+
+## Debugging and Issue Resolution
+- If you encounter backend startup issues (e.g., `MODULE_NOT_FOUND`, logger errors, or database connection problems), refer to the logs and use the helpers for diagnostics.
+- Do not add test or debug code directly to production files; use the helpers.

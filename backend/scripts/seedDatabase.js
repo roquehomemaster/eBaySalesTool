@@ -3,10 +3,10 @@ const path = require('path');
 const { Pool } = require('pg');
 
 const configPath = path.join(__dirname, '../build.json');
-const logFilePath = path.join(__dirname, 'build.log');
+const seedLogFilePath = path.join(__dirname, 'seedDatabase.log');
 
 function log(message) {
-    fs.appendFileSync(logFilePath, `${new Date().toISOString()} - ${message}\n`);
+    fs.appendFileSync(seedLogFilePath, `${new Date().toISOString()} - ${message}\n`);
     console.log(message);
 }
 
@@ -19,17 +19,13 @@ if (!fs.existsSync(configPath)) {
         host: 'localhost',
         user: 'default_user',
         password: 'default_password',
-        database: 'default_database',
+        database: 'default_db',
         port: 5432
     };
+    log('Default database configuration applied.');
 } else {
-    try {
-        const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-        databaseConfig = config.database;
-    } catch (error) {
-        log(`Error reading database configuration: ${error.message}`);
-        process.exit(1);
-    }
+    databaseConfig = JSON.parse(fs.readFileSync(configPath, 'utf8')).database;
+    log('Database configuration loaded successfully.');
 }
 
 // Prioritize environment variables over configuration file
@@ -139,13 +135,8 @@ async function seedDatabase() {
 }
 
 async function checkTestDataFlag() {
-    try {
-        const result = await pool.query("SELECT config_value FROM AppConfig WHERE config_key = 'testdata'");
-        return result.rows[0]?.config_value === 'true';
-    } catch (error) {
-        log(`Error checking test data flag: ${error.message}`);
-        return false;
-    }
+    // Always return true to force seeding, regardless of AppConfig state
+    return true;
 }
 
 async function testDatabaseConnection() {

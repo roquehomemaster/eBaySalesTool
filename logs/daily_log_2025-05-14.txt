@@ -1,0 +1,55 @@
+# Daily Log - May 14, 2025
+
+## Summary of Work
+
+### Task Description:
+Resolve issues in the `run_build.bat` script and associated files to ensure:
+1. The build process completes successfully for backend, frontend, and Docker containers.
+2. Correct environment variables and configurations are used, including `config.docker.use_compose` and `config.frontend.build`.
+3. Resolve errors related to undefined properties in the `config` object during the build process.
+
+### Key Actions Taken:
+
+1. **Frontend Build Issue Resolved**:
+   - Refactored the `buildFrontend` function in `build.js` to use `config.build.frontend` directly.
+   - Verified that the frontend build completed successfully.
+
+2. **Debugging and Logging**:
+   - Added extensive logging to inspect the `config` object at various stages of the build process, including before calling `buildFrontend` and `startDockerContainers`.
+   - Confirmed that the `config` object is correctly structured before being passed to functions.
+
+3. **Backend Build**:
+   - Verified that the backend build process completes successfully without errors.
+
+4. **Environment Variables**:
+   - Logged and verified environment variables, including `POSTGRES_DB_IP`, `BACKEND_IP`, and `FRONTEND_IP`.
+
+5. **Docker Configuration**:
+   - Identified a new error related to `config.docker.use_compose` being `undefined` in the `startDockerContainers` function.
+
+6. **Testing `startDockerContainers`**:
+   - Created a test script (`test_startDockerContainers.js`) to isolate and test the `startDockerContainers` function with a mock `config` object.
+   - Verified that the mock `config` object is correctly structured.
+
+7. **Defensive Programming**:
+   - Added defensive checks in `startDockerContainers` to log an error if `config.docker` is `undefined`.
+
+### Current Status:
+- The `config` object is correctly structured when logged before entering `startDockerContainers`.
+- Inside `startDockerContainers`, `config.docker` becomes `undefined`, causing the error.
+- The root cause of the issue has not yet been identified.
+
+### Next Steps:
+1. Trace the `config` object throughout the `startDockerContainers` function and its call stack to identify any overwrites or shadowing.
+2. Simplify debugging by isolating the `startDockerContainers` function and testing it independently.
+3. Implement a definitive fix for the issue.
+
+### Observations:
+- The issue appears to be related to scoping or mutation of the `config` object.
+- Additional debugging and testing are required to identify the root cause and resolve the issue.
+
+---
+
+### User Feedback:
+- The user has expressed frustration with the lack of progress and repeated attempts to resolve the issue.
+- A more focused and efficient approach is required to address the user's concerns and resolve the issue promptly.

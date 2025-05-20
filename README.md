@@ -1,5 +1,8 @@
 # eBay Sales Tool
 
+## Development Environment
+This project is developed and tested on a Windows 11 machine using WSL2 to run Docker containers. All Docker-based services (backend, database, frontend) are built and executed within the WSL2 environment. This setup may affect file paths, volume mounts, and networking behavior compared to native Linux or macOS environments.
+
 ## Project Overview
 The eBay Sales Tool is a full-stack web application designed to assist users in managing eBay sales, tracking items, and conducting product research. It includes a backend API, a frontend user interface, and a database for storing sales and product data.
 
@@ -65,6 +68,34 @@ scripts/
 4. Access the application:
    - Frontend: [http://localhost:3000](http://localhost:3000)
    - Backend API: [http://localhost:5000](http://localhost:5000)
+
+## Build Instructions
+
+### Standard Operating Procedure (SOP)
+To build the project, follow these steps:
+
+1. Navigate to the `backend/scripts` directory.
+2. Run the `run_build.bat` script:
+   ```
+   backend\scripts\run_build.bat
+   ```
+3. After the script completes, verify the `build.log` file for any errors or warnings.
+4. Ensure all containers are healthy and the database is seeded successfully.
+5. Test the application to confirm functionality.
+
+### Notes
+- The `run_build.bat` script in `backend/scripts` is the official and only supported build script.
+- Any other build scripts or folders (e.g., `build/scripts`) are deprecated and should not be used.
+
+## Instrumentation and Diagnostics
+
+As of May 2025, all backend, database, and frontend instrumentation, diagnostics, and test code should be placed in dedicated helpers:
+- `backend/src/utils/backendInstrumentation.js` (backend/database)
+- `frontend/src/frontendInstrumentation.js` (frontend)
+
+This keeps the production codebase clean and makes it easy to enable/disable diagnostics as needed. See the helpers for usage examples.
+
+For details on past issues and resolutions, see `logs/backend_docker_debugging_notes.md` and `logs/mount-issue.log`.
 
 ## Contributing
 1. Fork the repository.

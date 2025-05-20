@@ -3,19 +3,28 @@ const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
 
+const pgHost = process.env.PG_HOST || (process.env.NODE_ENV === 'docker' ? 'database' : 'localhost');
+
 const sequelize = new Sequelize(
     process.env.PG_DATABASE || 'ebay_sales_tool',
     process.env.PG_USER || 'postgres',
     process.env.PG_PASSWORD || 'password',
     {
-        host: process.env.PG_HOST || 'localhost',
+        host: pgHost,
         port: process.env.PG_PORT || 5432,
         dialect: 'postgres',
-        logging: false // Disable logging for cleaner output
+        logging: false // Disable SQL logging for production
     }
 );
 
-const pool = new Pool();
+const pool = new Pool({
+    host: pgHost,
+    max: 10,
+    user: process.env.PG_USER || 'postgres',
+    password: process.env.PG_PASSWORD || 'password',
+    database: process.env.PG_DATABASE || 'ebay_sales_tool',
+    port: process.env.PG_PORT || 5432
+});
 
 async function seedDatabaseIfTestFlag() {
     try {
@@ -23,16 +32,12 @@ async function seedDatabaseIfTestFlag() {
         const testDataFlag = result.rows[0]?.config_value === 'true';
 
         if (testDataFlag) {
-            console.log('Seeding database with test data...');
             const seedFilePath = path.join(__dirname, '../../database/seeds/sampleData.sql');
             const seedSQL = fs.readFileSync(seedFilePath, 'utf-8');
             await pool.query(seedSQL);
-            console.log('Database seeded successfully.');
-        } else {
-            console.log('Test data flag is false. Skipping database seeding.');
         }
     } catch (error) {
-        console.error('Error checking test data flag or seeding database:', error);
+        // Only log errors if needed for production
     }
 }
 

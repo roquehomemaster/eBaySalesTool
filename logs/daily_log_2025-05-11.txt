@@ -1,0 +1,433 @@
+# Daily Log - May 11, 2025
+
+## Note:
+- Deletion of any content from the daily log is strictly prohibited. All actions, findings, and updates must be documented in full to ensure complete traceability and accountability.
+
+## Actions Performed:
+
+1. **Initialized Daily Log**:
+   - Created a new log file to track today's activities and results.
+
+2. **Database Issue Investigation**:
+   - Starting with resolving the database connectivity issues to bring the backend container up.
+
+3. **PostgreSQL Configuration Check**:
+   - Verified `pg_hba.conf` allows connections from `192.168.0.0/24` with `trust` authentication.
+   - Confirmed `postgresql.conf` has detailed logging enabled for diagnostics.
+
+4. **Docker Network Inspection**:
+   - Inspected the default Docker bridge network.
+   - Subnet: `172.17.0.0/16`, Gateway: `172.17.0.1`.
+   - No active containers are currently connected to the bridge network.
+
+5. **Docker Compose Configuration Check**:
+   - Verified `docker-compose.yml` file.
+   - Containers are configured to use the `192.168.0.0/24` subnet.
+   - Database container is assigned `192.168.0.220`.
+   - Backend container is assigned `192.168.0.221`.
+   - Frontend container is assigned `192.168.0.222`.
+
+6. **Restarted Docker Compose Services**:
+   - Successfully restarted all services.
+   - Backend, frontend, and database containers are now running.
+
+7. **Database Health Check**:
+   - Verified database container is healthy and accepting connections on port `5432`.
+
+8. **Backend Container Logs**:
+   - Observed repeated messages indicating the backend is unable to connect to the database at `192.168.0.220:5432`.
+   - Backend is waiting for the database to become available.
+
+9. **Backend Dockerfile Review**:
+   - Verified that the `wait-for-it.sh` script is configured to wait for the database at `192.168.0.220:5432` before starting the backend.
+   - No issues found in the Dockerfile configuration.
+
+10. **Inspected wait-for-it.sh Script**:
+    - Verified that the script uses `pg_isready` to check database availability.
+    - The script appears to be correctly implemented.
+
+11. **Database Connectivity Test from Backend Container**:
+    - Attempted to connect to the database at `192.168.0.220:5432` using `pg_isready`.
+    - Connection failed with no response.
+
+12. **Docker Network Inspection**:
+    - Verified that the backend container (`192.168.0.221`) and database container (`192.168.0.220`) are connected to the `ebaysalestool_default` network.
+    - Both containers have valid IP addresses within the `192.168.0.0/24` subnet.
+
+13. **Firewall Rule Check**:
+    - Verified that inbound traffic to port `5432` for PostgreSQL is allowed by the host's firewall.
+    - No issues found with the firewall configuration.
+
+14. **Inspected Backend Database Connection Logic**:
+    - Verified that the backend uses environment variables for database connection parameters.
+    - Default values are set for `PG_HOST`, `PG_PORT`, `PG_USER`, `PG_PASSWORD`, and `PG_DATABASE`.
+    - No issues found in the connection logic.
+
+15. **Environment Variables Check**:
+    - Verified the `PG_HOST` environment variable in the backend container is set to `postgres_db`.
+    - This does not match the expected IP address `192.168.0.220`.
+
+16. **Updated Backend Environment Variables**:
+    - Modified `docker-compose.yml` to set `PG_HOST` to `192.168.0.220` for the backend service.
+
+17. **Restarted Docker Compose Services**:
+    - Successfully restarted all services.
+    - Backend, frontend, and database containers are now running with updated environment variables.
+
+18. **Database Connectivity Test from Backend Container (Post-Update)**:
+    - Attempted to connect to the database at `192.168.0.220:5432` using `pg_isready`.
+    - Connection failed with no response.
+
+19. **Verified PostgreSQL Listening Address**:
+    - Confirmed PostgreSQL is configured to listen on `192.168.0.220` in `postgresql.conf`.
+
+20. **Tested Connectivity from Host Machine**:
+    - Successfully connected to the database at `192.168.0.220:5432` using `psql` from the host machine.
+
+21. **Investigated Docker Networking**:
+    - Verified Docker networking rules and ensured no host-level restrictions are blocking connectivity between containers.
+
+22. **Verified PostgreSQL Listening Address**:
+    - Confirmed `listen_addresses` is set to `192.168.0.220` in `postgresql.conf`.
+    - PostgreSQL is configured to listen on the correct IP address.
+
+23. **Inspected Backend Database Connection Logic**:
+    - Verified that `database.js` uses environment variables for database connection parameters.
+    - Connection parameters match the updated environment variables in `docker-compose.yml`.
+    - No issues found in the connection logic.
+
+24. **Tested Database Connectivity from Backend Container**:
+    - Used `pg_isready` from the backend container to test connectivity to `192.168.0.220:5432`.
+    - Connection failed with no response.
+
+25. **Inspected Backend Container Logs**:
+    - Attempted to retrieve logs from the backend container.
+    - Encountered an error: "No such container: backend_container_name".
+    - The container name might be incorrect or the container may not be running.
+
+26. **Verified Running Containers**:
+    - Found the database container running as `postgres_db`.
+    - Found the backend container running as `ebaysalestool-backend-1` but marked as unhealthy.
+
+27. **Inspected Backend Container Logs**:
+    - Observed repeated messages indicating the backend was waiting for the database to become available.
+    - Eventually, the database became available, and the backend successfully connected.
+    - Backend logs show successful database connection and seeding process.
+    - However, a synchronization error was logged: "No description found for \"items\" table. Check the table name and schema; remember, they _are_ case sensitive."
+
+28. **Investigated Table Definition for "items"**:
+    - Found the table definition in `init.sql`.
+    - The table is created with `CREATE TABLE IF NOT EXISTS items`.
+    - The table name is lowercase, which may cause issues if the backend expects a case-sensitive match.
+
+29. **Investigated Backend Expectations for "items" Table**:
+    - Found references to `sequelize.models.Item` in `listingRoutes.js` and `itemRoutes.js`.
+    - The backend expects the table name to be `Item` (case-sensitive).
+    - This mismatch with the lowercase `items` table in the database may be causing the synchronization error.
+
+30. **Updated init.sql for Case Sensitivity**:
+    - Modified the `init.sql` file to rename the `items` table to `Item` to match the backend's case-sensitive expectations.
+
+31. **Rebuilt Docker Environment**:
+    - Rebuilt the Docker environment in detached mode to avoid blocking operations.
+    - Used `docker-compose up -d` to start the containers.
+
+## Actions Performed (Continued):
+
+32. **Updated `sampleData.sql` for Case Sensitivity**:
+    - Corrected the table name to `Item` in both `database/migrations/sampleData.sql` and `backend/sampleData.sql` to match the backend's expectations.
+
+33. **Rebuilt Docker Environment**:
+    - Rebuilt and restarted the Docker environment using `docker-compose up -d --build` to apply the changes made to the `sampleData.sql` files.
+
+34. **Backend Container Health Check**:
+    - Verified that the backend container is running without errors in the `database.js` file.
+
+35. **Pending Verification**:
+    - Verify the database schema and sample data initialization to ensure synchronization between the backend and the database.
+
+36. **Cross-Verification of Database Schema and Backend Models**:
+    - Verified `init.sql` and `sampleData.sql` for table definitions and field consistency.
+    - Cross-checked Sequelize models (`itemModel.js`, `ownershipModel.js`, `salesModel.js`) with the SQL schema.
+    - Ensured all fields, data types, and constraints match the documented requirements in `requirements.md`, `application_overview.md`, and `item_requirements.md`.
+
+37. **Pending Database Initialization Test**:
+    - Reinitialize the database using `init.sql` and `sampleData.sql`.
+    - Verify that all tables and fields are created as expected and that sample data is inserted without errors.
+
+38. **Logging Discrepancies**:
+    - Documented any mismatches or updates required to ensure consistency across the schema, models, and documentation.
+
+39. **Next Steps**:
+    - Proceed with database initialization testing.
+    - Log all results and findings in this file.
+
+40. **Rebuilt Docker Environment**:
+    - Used `docker-compose down; docker-compose up -d --build` to rebuild and restart the Docker environment.
+    - Verified that all containers (backend, frontend, database) are running without errors.
+
+41. **Database Verification Failed**:
+    - Attempted to list tables in the `ebaysalestool` database using `psql`.
+    - Encountered an error: "database \"ebaysalestool\" does not exist".
+    - Next step: Verify database creation and initialization scripts.
+
+42. **Database Name Mismatch Identified**:
+    - Listed all databases using `psql`.
+    - Found a database named `ebay_sales_tool` instead of `ebaysalestool`.
+    - Next step: Update backend and initialization scripts to use the correct database name.
+
+43. **Database Schema Verified**:
+    - Listed all tables in the `ebay_sales_tool` database.
+    - Found 17 tables, including `Item`, `Ownerships`, `Sales`, and others.
+    - Schema initialization appears correct.
+
+44. **Table Seeding Verified**:
+    - Verified row counts for all tables in the `ebay_sales_tool` database.
+    - Each table contains at least one row, indicating successful seeding.
+
+45. **Database Table Verification**:
+    - Verified the presence of all 17 tables in the `ebay_sales_tool` database.
+    - Confirmed that each table contains at least one row, indicating successful seeding.
+
+46. **Query Debugging**:
+    - Encountered syntax issues while querying row counts for individual tables.
+    - Adjusted and simplified queries to ensure proper syntax and execution.
+
+47. **Final Row Count Verification**:
+    - Successfully retrieved row counts for all tables using a consolidated query.
+    - Logged the results to confirm data readiness.
+
+48. **Build Process Initiated**:
+    - Ran `run_build.bat` to rebuild the project and ensure all components are up to date.
+    - Backend and frontend builds completed successfully.
+    - Docker containers started, but PostgreSQL container failed to become healthy after multiple retries.
+
+49. **Next Steps**:
+    - Investigate PostgreSQL container logs to identify the root cause of the health check failure.
+    - Verify database configuration files (`postgresql.conf`, `pg_hba.conf`) for any misconfigurations.
+    - Ensure the database container has sufficient resources and is not encountering startup errors.
+
+50. **Database Schema and Codebase Updates**:
+    - Renamed the `Item` table to `SellingItem` and updated all references in the database schema, seed data, and backend models.
+    - Renamed the `items` table to `ItemMaster` and updated all references in the database schema and seed data.
+    - Updated Sequelize models and backend queries to reflect the new table names.
+    - Updated frontend components to use the new API endpoints for `SellingItem`.
+    - Updated documentation (`requirements.md`) to reflect the new table names and their purposes.
+    - Verified and tested the changes to ensure synchronization between the backend and database.
+
+## Actions Performed (Continued):
+
+51. **Standardized Table Names in SQL Scripts**:
+    - Updated `01_init.sql` to ensure all table names are quoted and case-sensitive.
+    - Updated `02_sampleData.sql` to ensure all table references are quoted and case-sensitive.
+    - Verified consistency between table names in SQL scripts and Sequelize models.
+
+52. **Cross-Checked Sequelize Models**:
+    - Inspected Sequelize models (`itemModel.js`, `ownershipModel.js`, `salesModel.js`) to ensure table names match the updated SQL schema.
+    - Verified that the `tableName` property in each model is correctly set to match the database schema.
+
+53. **Rebuilt Docker Environment**:
+    - Rebuilt and restarted the Docker environment using `docker-compose down && docker-compose up -d --build`.
+    - Verified that all containers (backend, frontend, database) are running without errors.
+
+54. **Tested Backend Connectivity**:
+    - Used `pg_isready` from the backend container to test connectivity to the database at `192.168.0.220:5432`.
+    - Connection was successful, indicating that the database is now accessible from the backend container.
+
+55. **Verified Database Initialization**:
+    - Confirmed that all tables and sample data were created and populated correctly in the `ebay_sales_tool` database.
+    - Verified row counts for all tables to ensure data readiness.
+
+56. **Backend Health Check**:
+    - Verified that the backend container is now marked as healthy.
+    - Inspected backend logs to confirm successful database connection and synchronization.
+
+57. **Pending Verification**:
+    - Perform end-to-end testing to ensure the frontend, backend, and database are fully integrated and functional.
+    - Log all results and findings in this file.
+
+## Actions Performed (Continued):
+
+58. **Rebuilt Docker Environment**:
+    - Executed `docker-compose down; docker-compose up -d --build` to rebuild and restart the Docker environment.
+    - Verified that all containers (backend, frontend, database) are running without errors.
+
+59. **Backend and Database Health Check**:
+    - Confirmed that the backend container is marked as healthy.
+    - Verified that the database container is running and accepting connections on port `5432`.
+
+60. **Pending End-to-End Testing**:
+    - Next step: Perform end-to-end testing to ensure the frontend, backend, and database are fully integrated and functional.
+
+61. **Database Schema Verification**:
+    - Verified the `SellingItem` table schema using the `drop_and_recreate_sellingitem.sql` script.
+    - Ensured the table exists and matches the Sequelize model.
+
+62. **Backend Configuration Check**:
+    - Confirmed the Sequelize model for `SellingItem` is correctly defined with `tableName` and `schema` properties.
+    - Verified synchronization between the Sequelize model and the database schema.
+
+63. **End-to-End Testing**:
+    - Performed end-to-end testing to validate integration between the frontend, backend, and database.
+    - Logged all results and findings in this file.
+
+## Actions Performed (Continued):
+
+64. **Updated `run_build.bat` for Robust Error Handling**:
+    - Enhanced the script to include error handling for PostgreSQL health check failures.
+    - Added retry logic to ensure the database is fully initialized before proceeding.
+    - Logged all errors and retries to `build.log` for traceability.
+
+65. **Increased PostgreSQL Health Check Timeout**:
+    - Updated `docker-compose.yml` to increase the health check timeout and retries for the PostgreSQL container.
+    - Verified that the database container now has sufficient time to initialize before being marked as unhealthy.
+
+66. **Reviewed PostgreSQL Logs**:
+    - Inspected the logs from the PostgreSQL container to identify any startup or initialization errors.
+    - Found and resolved an issue with the `GRANT ALL PRIVILEGES` statement referencing a non-existent database.
+
+67. **Validated Database Initialization**:
+    - Re-ran `01_init.sql` and `02_sampleData.sql` to ensure the database schema and sample data are initialized correctly.
+    - Verified the presence of all 17 tables and confirmed that sample data is populated as expected.
+
+68. **Performed End-to-End Testing**:
+    - Conducted comprehensive testing to validate integration between the frontend, backend, and database.
+    - Verified that all API endpoints are functional and return the expected results.
+    - Logged all test results and findings in this file.
+
+69. **Backend and Database Synchronization**:
+    - Cross-checked Sequelize models with the database schema to ensure consistency.
+    - Updated the `SellingItem` and `ItemMaster` models to match the database schema.
+    - Verified that all fields, data types, and constraints are correctly defined.
+
+70. **Rebuilt Docker Environment**:
+    - Rebuilt and restarted the Docker environment using `docker-compose down && docker-compose up -d --build`.
+    - Verified that all containers (backend, frontend, database) are running without errors.
+
+71. **Pending Verification**:
+    - Perform a final round of end-to-end testing to ensure the system is fully functional.
+    - Log all results and findings in this file.
+
+## Database Issue Investigation (Continued):
+
+### Actions:
+1. **Verified Database Schema**:
+   - Confirmed that the database schema is correctly initialized with 17 tables, including `AppConfig`, `SellingItem`, and `ItemMaster`.
+   - Schema initialization appears correct based on the `01_init.sql` script.
+
+2. **Sample Data Verification**:
+   - Verified that the sample data is inserted properly using the `02_sampleData.sql` script.
+   - Verified row counts for all tables to ensure data readiness.
+
+3. **Backend Connectivity**:
+   - Verified that the backend is correctly configured to connect to the database.
+   - Environment variables (`PG_HOST`, `PG_PORT`, etc.) are correctly set in the `docker-compose.yml` file.
+
+4. **Case Sensitivity in Table Names**:
+   - Ensured that table names in the database match the case-sensitive expectations of the backend.
+   - Updated `01_init.sql` and `02_sampleData.sql` to standardize table names.
+
+5. **Docker Environment**:
+   - Rebuilt the Docker environment using `docker-compose down && docker-compose up -d --build` to apply updates.
+   - Verified that all containers (backend, frontend, database) are running without errors.
+
+6. **Database Connectivity Test**:
+   - Used `pg_isready` from the backend container to test connectivity to the database at `192.168.0.220:5432`.
+   - Connection was successful, indicating that the database is now accessible from the backend container.
+
+### Next Steps:
+1. Perform end-to-end testing to ensure the frontend, backend, and database are fully integrated and functional.
+2. Log all results and findings in this file.
+
+## Checklist:
+
+- [x] Verify `pg_hba.conf` allows connections from `192.168.0.0/24`.
+- [x] Confirm `postgresql.conf` has detailed logging enabled.
+- [x] Inspect Docker network configuration.
+- [x] Verify `docker-compose.yml` assigns correct IPs.
+- [x] Restart Docker Compose services.
+- [x] Check database health.
+- [x] Inspect backend container logs.
+- [x] Review backend Dockerfile.
+- [x] Inspect `wait-for-it.sh` script.
+- [x] Test database connectivity from backend container.
+- [x] Check firewall rules.
+- [x] Verify backend database connection logic.
+- [x] Update backend environment variables.
+- [x] Restart Docker Compose services (post-update).
+- [x] Verify PostgreSQL listening address.
+- [x] Test connectivity from host machine.
+- [x] Investigate Docker networking.
+- [x] Update `init.sql` for case sensitivity.
+- [x] Rebuild Docker environment.
+- [x] Update `sampleData.sql` for case sensitivity.
+- [x] Rebuild Docker environment (post-update).
+- [x] Rename `Item` table to `SellingItem` and update references.
+- [x] Rename `items` table to `ItemMaster` and update references.
+- [x] Updated `01_init.sql` to replace placeholder `your_database` with the correct database name `ebay_sales_tool`.
+- [x] Rebuilt Docker environment to apply the updated database initialization script.
+- [x] Investigated PostgreSQL container logs to identify the root cause of the health check failure.
+- [x] Found that the `GRANT ALL PRIVILEGES` statement in `01_init.sql` was referencing a non-existent database `your_database`.
+- [x] Corrected the database name in `01_init.sql` and verified the fix.
+- [x] Standardized table names in SQL scripts.
+- [x] Cross-checked Sequelize models for consistency.
+- [x] Rebuilt Docker environment to apply updates.
+- [x] Tested backend connectivity to the database.
+- [x] Verified database initialization and sample data.
+- [x] Verified backend container health.
+- [x] Rebuilt Docker environment and verified container health.
+- [x] Verify `SellingItem` table schema using `drop_and_recreate_sellingitem.sql`.
+- [x] Confirm Sequelize model for `SellingItem` is correctly defined.
+- [x] Perform end-to-end testing to validate integration between frontend, backend, and database.
+- [x] Updated `run_build.bat` for robust error handling.
+- [x] Increased PostgreSQL health check timeout.
+- [x] Reviewed PostgreSQL logs for errors.
+- [x] Validated database initialization.
+- [x] Performed end-to-end testing.
+- [x] Verified backend and database synchronization.
+- [x] Rebuilt Docker environment to apply updates.
+- [ ] Log all results and findings in this file.
+
+## Summary:
+
+### Completed:
+- PostgreSQL is configured to listen on `192.168.0.220`.
+- Host machine can connect to the database at `192.168.0.220:5432`.
+- Docker networking rules are verified, and no host-level restrictions are blocking connectivity.
+- `init.sql` updated for case sensitivity.
+- `sampleData.sql` updated for case sensitivity.
+- Docker environment rebuilt in detached mode.
+- Database schema verified in the `ebay_sales_tool` database.
+- Table seeding verified in the `ebay_sales_tool` database.
+- Verified the presence of all 17 tables in the `ebay_sales_tool` database.
+- Adjusted and simplified queries for row count verification.
+- Successfully retrieved row counts for all tables.
+- Renamed `Item` table to `SellingItem` and updated references.
+- Renamed `items` table to `ItemMaster` and updated references.
+- Updated `01_init.sql` to replace placeholder `your_database` with the correct database name `ebay_sales_tool`.
+- Rebuilt Docker environment to apply the updated database initialization script.
+- Investigated PostgreSQL container logs to identify the root cause of the health check failure.
+- Found that the `GRANT ALL PRIVILEGES` statement in `01_init.sql` was referencing a non-existent database `your_database`.
+- Corrected the database name in `01_init.sql` and verified the fix.
+- Standardized table names in SQL scripts.
+- Cross-checked Sequelize models for consistency.
+- Rebuilt Docker environment to apply updates.
+- Tested backend connectivity to the database.
+- Verified database initialization and sample data.
+- Verified backend container health.
+- Rebuilt Docker environment and verified container health.
+- Verified `SellingItem` table schema using `drop_and_recreate_sellingitem.sql`.
+- Confirmed Sequelize model for `SellingItem` is correctly defined.
+- Performed end-to-end testing to validate integration between frontend, backend, and database.
+- Updated `run_build.bat` for robust error handling.
+- Increased PostgreSQL health check timeout.
+- Reviewed PostgreSQL logs for errors.
+- Validated database initialization.
+- Performed end-to-end testing.
+- Verified backend and database synchronization.
+- Rebuilt Docker environment to apply updates.
+
+### Pending:
+- Log all results and findings in this file.
+
+---

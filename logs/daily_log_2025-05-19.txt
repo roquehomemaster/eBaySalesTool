@@ -1,0 +1,69 @@
+### Daily Log - May 19, 2025
+
+#### Task Summary:
+1. Fix logging issues in the backend container to ensure logs are written to `backend_container.log`.
+2. Resolve PostgreSQL connection issues (`ECONNREFUSED`) in the backend container.
+3. Ensure the backend application runs correctly inside the Docker container.
+
+---
+
+#### Attempts and Findings:
+
+1. **Initial Volume Mount Fix**:
+   - Updated `docker-compose.yml` to map `backend/src` to `/usr/src/app`.
+   - Restarted Docker Compose services.
+   - Result: Backend container failed to start with `MODULE_NOT_FOUND` for `app.js`.
+
+2. **Adjusted Volume Mount Path**:
+   - Changed volume mount to map `backend/src` to `/usr/src/app/src`.
+   - Restarted Docker Compose services.
+   - Result: Same error (`MODULE_NOT_FOUND` for `app.js`).
+
+3. **Simplified Volume Mount**:
+   - Mapped `backend` directory to `/usr/src/app`.
+   - Restarted Docker Compose services.
+   - Result: Same error (`MODULE_NOT_FOUND` for `app.js`).
+
+4. **Corrected Working Directory**:
+   - Verified `Dockerfile` and ensured `/usr/src/app` is set as the working directory.
+   - Restarted Docker Compose services.
+   - Result: Same error (`MODULE_NOT_FOUND` for `app.js`).
+
+5. **Inspected Directory Structure**:
+   - Attempted to inspect the directory structure inside the container.
+   - Result: Container not running, unable to inspect.
+
+6. **Revised Volume Mount Again**:
+   - Mapped `backend/src` directly to `/usr/src/app`.
+   - Restarted Docker Compose services.
+   - Result: Same error (`MODULE_NOT_FOUND` for `app.js`).
+
+7. **Verified PostgreSQL Connection**:
+   - Attempted to run `testPostgresConnection.js` inside the container.
+   - Result: Container not running, unable to test.
+
+8. **Checked Container Logs**:
+   - Reviewed logs for backend container.
+   - Result: Consistent `MODULE_NOT_FOUND` error for `app.js`.
+
+---
+
+#### Observations:
+- The `MODULE_NOT_FOUND` error persists despite multiple adjustments to the volume mount and working directory.
+- The backend container is unable to locate `app.js` at `/usr/src/app/src/app.js`.
+- PostgreSQL connection testing is blocked due to the container not running.
+
+---
+
+#### Next Steps:
+1. Inspect the actual directory structure of the `backend/src` folder on the host system.
+2. Ensure the `app.js` file is correctly located and accessible.
+3. Verify the `docker-compose.yml` and `Dockerfile` configurations for consistency.
+4. Restart the container and confirm the application starts successfully.
+
+---
+
+#### Accountability:
+- Documented all attempts and findings.
+- Identified repeated steps and consistent errors.
+- Proposed a clear plan to resolve the issue.

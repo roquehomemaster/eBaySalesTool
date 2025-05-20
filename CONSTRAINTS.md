@@ -71,6 +71,17 @@ To ensure effective collaboration and avoid repeated mistakes, the following pra
 - **Backend and Frontend Builds**:
   - Ensure `npm run build` is executed for both backend and frontend during the build process.
 
+## Build Configuration
+
+- The `build.json` file is now consolidated and located at `backend/build.json`.
+- All scripts and configurations must reference this file to ensure consistency.
+
+### Important Note:
+- Do not create duplicate files unless explicitly justified and approved. The complications and maintenance overhead can become too great. Ensure all configurations and scripts reference a single source of truth wherever possible.
+
+### Note:
+Ensure that no other `build.json` files are created or used in the project to avoid redundancy and confusion.
+
 ## Development Guidelines
 
 1. **No Refactoring Without Request**:
@@ -88,3 +99,13 @@ To ensure effective collaboration and avoid repeated mistakes, the following pra
 
 5. **Test Thoroughly**:
    - Test all changes to ensure they work as expected and do not introduce new issues.
+
+## Networking Information
+
+- **Router**: 192.168.0.1
+- **Database**: 192.168.0.220
+- **Backend**: 192.168.0.221
+- **Frontend**: 192.168.0.222
+
+### Note:
+This networking information is critical and must not be removed or altered without explicit approval.

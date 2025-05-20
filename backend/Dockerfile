@@ -13,6 +13,7 @@ RUN npm install
 # Copy only necessary files
 COPY package*.json ./
 COPY src ./src
+COPY database/seeds ./database/seeds
 
 # Expose the application port
 EXPOSE 3000

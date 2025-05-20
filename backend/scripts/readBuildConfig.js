@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const configPath = path.join(__dirname, '../build.json');
+const configPath = path.join(__dirname, '../backend/build.json');
 
 console.log('Attempting to read build.json from:', configPath);
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# wait-for-it.sh -- A script to wait for a service to become available
+# wait-for-it.sh -- A script to wait for a PostgreSQL service to become available
 
 set -e
 
@@ -11,7 +11,7 @@ cmd="$@"
 host="$(echo "$hostport" | cut -d: -f1)"
 port="$(echo "$hostport" | cut -d: -f2)"
 
-while ! nc -z "$host" "$port"; do
+while ! pg_isready -h "$host" -p "$port"; do
   echo "Waiting for $host:$port to be available..."
   sleep 1
 done

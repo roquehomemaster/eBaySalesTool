@@ -1,0 +1,51 @@
+{
+  "database": {
+    "host": "localhost",
+    "user": "postgres",
+    "password": "password",
+    "database": "ebay_sales_tool",
+    "port": 5432
+  },
+  "constants": {
+    "maxRetries": 10,
+    "retryDelay": 20000,
+    "healthCheckRetries": 20,
+    "healthCheckDelay": 10000
+  },
+  "paths": {
+    "backend": "f:/Dev/eBaySalesTool/backend",
+    "frontend": "f:/Dev/eBaySalesTool/frontend",
+    "buildScripts": "f:/Dev/eBaySalesTool/build/scripts",
+    "dockerComposeFile": "f:/Dev/eBaySalesTool/docker-compose.yml"
+  },
+  "testdata": true,
+  "network": {
+    "subnet": "192.168.1.0/24",
+    "postgresDbIp": "192.168.1.2",
+    "backendIp": "192.168.1.3",
+    "frontendIp": "192.168.1.4"
+  },
+  "build": {
+    "backend": {
+      "build": true
+    },
+    "frontend": {
+      "build": true
+    },
+    "docker": {
+      "use_compose": true
+    },
+    "build.json": {
+      "version": "1.0.0",
+      "description": "Build configuration for eBay Sales Tool",
+      "backend": {
+        "entry": "backend/src/app.js",
+        "output": "dist/backend"
+      },
+      "frontend": {
+        "entry": "frontend/src/index.js",
+        "output": "dist/frontend"
+      }
+    }
+  }
+}

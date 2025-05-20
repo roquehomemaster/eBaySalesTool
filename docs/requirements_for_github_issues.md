@@ -81,3 +81,9 @@
 
 ### 14. Custom Terms
 - **Special Agreements**: Document any unique terms or agreements.
+
+# Requirements for GitHub Issues (May 2025 Update)
+
+- When reporting backend or Docker issues, check the logs in `logs/` and reference the instrumentation helpers for diagnostics.
+- Do not add debug code to production files; use the helpers in `backend/src/utils/backendInstrumentation.js` or `frontend/src/frontendInstrumentation.js`.
+- For a full record of past issues and solutions, see `logs/backend_docker_debugging_notes.md` and `logs/mount-issue.log`.
