@@ -1,5 +1,5 @@
 const express = require('express');
-const Item = require('../models/itemModel');
+const itemController = require('../controllers/itemController');
 
 const router = express.Router();
 
@@ -105,16 +105,20 @@ const router = express.Router();
  */
 
 // Create a new item
-router.post('/items', async (req, res) => {
-    console.log('POST /items endpoint hit with body:', req.body);
-    try {
-        const newItem = new Item(req.body);
-        const savedItem = await newItem.save();
-        res.status(201).json(savedItem);
-    } catch (error) {
-        console.error('Error creating item:', error);
-        res.status(500).json({ message: 'Error creating item', error });
-    }
-});
+router.post('/items', itemController.createItem);
+// Get all items (with optional filters and pagination)
+router.get('/items', itemController.getAllItems);
+// Get item by ID
+router.get('/items/:id', itemController.getItemById);
+// Update item by ID
+router.put('/items/:id', itemController.updateItemById);
+// Delete item by ID
+router.delete('/items/:id', itemController.deleteItemById);
+// Bulk update items
+router.put('/items/bulk', itemController.bulkUpdateItems);
+// Bulk delete items
+router.delete('/items/bulk', itemController.bulkDeleteItems);
+// Search/filter items
+router.get('/items/search', itemController.searchItems);
 
 module.exports = router;

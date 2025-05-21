@@ -1,9 +1,11 @@
 const express = require('express');
 const { Pool } = require('pg');
-const setSalesRoutes = require('./routes/salesRoutes');
 const listingRoutes = require('./routes/listingRoutes');
 const itemRoutes = require('./routes/itemRoutes');
 const ownershipRoutes = require('./routes/ownershipRoutes');
+const salesRoutes = require('./routes/salesRoutes');
+const customerRoutes = require('./routes/customerRoutes');
+const ebayInfoRoutes = require('./routes/ebayInfoRoutes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const { sequelize } = require('./utils/database');
@@ -45,6 +47,9 @@ app.use(express.json());
 app.use(listingRoutes);
 app.use('/api', itemRoutes);
 app.use('/api', ownershipRoutes);
+app.use('/api', salesRoutes);
+app.use('/api', customerRoutes);
+app.use('/api/ebay', ebayInfoRoutes);
 
 // Swagger configuration
 const swaggerOptions = {
@@ -73,10 +78,12 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/templates/index.html');
 });
 
+// Use unified logic for Postgres host
+const pgHost = process.env.PG_HOST || (process.env.NODE_ENV === 'docker' ? 'database' : 'localhost');
 // Database connection
 const pool = new Pool({
     user: process.env.PG_USER || 'postgres',
-    host: process.env.PG_HOST || 'database',
+    host: pgHost,
     database: process.env.PG_DATABASE || 'ebay_sales_tool',
     password: process.env.PG_PASSWORD || 'password',
     port: process.env.PG_PORT || 5432,
@@ -86,19 +93,18 @@ const pool = new Pool({
 console.log = (...args) => process.stdout.write(args.join(' ') + '\n');
 console.error = (...args) => process.stderr.write(args.join(' ') + '\n');
 
-// Update pool connection logging
-pool.connect()
-    .then(() => console.log('PostgreSQL connected'))
-    .catch(err => console.error('PostgreSQL connection error:', err));
+// Only connect to DB and sync models if not in test mode
+if (process.env.NODE_ENV !== 'test') {
+    pool.connect()
+        .then(() => console.log('PostgreSQL connected'))
+        .catch(err => console.error('PostgreSQL connection error:', err));
 
-// Sync models with the database
-sequelize.sync({ alter: true })
-    .then(() => console.log('Database synchronized'))
-    .catch(err => console.error('Database synchronization error:', err));
+    sequelize.sync({ alter: true })
+        .then(() => console.log('Database synchronized'))
+        .catch(err => console.error('Database synchronization error:', err));
+}
 
 // Set up routes
-setSalesRoutes(app);
-
 /**
  * @swagger
  * /api/populate-database:
@@ -136,7 +142,11 @@ app.post('/api/populate-database', async (req, res) => {
     }
 });
 
-// Update server start logging
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+// Only start the server if not in test mode
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}
+
+module.exports = { app, pool };

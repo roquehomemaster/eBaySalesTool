@@ -70,4 +70,11 @@ if %ERRORLEVEL% neq 0 (
     exit /b 1
 )
 
+REM Generate Swagger JSON documentation
+node "%~dp0generate_swagger.js"
+if %ERRORLEVEL% neq 0 (
+    echo Error: Swagger JSON generator script failed.
+    exit /b 1
+)
+
 echo Build process completed successfully.

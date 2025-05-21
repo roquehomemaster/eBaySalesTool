@@ -1,5 +1,6 @@
 const express = require('express');
 const Ownership = require('../models/ownershipModel');
+const ownershipController = require('../controllers/ownershipController');
 
 const router = express.Router();
 
@@ -79,5 +80,84 @@ router.post('/ownership', async (req, res) => {
         res.status(500).json({ message: 'Error creating ownership record', error });
     }
 });
+
+/**
+ * @swagger
+ * /api/ownership:
+ *   get:
+ *     summary: Get all ownerships/agreements (with optional filters and pagination)
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *         description: Filter by status
+ *       - in: query
+ *         name: agreementType
+ *         schema:
+ *           type: string
+ *         description: Filter by agreement type
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Page size for pagination
+ *     responses:
+ *       200:
+ *         description: Paginated list of ownerships/agreements
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ownerships:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Ownership'
+ *                 total:
+ *                   type: integer
+ *                 page:
+ *                   type: integer
+ *                 pageSize:
+ *                   type: integer
+ *       500:
+ *         description: Error fetching ownerships/agreements
+ */
+router.get('/api/ownership', ownershipController.getAllOwnerships);
+
+/**
+ * @swagger
+ * /api/ownership/search:
+ *   get:
+ *     summary: Search/filter ownerships/agreements
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *         description: Filter by status
+ *       - in: query
+ *         name: agreementType
+ *         schema:
+ *           type: string
+ *         description: Filter by agreement type
+ *     responses:
+ *       200:
+ *         description: List of ownerships/agreements matching search
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Ownership'
+ *       500:
+ *         description: Error searching ownerships/agreements
+ */
+router.get('/api/ownership/search', ownershipController.searchOwnerships);
 
 module.exports = router;

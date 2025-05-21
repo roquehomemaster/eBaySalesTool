@@ -14,7 +14,8 @@ exports.createItem = async (req, res) => {
         const newItem = await Item.create(req.body);
         res.status(201).json(newItem);
     } catch (error) {
-        // Hide raw error details from client
+        // Hide raw error details from client and log server-side
+        console.error('Error in createItem:', error);
         if (error.name === 'SequelizeUniqueConstraintError') {
             return res.status(409).json({ message: 'Duplicate SKU/Barcode' });
         }
@@ -22,14 +23,23 @@ exports.createItem = async (req, res) => {
     }
 };
 
-// Get all items (with optional filters)
+// Get all items (with optional filters and pagination)
 exports.getAllItems = async (req, res) => {
     try {
         const where = {};
         if (req.query.status) { where.status = req.query.status; }
         if (req.query.category) { where.category = req.query.category; }
-        const items = await Item.findAll({ where });
-        res.json(items);
+        // Pagination
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 10;
+        const offset = (page - 1) * limit;
+        const { count, rows } = await Item.findAndCountAll({ where, offset, limit });
+        res.json({
+            items: rows,
+            total: count,
+            page,
+            pageSize: limit
+        });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching items' });
     }
@@ -54,6 +64,9 @@ exports.updateItemById = async (req, res) => {
         await item.update(req.body);
         res.json(item);
     } catch (error) {
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            return res.status(409).json({ message: 'Duplicate SKU/Barcode' });
+        }
         res.status(500).json({ message: 'Error updating item' });
     }
 };
