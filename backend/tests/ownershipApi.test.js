@@ -1,7 +1,7 @@
 const request = require('supertest');
-const app = require('../src/app');
+const { app } = require('../src/app');
 const { sequelize } = require('../src/utils/database');
-const Ownership = require('../models/ownershipModel');
+const Ownership = require('../src/models/ownershipModel');
 
 describe('Ownership API', () => {
   beforeAll(async () => {
@@ -13,9 +13,9 @@ describe('Ownership API', () => {
   it('should create a new ownership', async () => {
     const res = await request(app)
       .post('/api/ownership')
-      .send({ itemId: 1, ownerId: 1, agreementType: 'Standard' });
+      .send({ ownership_type: 'Full' }); // use correct snake_case field
     expect(res.statusCode).toBe(201);
-    expect(res.body.itemId).toBe(1);
+    expect(res.body.ownership_type).toBe('Full');
     ownershipId = res.body.id;
   });
 
@@ -26,7 +26,7 @@ describe('Ownership API', () => {
   });
 
   it('should search ownerships', async () => {
-    const res = await request(app).get('/api/ownership/search?agreementType=Standard');
+    const res = await request(app).get('/api/ownership/search?ownership_type=Full');
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
   });
@@ -40,9 +40,9 @@ describe('Ownership API', () => {
   it('should update an ownership by ID', async () => {
     const res = await request(app)
       .put(`/api/ownership/${ownershipId}`)
-      .send({ agreementType: 'Updated' });
+      .send({ ownership_type: 'Partial' });
     expect(res.statusCode).toBe(200);
-    expect(res.body.agreementType).toBe('Updated');
+    expect(res.body.ownership_type).toBe('Partial');
   });
 
   it('should delete an ownership by ID', async () => {

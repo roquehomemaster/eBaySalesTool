@@ -1,7 +1,7 @@
 // backend/tests/itemApi.test.js
 const request = require('supertest');
-const { app, pool } = require('../src/app'); // Import pool for teardown
-const { sequelize } = require('../src/utils/database');
+const { app } = require('../src/app'); // Import pool for teardown
+const { sequelize, pool } = require('../src/utils/database');
 
 describe('Item API', () => {
   let createdId;

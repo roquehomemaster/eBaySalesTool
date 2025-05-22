@@ -7,23 +7,23 @@ const Ownership = sequelize.define('Ownership', {
         autoIncrement: true,
         primaryKey: true
     },
-    ownershipType: {
-        type: DataTypes.ENUM('Self', 'Company'),
+    ownership_type: {
+        type: DataTypes.ENUM('Full', 'Partial', 'Consignment'),
         allowNull: false
     },
-    contact_firstName: DataTypes.STRING,
-    contact_lastName: DataTypes.STRING,
-    contact_address: DataTypes.STRING,
-    contact_telephone: DataTypes.STRING,
-    contact_email: DataTypes.STRING,
-    companyDetails_companyName: DataTypes.STRING,
-    companyDetails_companyAddress: DataTypes.STRING,
-    companyDetails_companyTelephone: DataTypes.STRING,
-    companyDetails_companyEmail: DataTypes.STRING,
-    companyDetails_assignedContact_firstName: DataTypes.STRING,
-    companyDetails_assignedContact_lastName: DataTypes.STRING,
-    companyDetails_assignedContact_telephone: DataTypes.STRING,
-    companyDetails_assignedContact_email: DataTypes.STRING
+    first_name: DataTypes.STRING,
+    last_name: DataTypes.STRING,
+    address: DataTypes.TEXT,
+    telephone: DataTypes.STRING,
+    email: DataTypes.STRING,
+    company_name: DataTypes.STRING,
+    company_address: DataTypes.TEXT,
+    company_telephone: DataTypes.STRING,
+    company_email: DataTypes.STRING,
+    assigned_contact_first_name: DataTypes.STRING,
+    assigned_contact_last_name: DataTypes.STRING,
+    assigned_contact_telephone: DataTypes.STRING,
+    assigned_contact_email: DataTypes.STRING
 });
 
 module.exports = Ownership;

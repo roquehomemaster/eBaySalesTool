@@ -35,7 +35,12 @@ const config = readConfig();
 log('Debugging full config object:', JSON.stringify(config, null, 2)); // Add debug log
 
 function setEnvironmentVariablesFromConfig(config) {
-    process.env.PG_HOST = 'postgres_db'; // Ensure PG_HOST is set to the correct value
+    // Use 'localhost' for PG_HOST when running tests outside Docker
+    if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
+        process.env.PG_HOST = 'localhost';
+    } else {
+        process.env.PG_HOST = 'postgres_db';
+    }
     process.env.PG_PORT = config.database.port;
     process.env.PG_USER = config.database.user;
     process.env.PG_PASSWORD = config.database.password;
@@ -485,7 +490,25 @@ async function main() {
         log('testdata flag is not true: skipping API-based database seeding.');
     }
 
-    // Step 12: Log completion of the build process
+    // Step 12: Run API tests if enabled in config
+    if (config.runApiTests === true) {
+        log('runApiTests flag is true: running API tests...');
+        try {
+            const testResultsPath = path.resolve(__dirname, '../../logs/test-results.txt');
+            // Capture both stdout and stderr to the results file
+            const testCommand = `npx jest --runInBand --testPathPattern=tests > "${testResultsPath}" 2>&1`;
+            log(`Running: ${testCommand}`);
+            execSync(testCommand, { cwd: path.resolve(__dirname, '../'), stdio: 'inherit', shell: true });
+            log('API tests executed and results written to logs/test-results.txt');
+        } catch (error) {
+            log(`Error running API tests: ${error.message}`);
+            process.exit(1);
+        }
+    } else {
+        log('runApiTests flag is not true: skipping API tests.');
+    }
+
+    // Step 13: Log completion of the build process
     log('Build process completed successfully.');
 }
 

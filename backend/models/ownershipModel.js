@@ -1,42 +1,36 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../src/utils/database');
 
-const ownerSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true
-    },
-    contactInfo: {
-        email: {
-            type: String,
-            required: true
-        },
-        phone: {
-            type: String,
-            required: false
-        },
-        address: {
-            type: String,
-            required: false
-        }
-    },
-    negotiatedTerms: {
-        commissionPercentage: {
-            type: Number,
-            required: true
-        },
-        minimumSalePrice: {
-            type: Number,
-            required: false
-        },
-        durationOfAgreement: {
-            type: String,
-            required: false
-        },
-        renewalTerms: {
-            type: String,
-            required: false
-        }
-    }
-}, { timestamps: true });
+const Ownership = sequelize.define('Ownership', {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
+  itemId: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  ownerId: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  agreementType: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  ownershipType: {
+    type: DataTypes.ENUM('Full', 'Partial', 'Consignment'),
+    allowNull: false
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  }
+});
 
-module.exports = mongoose.model('Owner', ownerSchema);
+module.exports = Ownership;

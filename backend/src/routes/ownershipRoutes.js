@@ -69,17 +69,7 @@ const router = express.Router();
  *       500:
  *         description: Error creating ownership record
  */
-router.post('/ownership', async (req, res) => {
-    console.log('POST /ownership endpoint hit with body:', req.body);
-    try {
-        const newOwnership = new Ownership(req.body);
-        const savedOwnership = await newOwnership.save();
-        res.status(201).json(savedOwnership);
-    } catch (error) {
-        console.error('Error creating ownership record:', error);
-        res.status(500).json({ message: 'Error creating ownership record', error });
-    }
-});
+router.post('/', ownershipController.createOwnership);
 
 /**
  * @swagger
@@ -128,7 +118,7 @@ router.post('/ownership', async (req, res) => {
  *       500:
  *         description: Error fetching ownerships/agreements
  */
-router.get('/api/ownership', ownershipController.getAllOwnerships);
+router.get('/', ownershipController.getAllOwnerships);
 
 /**
  * @swagger
@@ -158,6 +148,121 @@ router.get('/api/ownership', ownershipController.getAllOwnerships);
  *       500:
  *         description: Error searching ownerships/agreements
  */
-router.get('/api/ownership/search', ownershipController.searchOwnerships);
+router.get('/search', ownershipController.searchOwnerships);
+
+/**
+ * @swagger
+ * /api/ownership/{id}:
+ *   get:
+ *     summary: Get an ownership record by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Ownership record details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Ownership'
+ *       404:
+ *         description: Ownership record not found
+ *       500:
+ *         description: Error fetching ownership record
+ */
+router.get('/:id', ownershipController.getOwnershipById);
+
+/**
+ * @swagger
+ * /api/ownership/{id}:
+ *   put:
+ *     summary: Update an ownership record by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ownershipType:
+ *                 type: string
+ *                 enum: ["Self", "Company"]
+ *                 description: The type of ownership
+ *               contact:
+ *                 type: object
+ *                 properties:
+ *                   firstName:
+ *                     type: string
+ *                   lastName:
+ *                     type: string
+ *                   address:
+ *                     type: string
+ *                   telephone:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *               companyDetails:
+ *                 type: object
+ *                 properties:
+ *                   companyName:
+ *                     type: string
+ *                   companyAddress:
+ *                     type: string
+ *                   companyTelephone:
+ *                     type: string
+ *                   companyEmail:
+ *                     type: string
+ *                   assignedContact:
+ *                     type: object
+ *                     properties:
+ *                       firstName:
+ *                         type: string
+ *                       lastName:
+ *                         type: string
+ *                       telephone:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *     responses:
+ *       200:
+ *         description: Ownership record updated successfully
+ *       400:
+ *         description: Invalid input data
+ *       404:
+ *         description: Ownership record not found
+ *       500:
+ *         description: Error updating ownership record
+ */
+router.put('/:id', ownershipController.updateOwnershipById);
+
+/**
+ * @swagger
+ * /api/ownership/{id}:
+ *   delete:
+ *     summary: Delete an ownership record by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Ownership record deleted successfully
+ *       404:
+ *         description: Ownership record not found
+ *       500:
+ *         description: Error deleting ownership record
+ */
+router.delete('/:id', ownershipController.deleteOwnershipById);
 
 module.exports = router;

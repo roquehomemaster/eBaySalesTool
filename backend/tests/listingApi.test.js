@@ -1,7 +1,7 @@
 const request = require('supertest');
-const app = require('../src/app');
+const { app } = require('../src/app');
 const { sequelize } = require('../src/utils/database');
-const Listing = require('../models/listingModel');
+const Listing = require('../src/models/listingModel');
 
 describe('Listing API', () => {
   beforeAll(async () => {

@@ -5,6 +5,17 @@ const path = require('path');
 
 const pgHost = process.env.PG_HOST || (process.env.NODE_ENV === 'docker' ? 'database' : 'localhost');
 
+// DEBUG: Print Sequelize/Postgres config at runtime
+console.log('Sequelize config:', {
+    database: process.env.PG_DATABASE || 'ebay_sales_tool',
+    user: process.env.PG_USER || 'postgres',
+    password: process.env.PG_PASSWORD || 'password',
+    host: pgHost,
+    port: process.env.PG_PORT || 5432,
+    dialect: 'postgres',
+    NODE_ENV: process.env.NODE_ENV
+});
+
 const sequelize = new Sequelize(
     process.env.PG_DATABASE || 'ebay_sales_tool',
     process.env.PG_USER || 'postgres',

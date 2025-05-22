@@ -65,3 +65,8 @@ INSERT INTO "PerformanceMetrics" (item_id, total_sales, number_of_items_sold, av
 VALUES
 (1, 500.0, 5, 100.0),
 (2, 400.0, 2, 200.0);
+
+-- Insert Customer records for API tests
+INSERT INTO "Customer" ("firstName", "lastName", "email", "phone", "address", "status", "createdAt", "updatedAt") VALUES
+('John', 'Doe', 'john@example.com', '555-1234', '123 Main St', 'active', NOW(), NOW()),
+('Jane', 'Smith', 'jane@example.com', '555-5678', '456 Elm St', 'active', NOW(), NOW());

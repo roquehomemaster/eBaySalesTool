@@ -1,19 +1,26 @@
 // ebayInfoModel.js
 // Data model for eBay Info & Performance
 
-const ebayInfo = {
-  accountId: String,
-  storeName: String,
-  feedbackScore: Number,
-  positiveFeedbackPercent: Number,
-  sellerLevel: String,
-  defectRate: Number,
-  lateShipmentRate: Number,
-  transactionDefectRate: Number,
-  policyComplianceStatus: String,
-  sellingLimits: Object,
-  apiStatus: String,
-  lastSync: Date
-};
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../utils/database');
 
-module.exports = ebayInfo;
+const EbayInfo = sequelize.define('EbayInfo', {
+  accountId: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true
+  },
+  storeName: DataTypes.STRING,
+  feedbackScore: DataTypes.INTEGER,
+  positiveFeedbackPercent: DataTypes.FLOAT,
+  sellerLevel: DataTypes.STRING,
+  defectRate: DataTypes.FLOAT,
+  lateShipmentRate: DataTypes.FLOAT,
+  transactionDefectRate: DataTypes.FLOAT,
+  policyComplianceStatus: DataTypes.STRING,
+  sellingLimits: DataTypes.JSONB,
+  apiStatus: DataTypes.STRING,
+  lastSync: DataTypes.DATE
+});
+
+module.exports = EbayInfo;

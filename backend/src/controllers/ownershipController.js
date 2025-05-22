@@ -4,17 +4,45 @@ const Ownership = require('../models/ownershipModel');
 // Create a new ownership/agreement
 exports.createOwnership = async (req, res) => {
     try {
-        // Input validation for required fields
-        const requiredFields = ['itemId', 'ownerId', 'agreementType'];
-        for (const field of requiredFields) {
-            if (!req.body[field]) {
-                return res.status(400).json({ message: `Missing required field: ${field}` });
-            }
+        // Map incoming request to match model fields
+        const {
+            ownership_type,
+            first_name,
+            last_name,
+            address,
+            telephone,
+            email,
+            company_name,
+            company_address,
+            company_telephone,
+            company_email,
+            assigned_contact_first_name,
+            assigned_contact_last_name,
+            assigned_contact_telephone,
+            assigned_contact_email
+        } = req.body;
+        if (!ownership_type) {
+            return res.status(400).json({ message: 'Missing required field: ownership_type' });
         }
-        const newOwnership = await Ownership.create(req.body);
+        const newOwnership = await Ownership.create({
+            ownership_type,
+            first_name,
+            last_name,
+            address,
+            telephone,
+            email,
+            company_name,
+            company_address,
+            company_telephone,
+            company_email,
+            assigned_contact_first_name,
+            assigned_contact_last_name,
+            assigned_contact_telephone,
+            assigned_contact_email
+        });
         res.status(201).json(newOwnership);
     } catch (error) {
-        res.status(500).json({ message: 'Error creating ownership/agreement' });
+        res.status(500).json({ message: 'Error creating ownership/agreement', error });
     }
 };
 
@@ -23,7 +51,7 @@ exports.getAllOwnerships = async (req, res) => {
     try {
         const where = {};
         if (req.query.status) { where.status = req.query.status; }
-        if (req.query.agreementType) { where.agreementType = req.query.agreementType; }
+        if (req.query.ownership_type) { where.ownership_type = req.query.ownership_type; }
         // Pagination
         const page = parseInt(req.query.page, 10) || 1;
         const limit = parseInt(req.query.limit, 10) || 10;
@@ -106,10 +134,10 @@ exports.bulkDeleteOwnerships = async (req, res) => {
 // Search/filter ownerships/agreements
 exports.searchOwnerships = async (req, res) => {
     try {
-        const { status, agreementType } = req.query;
+        const { status, ownership_type } = req.query;
         const where = {};
         if (status) { where.status = status; }
-        if (agreementType) { where.agreementType = agreementType; }
+        if (ownership_type) { where.ownership_type = ownership_type; }
         const ownerships = await Ownership.findAll({ where });
         res.json(ownerships);
     } catch (error) {

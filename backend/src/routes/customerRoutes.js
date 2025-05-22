@@ -5,6 +5,42 @@ const router = express.Router();
 
 /**
  * @swagger
+ * /api/customers/search:
+ *   get:
+ *     summary: Search/filter customers
+ *     tags: [Customers]
+ *     parameters:
+ *       - in: query
+ *         name: firstName
+ *         schema:
+ *           type: string
+ *         description: Search by first name
+ *       - in: query
+ *         name: lastName
+ *         schema:
+ *           type: string
+ *         description: Search by last name
+ *       - in: query
+ *         name: email
+ *         schema:
+ *           type: string
+ *         description: Search by email
+ *     responses:
+ *       200:
+ *         description: List of customers matching search
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Customer'
+ *       500:
+ *         description: Server error
+ */
+router.get('/customers/search', customerController.searchCustomers);
+
+/**
+ * @swagger
  * /api/customers:
  *   post:
  *     summary: Create a new customer
@@ -212,41 +248,5 @@ router.delete('/customers/:id', customerController.deleteCustomerById);
  */
 router.put('/customers/bulk', customerController.bulkUpdateCustomers);
 router.delete('/customers/bulk', customerController.bulkDeleteCustomers);
-
-/**
- * @swagger
- * /api/customers/search:
- *   get:
- *     summary: Search/filter customers
- *     tags: [Customers]
- *     parameters:
- *       - in: query
- *         name: firstName
- *         schema:
- *           type: string
- *         description: Search by first name
- *       - in: query
- *         name: lastName
- *         schema:
- *           type: string
- *         description: Search by last name
- *       - in: query
- *         name: email
- *         schema:
- *           type: string
- *         description: Search by email
- *     responses:
- *       200:
- *         description: List of customers matching search
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Customer'
- *       500:
- *         description: Server error
- */
-router.get('/customers/search', customerController.searchCustomers);
 
 module.exports = router;

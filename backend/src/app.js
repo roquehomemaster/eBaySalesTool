@@ -46,7 +46,7 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(listingRoutes);
 app.use('/api', itemRoutes);
-app.use('/api', ownershipRoutes);
+app.use('/api/ownership', ownershipRoutes);
 app.use('/api', salesRoutes);
 app.use('/api', customerRoutes);
 app.use('/api/ebay', ebayInfoRoutes);
@@ -90,8 +90,20 @@ const pool = new Pool({
 });
 
 // Replace console.log and console.error with logger for structured logs
-console.log = (...args) => process.stdout.write(args.join(' ') + '\n');
-console.error = (...args) => process.stderr.write(args.join(' ') + '\n');
+console.log = (...args) => process.stdout.write(args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg))).join(' ') + '\n');
+console.error = (...args) => process.stderr.write(args.map(arg => {
+    if (arg instanceof Error) {
+        return arg.stack || arg.toString();
+    }
+    if (typeof arg === 'object') {
+        try {
+            return JSON.stringify(arg, null, 2);
+        } catch (e) {
+            return String(arg);
+        }
+    }
+    return String(arg);
+}).join(' ') + '\n');
 
 // Only connect to DB and sync models if not in test mode
 if (process.env.NODE_ENV !== 'test') {

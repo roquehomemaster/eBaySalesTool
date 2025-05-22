@@ -1,7 +1,7 @@
 const request = require('supertest');
-const app = require('../src/app');
+const { app } = require('../src/app');
 const { sequelize } = require('../src/utils/database');
-const EbayInfo = require('../models/ebayInfoModel');
+const EbayInfo = require('../src/models/ebayInfoModel');
 
 describe('eBay Info API', () => {
   beforeAll(async () => {

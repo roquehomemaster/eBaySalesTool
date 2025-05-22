@@ -34,6 +34,9 @@ const Customer = sequelize.define('Customer', {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW
     }
+}, {
+    schema: 'public', // Ensure table is created in the public schema
+    tableName: 'Customer',
 });
 
 module.exports = Customer;

@@ -1,4 +1,5 @@
 {
+  "runApiTests": true,
   "database": {
     "host": "localhost",
     "user": "postgres",

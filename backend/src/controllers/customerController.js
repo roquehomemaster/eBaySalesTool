@@ -1,4 +1,4 @@
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 const Customer = require('../models/customerModel');
 
 // Create a new customer
@@ -111,12 +111,22 @@ exports.searchCustomers = async (req, res) => {
     try {
         const { firstName, lastName, email } = req.query;
         const where = {};
-        if (firstName) { where.firstName = { [Op.iLike]: `%${firstName}%` }; }
-        if (lastName) { where.lastName = { [Op.iLike]: `%${lastName}%` }; }
-        if (email) { where.email = { [Op.iLike]: `%${email}%` }; }
-        const customers = await Customer.findAll({ where });
-        res.json(customers);
+        // Use iLike for Postgres, like for others (e.g., SQLite)
+        const likeOperator = Customer.sequelize.getDialect() === 'postgres' ? Op.iLike : Op.like;
+        if (firstName) { where.firstName = { [likeOperator]: `%${firstName}%` }; }
+        if (lastName) { where.lastName = { [likeOperator]: `%${lastName}%` }; }
+        if (email) { where.email = { [likeOperator]: `%${email}%` }; }
+        let customers = [];
+        try {
+            customers = await Customer.findAll({ where });
+        } catch (err) {
+            console.error('Customer search query error:', err.message, err.stack);
+            return res.status(500).json({ message: 'Database error during customer search', error: err.message });
+        }
+        res.json({ customers });
     } catch (error) {
-        res.status(500).json({ message: 'Error searching customers' });
+        // Log and return the full error for diagnostics
+        console.error('Error searching customers:', error);
+        res.status(500).json({ message: 'Error searching customers', error: error.message, stack: error.stack });
     }
 };
