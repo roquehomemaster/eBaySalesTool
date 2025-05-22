@@ -15,6 +15,8 @@ const Sales = require('./models/salesModel');
 const fs = require('fs');
 const path = require('path');
 const winston = require('winston');
+// Auth models (roles, users, pages, access matrix)
+const { User, Role, Page, RolePageAccess } = require('./models/authModels');
 
 // Ensure the logs directory exists BEFORE logger is created
 const logDir = '/usr/src/app/logs';

@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    restart: always
+    volumes:
+      - ../database/migrations:/docker-entrypoint-initdb.d:ro
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
