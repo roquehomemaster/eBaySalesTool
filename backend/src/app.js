@@ -6,6 +6,7 @@ const ownershipRoutes = require('./routes/ownershipRoutes');
 const salesRoutes = require('./routes/salesRoutes');
 const customerRoutes = require('./routes/customerRoutes');
 const ebayInfoRoutes = require('./routes/ebayInfoRoutes');
+const authRoutes = require('./routes/authRoutes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const { sequelize } = require('./utils/database');
@@ -52,28 +53,11 @@ app.use('/api/ownership', ownershipRoutes);
 app.use('/api', salesRoutes);
 app.use('/api', customerRoutes);
 app.use('/api/ebay', ebayInfoRoutes);
+app.use('/api/auth', authRoutes);
 
-// Swagger configuration
-const swaggerOptions = {
-    definition: {
-        openapi: '3.0.0',
-        info: {
-            title: 'eBay Sales Tool API',
-            version: '1.0.0',
-            description: 'API documentation for the eBay Sales Tool',
-        },
-        servers: [
-            {
-                url: 'http://localhost:5000',
-                description: 'Local server',
-            },
-        ],
-    },
-    apis: ['./src/routes/*.js'], // Path to the API docs
-};
-
-const swaggerDocs = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+// Swagger configuration (merged)
+const mergedSwagger = require('./swagger/mergedSwagger');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(mergedSwagger));
 
 // Serve the index.html file for the root URL
 app.get('/', (req, res) => {
@@ -163,4 +147,4 @@ if (process.env.NODE_ENV !== 'test') {
     });
 }
 
-module.exports = { app, pool };
+module.exports = app;

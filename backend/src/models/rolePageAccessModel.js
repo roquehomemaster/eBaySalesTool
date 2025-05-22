@@ -15,15 +15,10 @@ const RolePageAccess = sequelize.define('RolePageAccess', {
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    can_view: {
-        type: DataTypes.BOOLEAN,
+    access: {
+        type: DataTypes.ENUM('none', 'read', 'read_write', 'read_write_create', 'full'),
         allowNull: false,
-        defaultValue: false
-    },
-    can_edit: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
+        defaultValue: 'none'
     }
 });
 
