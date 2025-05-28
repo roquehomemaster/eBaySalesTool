@@ -1,0 +1,1 @@
+This file marks that all build scripts in this folder are deprecated. Use backend/scripts/run_build.bat only.
