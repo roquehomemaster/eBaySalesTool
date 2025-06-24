@@ -6,7 +6,7 @@
 --     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 -- );
 
-CREATE TABLE "sales" (
+CREATE TABLE IF NOT EXISTS "sales" (
     id SERIAL PRIMARY KEY,
     item VARCHAR(255) NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE "sales" (
     negotiatedTerms TEXT
 );
 
-CREATE TABLE "product_research" (
+CREATE TABLE IF NOT EXISTS "product_research" (
     id SERIAL PRIMARY KEY,
     item VARCHAR(255) NOT NULL,
     sold_price DECIMAL(10, 2),
@@ -26,7 +26,7 @@ CREATE TABLE "product_research" (
 -- Ensure SellingItem table is created with correct schema and case-sensitive name
 DROP TABLE IF EXISTS "SellingItem" CASCADE;
 
-CREATE TABLE "SellingItem" (
+CREATE TABLE IF NOT EXISTS "SellingItem" (
     id SERIAL PRIMARY KEY,
     description VARCHAR(255) NOT NULL,
     manufacturer VARCHAR(255) NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE "SellingItem" (
 );
 
 -- Table for ownership details
-CREATE TABLE "Ownership" (
+CREATE TABLE IF NOT EXISTS "Ownership" (
     id SERIAL PRIMARY KEY,
     ownership_type VARCHAR(50) NOT NULL,
     first_name VARCHAR(100),
@@ -65,7 +65,7 @@ CREATE TABLE "Ownership" (
 );
 
 -- Table for ownership agreements
-CREATE TABLE "OwnershipAgreements" (
+CREATE TABLE IF NOT EXISTS "OwnershipAgreements" (
     id SERIAL PRIMARY KEY,
     ownership_id INT REFERENCES "Ownership"(id),
     commission_percentage DECIMAL(5, 2),
@@ -75,7 +75,7 @@ CREATE TABLE "OwnershipAgreements" (
 );
 
 -- Table for history logs
-CREATE TABLE "HistoryLogs" (
+CREATE TABLE IF NOT EXISTS "HistoryLogs" (
     id SERIAL PRIMARY KEY,
     item_id INT REFERENCES "SellingItem"(id),
     change_type VARCHAR(255),
@@ -83,7 +83,7 @@ CREATE TABLE "HistoryLogs" (
 );
 
 -- Table for sales history
-CREATE TABLE "SalesHistory" (
+CREATE TABLE IF NOT EXISTS "SalesHistory" (
     id SERIAL PRIMARY KEY,
     item_id INT REFERENCES "SellingItem"(id),
     sales_channel VARCHAR(255),
@@ -92,7 +92,7 @@ CREATE TABLE "SalesHistory" (
 );
 
 -- Table for eBay-specific information
-CREATE TABLE "eBayInfo" (
+CREATE TABLE IF NOT EXISTS "eBayInfo" (
     id SERIAL PRIMARY KEY,
     item_id INT REFERENCES "SellingItem"(id),
     listing_status VARCHAR(50),
@@ -103,7 +103,7 @@ CREATE TABLE "eBayInfo" (
 );
 
 -- Table for customer details
-CREATE TABLE "CustomerDetails" (
+CREATE TABLE IF NOT EXISTS "CustomerDetails" (
     id SERIAL PRIMARY KEY,
     purchase_date DATE,
     purchase_method VARCHAR(255),
@@ -111,14 +111,14 @@ CREATE TABLE "CustomerDetails" (
 );
 
 -- Table for financial tracking
-CREATE TABLE "FinancialTracking" (
+CREATE TABLE IF NOT EXISTS "FinancialTracking" (
     id SERIAL PRIMARY KEY,
     item_id INT REFERENCES "SellingItem"(id),
     net_proceeds_calculation TEXT
 );
 
 -- Table for communication logs
-CREATE TABLE "CommunicationLogs" (
+CREATE TABLE IF NOT EXISTS "CommunicationLogs" (
     id SERIAL PRIMARY KEY,
     owner_id INT REFERENCES "Ownership"(id),
     owner_communication_history TEXT,
@@ -126,7 +126,7 @@ CREATE TABLE "CommunicationLogs" (
 );
 
 -- Table for performance metrics
-CREATE TABLE "PerformanceMetrics" (
+CREATE TABLE IF NOT EXISTS "PerformanceMetrics" (
     id SERIAL PRIMARY KEY,
     item_id INT REFERENCES "SellingItem"(id),
     total_sales DECIMAL(10, 2),
@@ -162,7 +162,7 @@ INSERT INTO "database"."configuration" (key, value) VALUES ('01_Ready', '{"isrea
 ON CONFLICT (key) DO UPDATE SET value = '{"isready": "false"}';
 
 -- Table for item master
-CREATE TABLE "ItemMaster" (
+CREATE TABLE IF NOT EXISTS "ItemMaster" (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,

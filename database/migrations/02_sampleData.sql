@@ -37,10 +37,10 @@ INSERT INTO "SellingItem" (description, manufacturer, manufacturer_info, model, 
 ('Vintage Camera', 'Canon', 'Canon Inc.', 'AE-1', '12345', '{"x": 10, "y": 5, "z": 3}', 1.2, 'Used', 'Electronics', 'CAM12345', '{"http://example.com/camera.jpg"}', '35mm film camera', 'http://example.com/camera', '1-year limited warranty', 'FCC certified'),
 ('Antique Vase', 'Unknown', 'Handcrafted in 19th century', 'N/A', '67890', '{"x": 8, "y": 8, "z": 12}', 2.5, 'Good', 'Home Decor', 'VAS67890', '{"http://example.com/vase.jpg"}', 'Porcelain vase from the 19th century', 'http://example.com/vase', 'No warranty', 'None');
 
--- Insert sample data into SellingItem table
+-- Insert sample data into SellingItem table (ensure unique SKUs)
 INSERT INTO "SellingItem" (description, manufacturer, model, serial_number, product_page_link, dimensions, weight, condition, category, sku_barcode, images, specifications, warranty_information, compliance_and_certifications, manufacturer_info)
 VALUES
-('Sample Item 1', 'Manufacturer A', 'Model X', 'SN12345', 'http://example.com/product1', '{"length": 10, "width": 5, "height": 2}', 1.5, 'New', 'Category A', 'SKU12345', ARRAY['image1.jpg', 'image2.jpg'], 'Specifications for item 1', '1 year warranty', 'Certifications for item 1', 'Manufacturer info for item 1');
+('Sample Item 1', 'Manufacturer A', 'Model X', 'SN12345', 'http://example.com/product1', '{"length": 10, "width": 5, "height": 2}', 1.5, 'New', 'Category A', 'SKU54321', ARRAY['image1.jpg', 'image2.jpg'], 'Specifications for item 1', '1 year warranty', 'Certifications for item 1', 'Manufacturer info for item 1');
 
 -- Update seed data for `ItemMaster`
 INSERT INTO "ItemMaster" (name, description, price, stock, created_at) VALUES
