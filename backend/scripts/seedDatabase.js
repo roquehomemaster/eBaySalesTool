@@ -139,28 +139,8 @@ async function checkTestDataFlag() {
     return true;
 }
 
-async function testDatabaseConnection() {
-    try {
-        const client = new Pool({
-            host: databaseConfig.host,
-            user: databaseConfig.user,
-            password: databaseConfig.password,
-            database: databaseConfig.database,
-            port: databaseConfig.port
-        });
-        await client.query('SELECT 1');
-        console.log('Direct database connection test successful.');
-        client.end();
-    } catch (error) {
-        console.error('Direct database connection test failed:', error.message);
-        process.exit(1);
-    }
-}
-
 (async () => {
     console.log('Testing database connectivity...');
-    await testDatabaseConnection();
-
     await waitForDatabaseConnection();
 
     const testDataFlag = await checkTestDataFlag();

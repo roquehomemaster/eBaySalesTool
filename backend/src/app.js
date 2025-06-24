@@ -140,6 +140,11 @@ app.post('/api/populate-database', async (req, res) => {
     }
 });
 
+// Health check endpoint for Docker and custom health checks
+app.get('/api/health', (req, res) => {
+    res.status(200).json({ status: 'ok' });
+});
+
 // Only start the server if not in test mode
 if (process.env.NODE_ENV !== 'test') {
     app.listen(PORT, () => {

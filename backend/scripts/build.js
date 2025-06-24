@@ -32,35 +32,43 @@ function readConfig() {
 
 // Load configuration at the start of the script
 const config = readConfig();
-log('Debugging full config object:', JSON.stringify(config, null, 2)); // Add debug log
+// Set DB host for all uses immediately after loading config
+let inDocker = false;
+try {
+    inDocker = fs.existsSync('/.dockerenv') ||
+        (fs.existsSync('/proc/1/cgroup') && fs.readFileSync('/proc/1/cgroup', 'utf-8').includes('docker'));
+} catch (e) {}
+config.database.host = inDocker ? 'postgres_db' : 'localhost';
+log('Debugging full config object:', JSON.stringify(config, null, 2));
 
 function setEnvironmentVariablesFromConfig(config) {
-    // Use 'localhost' for PG_HOST when running tests outside Docker
-    if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
-        process.env.PG_HOST = 'localhost';
-    } else {
-        process.env.PG_HOST = 'postgres_db';
-    }
+    // Detect if running inside Docker
+    let inDocker = false;
+    try {
+        inDocker = fs.existsSync('/.dockerenv') ||
+            (fs.existsSync('/proc/1/cgroup') && fs.readFileSync('/proc/1/cgroup', 'utf-8').includes('docker'));
+    } catch (e) {}
+    // Use service name in Docker, static IP on host
+    const dbHost = inDocker ? 'postgres_db' : config.database.host;
+    process.env.PG_HOST = dbHost;
     process.env.PG_PORT = config.database.port;
     process.env.PG_USER = config.database.user;
     process.env.PG_PASSWORD = config.database.password;
     process.env.PG_DATABASE = config.database.database;
-    process.env.SUBNET = config.subnet; // Ensure the subnet is set
-    process.env.NETWORK_SUBNET = config.network.subnet; // Restore networking information
+    process.env.SUBNET = config.network.subnet;
+    process.env.NETWORK_SUBNET = config.network.subnet;
     process.env.POSTGRES_DB_IP = config.network.postgresDbIp;
     process.env.BACKEND_IP = config.network.backendIp;
     process.env.FRONTEND_IP = config.network.frontendIp;
+    config.database.host = dbHost;
 }
 
 const { maxRetries, retryDelay, healthCheckRetries, healthCheckDelay } = config.constants;
 
 function runCommand(command, args, options = {}) {
-    if (process.platform === 'win32') {
-        if (command === 'npm') {
-            command = 'npm.cmd';
-        }
+    if (process.platform === 'win32' && command === 'npm') {
+        command = 'npm.cmd';
     }
-
     const result = spawnSync(command, args, { ...options, encoding: 'utf-8' });
     if (result.stdout) {
         log(result.stdout);
@@ -89,31 +97,21 @@ function verifyDependencies(directory) {
 }
 
 function buildBackend(config) {
-    log('Debugging config.build.backend:', JSON.stringify(config.build.backend, null, 2)); // Update debug log
-
-    if (config.build.backend.build) { // Corrected path to access the build property
+    log('Debugging config.build.backend:', JSON.stringify(config.build.backend, null, 2));
+    if (config.build.backend.build) {
         log('Building backend...');
-
         const backendPath = config.paths.backend;
         const backendBuildOptions = {
             cwd: backendPath,
             stdio: 'inherit',
             env: { ...process.env, PATH: process.env.PATH },
         };
-
         try {
             log(`Running npm install in backend path: ${backendPath}`);
             log(`Environment Variables: ${JSON.stringify(backendBuildOptions.env)}`);
-
-            // Fallback to execSync for debugging
-            const installCommand = `npm.cmd install --no-update-notifier --no-audit`;
-            execSync(installCommand, backendBuildOptions);
-
+            execSync('npm.cmd install --no-update-notifier --no-audit', backendBuildOptions);
             verifyDependencies(backendPath);
-
-            const buildCommand = `npm.cmd run build`;
-            execSync(buildCommand, backendBuildOptions);
-
+            execSync('npm.cmd run build', backendBuildOptions);
             log('Backend build completed successfully.');
         } catch (error) {
             log(`Error building backend: ${error.message}`);
@@ -125,31 +123,21 @@ function buildBackend(config) {
 }
 
 function buildFrontend(config) {
-    log('Debugging config.build.frontend:', JSON.stringify(config.build.frontend, null, 2)); // Update debug log
-
-    if (config.build.frontend.build) { // Corrected path to access the build property
+    log('Debugging config.build.frontend:', JSON.stringify(config.build.frontend, null, 2));
+    if (config.build.frontend.build) {
         log('Building frontend...');
-
         const frontendPath = config.paths.frontend;
         const frontendBuildOptions = {
             cwd: frontendPath,
             stdio: 'inherit',
             env: { ...process.env, PATH: process.env.PATH },
         };
-
         try {
             log(`Running npm install in frontend path: ${frontendPath}`);
             log(`Environment Variables: ${JSON.stringify(frontendBuildOptions.env)}`);
-
-            // Fallback to execSync for debugging
-            const installCommand = `npm.cmd install --no-update-notifier --no-audit`;
-            execSync(installCommand, frontendBuildOptions);
-
+            execSync('npm.cmd install --no-update-notifier --no-audit', frontendBuildOptions);
             verifyDependencies(frontendPath);
-
-            const buildCommand = `npm.cmd run build`;
-            execSync(buildCommand, frontendBuildOptions);
-
+            execSync('npm.cmd run build', frontendBuildOptions);
             log('Frontend build completed successfully.');
         } catch (error) {
             log(`Error building frontend: ${error.message}`);
@@ -182,11 +170,9 @@ async function ensureContainersStopped() {
 }
 
 async function startDockerContainers(config) {
-    log('Debugging config.build.docker:', JSON.stringify(config.build.docker, null, 2)); // Update debug log
-
+    log('Debugging config.build.docker:', JSON.stringify(config.build.docker, null, 2));
     await ensureContainersStopped();
-
-    if (config.build.docker.use_compose) { // Corrected path to access the docker property
+    if (config.build.docker.use_compose) {
         log('Starting Docker containers...');
         try {
             const composeFilePath = config.paths.dockerComposeFile;
@@ -203,10 +189,8 @@ async function startDockerContainers(config) {
 
 async function waitForDatabaseReadiness(config) {
     log('Waiting for the database to be ready...');
-
     for (let attempt = 1; attempt <= 10; attempt++) {
         try {
-            // Defensive: ensure password is always a string and not undefined/null
             const password = config.database.password != null ? String(config.database.password) : '';
             const client = new Client({
                 host: config.database.host,
@@ -215,10 +199,8 @@ async function waitForDatabaseReadiness(config) {
                 password,
                 database: config.database.database
             });
-
             await client.connect();
             await client.end();
-
             log('Database is ready.');
             return;
         } catch (error) {
@@ -235,29 +217,24 @@ async function waitForDatabaseReadiness(config) {
 
 function waitForAllContainers(config) {
     log('Waiting for all containers to be fully operational...');
-    const delay = retryDelay; // Use retryDelay from build.json for consistency
-
+    const delay = retryDelay;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
             const result = execSync('docker ps --filter "status=running" --format "{{.Names}}"', { encoding: 'utf-8' }).trim();
-            const expectedContainers = ['postgres_db', 'ebaysalestool-backend-1']; // Only check DB and backend
+            const expectedContainers = ['postgres_db', 'ebaysalestool-backend'];
             const runningContainers = result.split('\n');
-
             if (expectedContainers.every((container) => runningContainers.includes(container))) {
                 log('All containers are fully operational.');
                 return;
             }
-
             log(`Attempt ${attempt}: Not all containers are running. Retrying in ${delay / 1000} seconds...`);
         } catch (error) {
             log(`Attempt ${attempt} failed: ${error.message}`);
         }
-
         if (attempt === maxRetries) {
             log('Containers are not fully operational after maximum retries. Exiting...');
             process.exit(1);
         }
-
         execSync(`timeout ${delay / 1000}`, { stdio: 'inherit' });
     }
 }
@@ -265,11 +242,10 @@ function waitForAllContainers(config) {
 // --- Add robust seeding: TRUNCATE tables before seeding via API ---
 async function robustApiSeed() {
     const axios = require('axios');
-    // Remove '"users"' from the list, and add a comment for later development
     const tablesToTruncate = [
         '"eBayInfo"', '"SalesHistory"', '"HistoryLogs"', '"OwnershipAgreements"', '"Ownership"',
         '"SellingItem"', '"sales"', '"ItemMaster"', '"CustomerDetails"', '"FinancialTracking"',
-        '"CommunicationLogs"', '"PerformanceMetrics"', '"AppConfig"' // '"users"' removed, add back when user table is reintroduced
+        '"CommunicationLogs"', '"PerformanceMetrics"', '"AppConfig"'
     ];
     try {
         log('Truncating all relevant tables before seeding...');
@@ -282,11 +258,11 @@ async function robustApiSeed() {
             database: config.database.database
         });
         await client.connect();
-        await client.query('SET session_replication_role = replica;'); // Disable FK checks
+        await client.query('SET session_replication_role = replica;');
         for (const table of tablesToTruncate) {
             await client.query(`TRUNCATE TABLE ${table} RESTART IDENTITY CASCADE;`);
         }
-        await client.query('SET session_replication_role = DEFAULT;'); // Restore FK checks
+        await client.query('SET session_replication_role = DEFAULT;');
         await client.end();
         log('All tables truncated successfully.');
     } catch (err) {
@@ -325,19 +301,17 @@ async function waitForContainerHealth(containerName) {
         } catch (error) {
             log(`Attempt ${attempt} failed: ${error.message}`);
         }
-
         if (attempt === healthCheckRetries) {
             log(`Container ${containerName} did not become healthy/running after ${healthCheckRetries} attempts. Exiting...`);
             process.exit(1);
         }
-
         log(`Retrying in ${healthCheckDelay / 1000} seconds...`);
         await new Promise(resolve => setTimeout(resolve, healthCheckDelay));
     }
 }
 
 async function waitForAllContainersHealth() {
-    const containers = ['postgres_db', 'ebaysalestool-backend-1']; // Only check DB and backend for now
+    const containers = ['postgres_db', 'ebaysalestool-backend'];
     for (const container of containers) {
         await waitForContainerHealth(container);
     }
@@ -365,19 +339,17 @@ async function verifyContainerHealth(containerName) {
         } catch (error) {
             log(`Attempt ${attempt} failed: ${error.message}`);
         }
-
         if (attempt === healthCheckRetries) {
             log(`Container ${containerName} did not become healthy/running after ${healthCheckRetries} attempts. Exiting...`);
             process.exit(1);
         }
-
         log(`Retrying in ${healthCheckDelay / 1000} seconds...`);
         await new Promise(resolve => setTimeout(resolve, healthCheckDelay));
     }
 }
 
 async function verifyAllContainersHealth() {
-    const containers = ['postgres_db', 'ebaysalestool-backend-1']; // Only check DB and backend for now
+    const containers = ['postgres_db', 'ebaysalestool-backend'];
     for (const container of containers) {
         await verifyContainerHealth(container);
     }
@@ -392,8 +364,6 @@ function ensureNpmInPath() {
     } catch (error) {
         log(`Error ensuring npm in PATH: ${error.message}`);
         log('Attempting to manually set npm path based on Node.js installation...');
-
-        // Fallback: Manually set npm path based on common Node.js installation locations
         const fallbackNpmPath = 'D:\\Program Files\\nodejs\\npm.cmd';
         if (fs.existsSync(fallbackNpmPath)) {
             const fallbackNpmDir = path.dirname(fallbackNpmPath);
@@ -415,13 +385,10 @@ function testNpmExecution() {
     } catch (error) {
         log(`Error testing npm execution with execSync: ${error.message}`);
         log('Falling back to logging environment variables for debugging...');
-
-        // Log environment variables for debugging
         log('Environment Variables:');
         Object.keys(process.env).forEach((key) => {
             log(`${key}: ${process.env[key]}`);
         });
-
         process.exit(1);
     }
 }
@@ -448,54 +415,29 @@ function logConstantsAndVariables() {
 
 async function main() {
     log('Starting build process...');
-
-    // Step 1: Clear the log file
     fs.writeFileSync(logFilePath, '');
     log('Cleared previous log.');
-
-    // Step 2: Ensure npm is in PATH
     ensureNpmInPath();
-
-    // Step 3: Test npm execution
     testNpmExecution();
-
-    // Step 4: Set environment variables and log them
     setEnvironmentVariablesFromConfig(config);
     log('Environment variables set successfully.');
-
-    // Step 5: Log constants and variables
     logConstantsAndVariables();
-
-    // Step 6: Check if Docker containers are running and stop them
     await ensureContainersStopped();
-
-    // Step 7: Build the backend and frontend environments
     buildBackend(config);
     buildFrontend(config);
-
-    // Step 8: Start Docker containers
     await startDockerContainers(config);
-
-    // Step 9: Verify container health
     await verifyAllContainersHealth();
-
-    // Step 10: Wait for the database to be ready
     await waitForDatabaseReadiness(config);
-
-    // Step 11: Seed the database if the testdata flag is true
     if (config.testdata === true) {
         log('testdata flag is true: truncating tables and seeding database via API endpoint...');
         await robustApiSeed();
     } else {
         log('testdata flag is not true: skipping API-based database seeding.');
     }
-
-    // Step 12: Run API tests if enabled in config
     if (config.runApiTests === true) {
         log('runApiTests flag is true: running API tests...');
         try {
             const testResultsPath = path.resolve(__dirname, '../../logs/test-results.txt');
-            // Capture both stdout and stderr to the results file
             const testCommand = `npx jest --runInBand --testPathPattern=tests > "${testResultsPath}" 2>&1`;
             log(`Running: ${testCommand}`);
             execSync(testCommand, { cwd: path.resolve(__dirname, '../'), stdio: 'inherit', shell: true });
@@ -507,8 +449,6 @@ async function main() {
     } else {
         log('runApiTests flag is not true: skipping API tests.');
     }
-
-    // Step 13: Log completion of the build process
     log('Build process completed successfully.');
 }
 

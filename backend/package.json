@@ -14,6 +14,7 @@
     "axios": "^1.8.4",
     "dotenv": "^16.5.0",
     "ebay-sales-tool-backend": "file:",
+    "ebaysalestool": "file:..",
     "express": "^5.1.0",
     "mongoose": "^8.13.2",
     "pg": "^8.11.1",

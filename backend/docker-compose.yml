@@ -1,3 +1,6 @@
+# DEPRECATED: DO NOT USE THIS FILE
+# All Docker operations must use the root docker-compose.yml with postgres_db only.
+
 version: '3.8'
 
 services:

@@ -1,7 +1,7 @@
 {
   "runApiTests": true,
   "database": {
-    "host": "localhost",
+    "host": "192.168.0.220",
     "user": "postgres",
     "password": "password",
     "database": "ebay_sales_tool",
@@ -21,10 +21,10 @@
   },
   "testdata": true,
   "network": {
-    "subnet": "192.168.1.0/24",
-    "postgresDbIp": "192.168.1.2",
-    "backendIp": "192.168.1.3",
-    "frontendIp": "192.168.1.4"
+    "subnet": "192.168.0.0/24",
+    "postgresDbIp": "192.168.0.220",
+    "backendIp": "192.168.0.221",
+    "frontendIp": "192.168.0.222"
   },
   "build": {
     "backend": {

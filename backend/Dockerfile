@@ -10,6 +10,9 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
+# Install curl for healthcheck
+RUN apk add --no-cache curl
+
 # Copy only necessary files
 COPY package*.json ./
 COPY src ./src

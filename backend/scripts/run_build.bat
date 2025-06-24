@@ -20,14 +20,14 @@ if %ERRORLEVEL% neq 0 (
 REM Check if Docker containers are already running
 for /f "tokens=1,2,3,4,5*" %%a in ('docker ps -a --format "{{.Names}} {{.Status}}"') do (
     if "%%a"=="postgres_db" (
-        docker-compose down -v
+        docker-compose -f f:\Dev\eBaySalesTool\docker-compose.yml down -v
         echo Existing Docker containers found. Bringing them down with -v.
         REM Do not jump to :continue_build here; always proceed to bring up containers and health check
     )
 )
 
 REM Bring up the Docker containers
-docker-compose up --build -d
+docker-compose -f f:\Dev\eBaySalesTool\docker-compose.yml up --build -d
 if %ERRORLEVEL% neq 0 (
     echo Error: Failed to start Docker containers.
     exit /b 1
@@ -47,7 +47,6 @@ for /L %%i in (1,1,%HEALTH_CHECK_RETRIES%) do (
     echo Attempt %%i: PostgreSQL container is not healthy. Retrying in %HEALTH_CHECK_DELAY% seconds...
     timeout /t %HEALTH_CHECK_DELAY% >nul
 )
-
 echo PostgreSQL container failed to become healthy after %HEALTH_CHECK_RETRIES% attempts.
 exit /b 1
 
@@ -78,3 +77,5 @@ if %ERRORLEVEL% neq 0 (
 )
 
 echo Build process completed successfully.
+echo Build process completed successfully. >> f:\Dev\eBaySalesTool\backend\scripts\build.log
+exit /b 0
