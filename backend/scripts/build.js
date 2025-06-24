@@ -442,6 +442,14 @@ async function main() {
             log(`Running: ${testCommand}`);
             execSync(testCommand, { cwd: path.resolve(__dirname, '../'), stdio: 'inherit', shell: true });
             log('API tests executed and results written to logs/test-results.txt');
+            // Append API test results to build.log
+            if (fs.existsSync(testResultsPath)) {
+                const apiResults = fs.readFileSync(testResultsPath, 'utf-8');
+                fs.appendFileSync(logFilePath, '\n===== API TEST RESULTS =====\n' + apiResults + '\n===========================\n');
+                log('API test results appended to build.log');
+            } else {
+                log('API test results file not found, nothing to append.');
+            }
         } catch (error) {
             log(`Error running API tests: ${error.message}`);
             process.exit(1);
