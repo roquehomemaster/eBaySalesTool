@@ -109,3 +109,14 @@ Ensure that no other `build.json` files are created or used in the project to av
 
 ### Note:
 This networking information is critical and must not be removed or altered without explicit approval.
+
+## Database Configuration
+
+### Sequelize Setup
+- Sequelize is configured to run inside the Docker container.
+- Ensure the container is running before executing any database-related commands.
+- Database connection settings are defined in the environment variables and used by Sequelize.
+
+### Important Notes
+- Local execution of Sequelize commands will not work unless the container is properly configured to expose the database.
+- Use `docker-compose` commands to manage the container lifecycle.

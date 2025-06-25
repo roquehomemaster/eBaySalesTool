@@ -1,0 +1,661 @@
+FAIL tests/itemApi.test.js
+  ● Console
+
+    console.log
+      Sequelize config: {
+        database: 'ebay_sales_tool',
+        user: 'postgres',
+        password: 'password',
+        host: 'postgres_db',
+        port: '5432',
+        dialect: 'postgres',
+        NODE_ENV: 'test'
+      }
+
+      at Object.log (src/utils/database.js:9:9)
+
+    console.log
+      Logs directory already exists at /usr/src/app/logs
+
+      at Object.log (src/app.js:28:13)
+
+  ● Item API › should create an item with valid data
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Item API › should fail to create item with missing required field
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Item API › should fail to create item with duplicate SKU
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Item API › should ignore extra/unexpected fields on create
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Item API › should get all items
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Item API › should get item by ID
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Item API › should return 404 for non-existent item
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Item API › should update item by ID
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Item API › should fail to update item with duplicate SKU
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Item API › should delete item by ID
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Item API › should return 404 when deleting non-existent item
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Item API › should paginate items correctly
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+FAIL src/tests/authApi.test.js (8.38 s)
+  ● Console
+
+    console.log
+      Sequelize config: {
+        database: 'ebay_sales_tool',
+        user: 'postgres',
+        password: 'password',
+        host: 'postgres_db',
+        port: '5432',
+        dialect: 'postgres',
+        NODE_ENV: 'test'
+      }
+
+      at Object.log (src/utils/database.js:9:9)
+
+    console.log
+      Logs directory already exists at /usr/src/app/logs
+
+      at Object.log (src/app.js:28:13)
+
+  ● Auth API Endpoints › Role CRUD › should create a new role
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › Role CRUD › should get all roles
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › Role CRUD › should update a role
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › Role CRUD › should delete a role
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › Page CRUD › should create a new page
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › Page CRUD › should get all pages
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › RolePageAccess CRUD › should create a new role-page access entry
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › RolePageAccess CRUD › should create a new role-page access entry
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › RolePageAccess CRUD › should get the access matrix
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › RolePageAccess CRUD › should get the access matrix
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › RolePageAccess CRUD › should update a role-page access entry
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › RolePageAccess CRUD › should update a role-page access entry
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › RolePageAccess CRUD › should delete a role-page access entry
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › RolePageAccess CRUD › should delete a role-page access entry
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › User CRUD › should create a new user
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › User CRUD › should create a new user
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › User CRUD › should get all users
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › User CRUD › should get all users
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › User CRUD › should update a user
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › User CRUD › should update a user
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › User CRUD › should delete a user
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Auth API Endpoints › User CRUD › should delete a user
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+DEBUG: Registered models: [
+  "Listing",
+  "Item",
+  "Ownership",
+  "Sales",
+  "Customer",
+  "EbayInfo",
+  "User",
+  "Role",
+  "Page",
+  "RolePageAccess"
+]
+DEBUG: Sequelize config: {
+  "database": "ebay_sales_tool",
+  "username": "postgres",
+  "password": "password",
+  "host": "postgres_db",
+  "port": "5432",
+  "pool": {},
+  "protocol": "tcp",
+  "native": false,
+  "replication": false,
+  "dialectModule": null,
+  "dialectModulePath": null
+}
+DEBUG: Sequelize dialect: postgres
+FAIL tests/customerApi.test.js
+  ● Console
+
+    console.log
+      Sequelize config: {
+        database: 'ebay_sales_tool',
+        user: 'postgres',
+        password: 'password',
+        host: 'postgres_db',
+        port: '5432',
+        dialect: 'postgres',
+        NODE_ENV: 'test'
+      }
+
+      at Object.log (src/utils/database.js:9:9)
+
+    console.log
+      Logs directory already exists at /usr/src/app/logs
+
+      at Object.log (src/app.js:28:13)
+
+  ● Customer API › should create a new customer
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Customer API › should get all customers (paginated)
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Customer API › should search customers
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Customer API › should get a customer by ID
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Customer API › should update a customer by ID
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Customer API › should delete a customer by ID
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+FAIL tests/ownershipApi.test.js
+  ● Console
+
+    console.log
+      Sequelize config: {
+        database: 'ebay_sales_tool',
+        user: 'postgres',
+        password: 'password',
+        host: 'postgres_db',
+        port: '5432',
+        dialect: 'postgres',
+        NODE_ENV: 'test'
+      }
+
+      at Object.log (src/utils/database.js:9:9)
+
+    console.log
+      Logs directory already exists at /usr/src/app/logs
+
+      at Object.log (src/app.js:28:13)
+
+  ● Ownership API › should create a new ownership
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Ownership API › should get all ownerships (paginated)
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Ownership API › should search ownerships
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Ownership API › should get an ownership by ID
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Ownership API › should update an ownership by ID
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Ownership API › should delete an ownership by ID
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+FAIL tests/listingApi.test.js
+  ● Console
+
+    console.log
+      Sequelize config: {
+        database: 'ebay_sales_tool',
+        user: 'postgres',
+        password: 'password',
+        host: 'postgres_db',
+        port: '5432',
+        dialect: 'postgres',
+        NODE_ENV: 'test'
+      }
+
+      at Object.log (src/utils/database.js:9:9)
+
+    console.log
+      Logs directory already exists at /usr/src/app/logs
+
+      at Object.log (src/app.js:28:13)
+
+  ● Listing API › should create a new listing
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Listing API › should get all listings (paginated)
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Listing API › should search listings
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Listing API › should get a listing by ID
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Listing API › should update a listing by ID
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● Listing API › should delete a listing by ID
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+FAIL tests/ebayInfoApi.test.js
+  ● Console
+
+    console.log
+      Sequelize config: {
+        database: 'ebay_sales_tool',
+        user: 'postgres',
+        password: 'password',
+        host: 'postgres_db',
+        port: '5432',
+        dialect: 'postgres',
+        NODE_ENV: 'test'
+      }
+
+      at Object.log (src/utils/database.js:9:9)
+
+    console.log
+      Logs directory already exists at /usr/src/app/logs
+
+      at Object.log (src/app.js:28:13)
+
+  ● eBay Info API › should get eBay account info
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● eBay Info API › should search eBay info
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● eBay Info API › should get eBay performance
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+  ● eBay Info API › should get eBay API status
+
+    SequelizeHostNotFoundError: getaddrinfo ENOTFOUND postgres_db
+
+      at Client._connectionCallback (node_modules/sequelize/src/dialects/postgres/connection-manager.js:187:24)
+      at Client._handleErrorWhileConnecting (node_modules/pg/lib/client.js:336:19)
+      at Client._handleErrorEvent (node_modules/pg/lib/client.js:346:19)
+      at Socket.reportStreamError (node_modules/pg/lib/connection.js:57:12)
+
+Test Suites: 6 failed, 6 total
+Tests:       48 failed, 48 total
+Snapshots:   0 total
+Time:        24.766 s, estimated 34 s
+Ran all test suites matching /tests/i.

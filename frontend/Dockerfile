@@ -7,9 +7,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-# Ensure node_modules is excluded
+# Copy the rest of the application files
 COPY . /app
-RUN rm -rf node_modules
 
 # Expose the frontend port
 EXPOSE 3000

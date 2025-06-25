@@ -1,0 +1,243 @@
+DEBUG: Registered models: [
+  "Listing",
+  "Item",
+  "Ownership",
+  "Sales",
+  "Customer",
+  "EbayInfo",
+  "User",
+  "Role",
+  "Page",
+  "RolePageAccess"
+]
+DEBUG: Sequelize config: {
+  "database": "ebay_sales_tool",
+  "username": "postgres",
+  "password": "password",
+  "host": "localhost",
+  "port": "5432",
+  "pool": {},
+  "protocol": "tcp",
+  "native": false,
+  "replication": false,
+  "dialectModule": null,
+  "dialectModulePath": null
+}
+DEBUG: Sequelize dialect: postgres
+PASS tests/customerApi.test.js
+  ● Console
+
+    console.log
+      Sequelize config: {
+        database: 'ebay_sales_tool',
+        user: 'postgres',
+        password: 'password',
+        host: 'localhost',
+        port: '5432',
+        dialect: 'postgres',
+        NODE_ENV: 'test'
+      }
+
+      at Object.log (src/utils/database.js:9:9)
+
+    console.log
+      Logs directory already exists at /usr/src/app/logs
+
+      at Object.log (src/app.js:28:13)
+
+DEBUG: Tables in public schema after sync: [
+  null
+]
+DEBUG: Current database: ebay_sales_tool
+DEBUG: Current schema: public
+DEBUG: Raw select from Customer after sync: [
+  {
+    "id": 1,
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "phone": "555-1234",
+    "address": "123 Main St",
+    "status": "active",
+    "createdAt": "2025-06-24T18:57:29.946Z",
+    "updatedAt": "2025-06-24T18:57:29.946Z"
+  },
+  {
+    "id": 2,
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "email": "jane@example.com",
+    "phone": "555-5678",
+    "address": "456 Elm St",
+    "status": "active",
+    "createdAt": "2025-06-24T18:57:29.947Z",
+    "updatedAt": "2025-06-24T18:57:29.947Z"
+  }
+]
+DEBUG: Raw select from Customer after create: [
+  {
+    "id": 1,
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "phone": "555-1234",
+    "address": "123 Main St",
+    "status": "active",
+    "createdAt": "2025-06-24T18:57:29.946Z",
+    "updatedAt": "2025-06-24T18:57:29.946Z"
+  },
+  {
+    "id": 2,
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "email": "jane@example.com",
+    "phone": "555-5678",
+    "address": "456 Elm St",
+    "status": "active",
+    "createdAt": "2025-06-24T18:57:29.947Z",
+    "updatedAt": "2025-06-24T18:57:29.947Z"
+  },
+  {
+    "id": 3,
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.unique@example.com",
+    "phone": null,
+    "address": null,
+    "status": "active",
+    "createdAt": "2025-06-24T18:57:29.978Z",
+    "updatedAt": "2025-06-24T18:57:29.979Z"
+  }
+]
+PASS tests/ownershipApi.test.js
+  ● Console
+
+    console.log
+      Sequelize config: {
+        database: 'ebay_sales_tool',
+        user: 'postgres',
+        password: 'password',
+        host: 'localhost',
+        port: '5432',
+        dialect: 'postgres',
+        NODE_ENV: 'test'
+      }
+
+      at Object.log (src/utils/database.js:9:9)
+
+    console.log
+      Logs directory already exists at /usr/src/app/logs
+
+      at Object.log (src/app.js:28:13)
+
+PASS tests/listingApi.test.js
+  ● Console
+
+    console.log
+      Sequelize config: {
+        database: 'ebay_sales_tool',
+        user: 'postgres',
+        password: 'password',
+        host: 'localhost',
+        port: '5432',
+        dialect: 'postgres',
+        NODE_ENV: 'test'
+      }
+
+      at Object.log (src/utils/database.js:9:9)
+
+    console.log
+      Logs directory already exists at /usr/src/app/logs
+
+      at Object.log (src/app.js:28:13)
+
+Error in createItem: Error: 
+    at Query.run (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\dialects\postgres\query.js:76:25)
+    at F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\sequelize.js:650:28
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at PostgresQueryInterface.insert (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\dialects\abstract\query-interface.js:795:21)
+    at model.save (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\model.js:4154:35)
+    at Function.create (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\model.js:2305:12)
+    at Object.<anonymous>.exports.createItem (F:\Dev\eBaySalesTool\backend\src\controllers\itemController.js:14:25)
+PASS tests/itemApi.test.js
+  ● Console
+
+    console.log
+      Sequelize config: {
+        database: 'ebay_sales_tool',
+        user: 'postgres',
+        password: 'password',
+        host: 'localhost',
+        port: '5432',
+        dialect: 'postgres',
+        NODE_ENV: 'test'
+      }
+
+      at Object.log (src/utils/database.js:9:9)
+
+    console.log
+      Logs directory already exists at /usr/src/app/logs
+
+      at Object.log (src/app.js:28:13)
+
+PASS tests/ebayInfoApi.test.js
+  ● Console
+
+    console.log
+      Sequelize config: {
+        database: 'ebay_sales_tool',
+        user: 'postgres',
+        password: 'password',
+        host: 'localhost',
+        port: '5432',
+        dialect: 'postgres',
+        NODE_ENV: 'test'
+      }
+
+      at Object.log (src/utils/database.js:9:9)
+
+    console.log
+      Logs directory already exists at /usr/src/app/logs
+
+      at Object.log (src/app.js:28:13)
+
+PASS src/tests/authApi.test.js
+  ● Console
+
+    console.log
+      Sequelize config: {
+        database: 'ebay_sales_tool',
+        user: 'postgres',
+        password: 'password',
+        host: 'localhost',
+        port: '5432',
+        dialect: 'postgres',
+        NODE_ENV: 'test'
+      }
+
+      at Object.log (src/utils/database.js:9:9)
+
+    console.log
+      Logs directory already exists at /usr/src/app/logs
+
+      at Object.log (src/app.js:28:13)
+
+FAIL src/tests/customerApi.test.js
+  ● Test suite failed to run
+
+    Your test suite must contain at least one test.
+
+      at onResult (node_modules/@jest/core/build/TestScheduler.js:133:18)
+      at node_modules/@jest/core/build/TestScheduler.js:254:19
+      at node_modules/emittery/index.js:363:13
+          at Array.map (<anonymous>)
+      at Emittery.emit (node_modules/emittery/index.js:361:23)
+
+Test Suites: 1 failed, 6 passed, 7 total
+Tests:       48 passed, 48 total
+Snapshots:   0 total
+Time:        4.548 s, estimated 5 s
+Ran all test suites matching /tests/i.
+Jest did not exit one second after the test run has completed.
+
+'This usually means that there are asynchronous operations that weren't stopped in your tests. Consider running Jest with `--detectOpenHandles` to troubleshoot this issue.

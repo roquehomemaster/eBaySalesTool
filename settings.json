@@ -1,0 +1,10 @@
+{
+  "terminal.integrated.defaultProfile.windows": "Administrator PowerShell",
+  "terminal.integrated.profiles.windows": {
+    "Administrator PowerShell": {
+      "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "args": ["-NoExit", "-Command", "Start-Process PowerShell -ArgumentList '-NoExit' -Verb RunAs"]
+    }
+  },
+  "terminal.integrated.shellIntegration.enabled": true
+}

@@ -1,5 +1,6 @@
 services:
   backend:
+    container_name: ebaysalestool-backend
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -16,15 +17,29 @@ services:
     command: ["node", "src/app.js"]
     depends_on:
       - database
+    volumes:
+      - ./backend/config:/usr/src/app/config:ro
+      - ./backend/database/migrations:/usr/src/app/migrations:ro
+      - ./backend/seeders:/usr/src/app/seeders:ro
+      - ./backend/tests:/usr/src/app/tests:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      default:
+        ipv4_address: 192.168.0.221
 
   database:
-    image: postgres:15-alpine
     container_name: postgres_db
+    image: postgres:15-alpine
     restart: always
     environment:
-      POSTGRES_DB: ebay_sales_tool
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      - POSTGRES_DB=ebay_sales_tool
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_HOST_AUTH_METHOD=trust
     ports:
       - "5432:5432"
     volumes:
@@ -35,6 +50,37 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      default:
+        ipv4_address: 192.168.0.220
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./frontend/src:/usr/src/app/src:ro
+      - ./frontend/public:/usr/src/app/public:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      default:
+        ipv4_address: 192.168.0.222
 
 volumes:
   db_data:
+    driver: local
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 192.168.0.0/24

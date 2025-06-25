@@ -80,12 +80,40 @@ To build the project, follow these steps:
    backend\scripts\run_build.bat
    ```
 3. After the script completes, verify the `build.log` file for any errors or warnings.
-4. Ensure all containers are healthy and the database is seeded successfully.
+4. Ensure all containers are healthy and the database is seeded successfully (if enabled).
 5. Test the application to confirm functionality.
 
-### Notes
+**Note:**
+- API tests and database seeding are both controlled by configuration flags in `backend/build.json` (see below). The Node.js build script handles these steps and logs the results in `backend/scripts/build.log`.
+- API test results are written to `logs/test-results.txt`.
+- The build will fail if any test fails or if any test suite is empty.
 - The `run_build.bat` script in `backend/scripts` is the official and only supported build script.
 - Any other build scripts or folders (e.g., `build/scripts`) are deprecated and should not be used.
+
+## Build Configuration Flags
+
+The following flags in `backend/build.json` control build-time testing and seeding:
+
+```
+  "runApiTests": true,
+  "testdata": true
+```
+- If `runApiTests` is `true`, API tests are executed automatically during the build and results are saved to `logs/test-results.txt`. If `false`, API tests are skipped.
+- If `testdata` is `true`, the database is truncated and seeded with test data during the build. If `false`, seeding is skipped.
+
+You can change these flags to enable or disable API test execution and database seeding as needed. All actions and their results are logged in `backend/scripts/build.log`.
+
+## API Test Configuration
+
+The execution of backend API tests during the build is controlled by the `runApiTests` flag in `backend/build.json`:
+
+```
+  "runApiTests": true
+```
+- If `true`, API tests are executed automatically during the build and results are saved to `logs/test-results.txt`.
+- If `false`, API tests are skipped.
+
+You can change this flag to enable or disable API test execution as needed.
 
 ## Instrumentation and Diagnostics
 

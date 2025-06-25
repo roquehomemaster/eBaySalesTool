@@ -2,16 +2,16 @@
 REM Docker Environment Configuration
 
 REM Database Configuration
-set PG_HOST=192.168.0.220
+set PG_HOST=postgres_db
 set PG_PORT=5432
 set PG_USER=postgres
 set PG_DATABASE=ebay_sales_tool
 
 REM Network Configuration
-set NETWORK_SUBNET=192.168.1.0/24
-set POSTGRES_DB_IP=192.168.1.2
-set BACKEND_IP=192.168.1.3
-set FRONTEND_IP=192.168.1.4
+set NETWORK_SUBNET=192.168.0.0/24
+set POSTGRES_DB_IP=192.168.0.220
+set BACKEND_IP=192.168.0.221
+set FRONTEND_IP=192.168.0.222
 
 REM Paths
 set BACKEND_PATH=f:/Dev/eBaySalesTool/backend
