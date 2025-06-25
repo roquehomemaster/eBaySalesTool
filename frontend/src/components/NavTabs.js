@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import './NavTabs.css';
 
 const tabs = [
-  { label: 'Items', path: '/' },
+  { label: 'Catalog', path: '/' },
   { label: 'Sales', path: '/sales' },
   { label: 'Reports', path: '/reports' },
 ];

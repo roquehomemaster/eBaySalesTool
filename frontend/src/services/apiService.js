@@ -30,9 +30,9 @@ const apiService = {
         }
     },
 
-    getItems: async () => {
+    getCatalog: async () => {
         try {
-            const response = await axios.get(`${API_BASE_URL}/items`);
+            const response = await axios.get(`${API_BASE_URL}/catalog`);
             return response.data;
         } catch (error) {
             throw error.response ? error.response.data : error.message;

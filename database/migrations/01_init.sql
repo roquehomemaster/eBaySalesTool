@@ -1,3 +1,16 @@
+-- Create Catalog table at the start so it exists for all seeds and FKs
+DROP TABLE IF EXISTS "Catalog" CASCADE;
+CREATE TABLE IF NOT EXISTS "Catalog" (
+    id SERIAL PRIMARY KEY,
+    description VARCHAR(255) NOT NULL,
+    manufacturer VARCHAR(255),
+    model VARCHAR(255),
+    serial_number VARCHAR(255),
+    sku_barcode VARCHAR(255) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- [REMOVED 2025-05-20] CREATE TABLE "users" (
 --     id SERIAL PRIMARY KEY,
 --     username VARCHAR(50) NOT NULL UNIQUE,

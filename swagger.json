@@ -545,9 +545,9 @@
         }
       }
     },
-    "/api/items": {
+    "/api/catalog": {
       "post": {
-        "summary": "Create a new item",
+        "summary": "Create a new catalog entry",
         "requestBody": {
           "required": true,
           "content": {
@@ -638,7 +638,7 @@
         },
         "responses": {
           "201": {
-            "description": "Item created successfully",
+            "description": "Catalog entry created successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -646,7 +646,7 @@
                   "properties": {
                     "_id": {
                       "type": "string",
-                      "description": "The ID of the created item"
+                      "description": "The ID of the created catalog entry"
                     },
                     "name": {
                       "type": "string",
@@ -678,7 +678,7 @@
             }
           },
           "500": {
-            "description": "Error creating item"
+            "description": "Error creating catalog entry"
           }
         }
       }

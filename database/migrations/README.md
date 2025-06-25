@@ -22,10 +22,13 @@ This directory contains SQL scripts for initializing and migrating the database 
 - `05_add_user_security_fields.sql`: Adds security fields to the user table.
 - `06_create_userlog_table.sql`: Creates the user log table.
 - `07_create_ownerships_table.sql`: Creates the ownerships table.
-- `08_create_items_table.sql`: Creates the items table.
+- `08_create_catalog_table.sql`: Creates the Catalog table (formerly Items).
 - `09_create_owners_table.sql`: Creates the owners table (duplicate, consider removing).
 - `10_add_address_to_owners.sql`: Adds address fields to the owners table.
 - `11_create_owners_table.sql`: Creates the owners table (duplicate, consider removing).
+
+## Data Model Note
+- The `Catalog` table is the master list of all products ever tracked, regardless of eBay listing status. The `SellingItem` table tracks all eBay listings, past or present, and references products in the Catalog.
 
 ## Cleanup Required
 - Review and remove duplicate scripts, such as `09_create_owners_table.sql` and `11_create_owners_table.sql`.

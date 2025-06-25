@@ -4,12 +4,16 @@
 This project is developed and tested on a Windows 11 machine using WSL2 to run Docker containers. All Docker-based services (backend, database, frontend) are built and executed within the WSL2 environment. This setup may affect file paths, volume mounts, and networking behavior compared to native Linux or macOS environments.
 
 ## Project Overview
-The eBay Sales Tool is a full-stack web application designed to assist users in managing eBay sales, tracking items, and conducting product research. It includes a backend API, a frontend user interface, and a database for storing sales and product data.
+The eBay Sales Tool is a full-stack web application designed to assist users in managing eBay sales, tracking eBay listings, and maintaining a growing product catalog. It includes a backend API, a frontend user interface, and a database for storing sales, catalog, and listing data.
+
+## Data Model Overview
+- **Catalog**: The master list of all products ever tracked, regardless of whether they were ever listed on eBay. This table grows over time and serves as a historical record of all products.
+- **SellingItem**: Tracks all eBay listings, past or present, regardless of their status (active, sold, ended, etc.). Each entry corresponds to an eBay listing. Not every catalog item must have a corresponding SellingItem, but every SellingItem should reference a product in the Catalog.
 
 ## Features
-- **Backend**: Built with Node.js and Express, providing RESTful APIs for managing sales, items, and ownership.
-- **Frontend**: Developed with React, offering a user-friendly interface for data entry, sales tracking, and product research.
-- **Database**: Uses MongoDB for storing sales and item data.
+- **Backend**: Built with Node.js and Express, providing RESTful APIs for managing sales, catalog, listings, and ownership.
+- **Frontend**: Developed with React, offering a user-friendly interface for catalog management, sales tracking, and product research.
+- **Database**: Uses PostgreSQL for storing sales, catalog, and listing data.
 - **Dockerized**: Fully containerized setup for easy deployment and development.
 - **Swagger Documentation**: API documentation available at `/api-docs`.
 

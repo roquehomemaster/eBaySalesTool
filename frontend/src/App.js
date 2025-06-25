@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import SalesForm from './components/SalesForm';
-import ItemTable from './components/ItemTable';
+import CatalogTable from './components/ItemTable';
 import ProductResearch from './components/ProductResearch';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
@@ -13,7 +13,7 @@ function App() {
     <Router>
       <Layout>
         <Routes>
-          <Route path="/" element={<ItemTable />} />
+          <Route path="/" element={<CatalogTable />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/sales" element={<SalesList />} />
           <Route path="/reports" element={<Reports />} />

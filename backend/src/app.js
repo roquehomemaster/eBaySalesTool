@@ -1,7 +1,7 @@
 const express = require('express');
 const { Pool } = require('pg');
 const listingRoutes = require('./routes/listingRoutes');
-const itemRoutes = require('./routes/itemRoutes');
+const catalogRoutes = require('./routes/itemRoutes');
 const ownershipRoutes = require('./routes/ownershipRoutes');
 const salesRoutes = require('./routes/salesRoutes');
 const customerRoutes = require('./routes/customerRoutes');
@@ -10,7 +10,7 @@ const authRoutes = require('./routes/authRoutes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const { sequelize } = require('./utils/database');
-const Item = require('./models/itemModel');
+const Catalog = require('./models/itemModel');
 const Ownership = require('./models/ownershipModel');
 const Sales = require('./models/salesModel');
 const fs = require('fs');
@@ -48,7 +48,7 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(express.json());
 app.use(listingRoutes);
-app.use('/api', itemRoutes);
+app.use('/api', catalogRoutes);
 app.use('/api/ownership', ownershipRoutes);
 app.use('/api', salesRoutes);
 app.use('/api', customerRoutes);
