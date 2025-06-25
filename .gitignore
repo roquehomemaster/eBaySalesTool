@@ -29,6 +29,7 @@ scripts/npm_cleanup_and_install.bat
 scripts/docker_prune.bat
 scripts/npm_warnings.log
 
-# Ignore WSL2 and Docker Desktop virtual disk images
+# Ignore all vhdx files (virtual disk images)
+*.vhdx
 Ubuntu/
 docker-desktop/
