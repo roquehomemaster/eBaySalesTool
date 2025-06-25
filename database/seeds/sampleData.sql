@@ -65,3 +65,9 @@ INSERT INTO "PerformanceMetrics" (item_id, total_sales, number_of_items_sold, av
 VALUES
 (1, 500.0, 5, 100.0),
 (2, 400.0, 2, 200.0);
+
+-- Insert Items records (for API compatibility)
+INSERT INTO "Items" (description, manufacturer, model, serial_number, sku_barcode)
+VALUES
+('Vintage Camera', 'Canon', 'AE-1', '12345', 'CAM12345'),
+('Antique Vase', 'Unknown', 'N/A', '67890', 'VAS67890');

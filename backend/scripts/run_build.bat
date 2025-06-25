@@ -79,3 +79,4 @@ if %ERRORLEVEL% neq 0 (
 echo Build process completed successfully.
 echo Build process completed successfully. >> f:\Dev\eBaySalesTool\backend\scripts\build.log
 exit /b 0
+REM Ensure the batch job exits immediately after build completion

@@ -19,8 +19,7 @@ CREATE TABLE IF NOT EXISTS "product_research" (
     id SERIAL PRIMARY KEY,
     item VARCHAR(255) NOT NULL,
     sold_price DECIMAL(10, 2),
-    research_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    user_id INT REFERENCES "users"(id)
+    research_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Ensure SellingItem table is created with correct schema and case-sensitive name

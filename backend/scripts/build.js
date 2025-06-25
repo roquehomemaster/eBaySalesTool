@@ -192,6 +192,7 @@ async function waitForDatabaseReadiness(config) {
     for (let attempt = 1; attempt <= 10; attempt++) {
         try {
             const password = config.database.password != null ? String(config.database.password) : '';
+            log(`[waitForDatabaseReadiness] Attempt ${attempt}: Connecting to host=${config.database.host}, port=${config.database.port}`);
             const client = new Client({
                 host: config.database.host,
                 port: config.database.port,
@@ -204,7 +205,7 @@ async function waitForDatabaseReadiness(config) {
             log('Database is ready.');
             return;
         } catch (error) {
-            log(`Attempt ${attempt} failed: ${error.message}`);
+            log(`[waitForDatabaseReadiness] Attempt ${attempt} failed: ${error.message}`);
             if (attempt === 10) {
                 log('Database is not ready after maximum retries. Exiting...');
                 process.exit(1);
@@ -428,21 +429,14 @@ async function main() {
     await startDockerContainers(config);
     await verifyAllContainersHealth();
     await waitForDatabaseReadiness(config);
-    if (config.testdata === true) {
-        log('testdata flag is true: truncating tables and seeding database via API endpoint...');
-        await robustApiSeed();
-    } else {
-        log('testdata flag is not true: skipping API-based database seeding.');
-    }
     if (config.runApiTests === true) {
         log('runApiTests flag is true: running API tests...');
         try {
             const testResultsPath = path.resolve(__dirname, '../../logs/test-results.txt');
-            const testCommand = `npx jest --runInBand --testPathPattern=tests > "${testResultsPath}" 2>&1`;
+            const testCommand = `npx jest --runInBand --detectOpenHandles --forceExit --testPathPattern=tests > "${testResultsPath}" 2>&1`;
             log(`Running: ${testCommand}`);
             execSync(testCommand, { cwd: path.resolve(__dirname, '../'), stdio: 'inherit', shell: true });
             log('API tests executed and results written to logs/test-results.txt');
-            // Append API test results to build.log
             if (fs.existsSync(testResultsPath)) {
                 const apiResults = fs.readFileSync(testResultsPath, 'utf-8');
                 fs.appendFileSync(logFilePath, '\n===== API TEST RESULTS =====\n' + apiResults + '\n===========================\n');
@@ -456,6 +450,13 @@ async function main() {
         }
     } else {
         log('runApiTests flag is not true: skipping API tests.');
+    }
+    // Always seed the database after tests to ensure a known state for development
+    if (config.testdata === true) {
+        log('Seeding database after tests to ensure a known state for development...');
+        await robustApiSeed();
+    } else {
+        log('testdata flag is not true: skipping post-test database seeding.');
     }
     log('Build process completed successfully.');
 }

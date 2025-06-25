@@ -1,4 +1,11 @@
 @echo off
+REM EXPERIMENTAL SCRIPT: See EXPERIMENTAL.md for details.
+REM Purpose: To rapidly test Docker build and restart behavior without the full migration/seeding/healthcheck process. This is needed to isolate and debug issues with container lifecycle and static file serving, which may be masked by the more complex official build process.
+REM Logic: The script prunes or brings down all containers and volumes, then runs a fresh 'docker compose up -d --build'. It omits migrations and health checks to focus solely on image/container state and static file serving.
+REM Intended Goals:
+REM   - Determine if stale frontend code is due to Docker image/container caching or volume issues.
+REM   - Provide a minimal, fast feedback loop for frontend build/deployment experiments.
+REM Status: EXPERIMENTAL
 
 :: Check if Docker is running
 echo "Checking if Docker is running..."

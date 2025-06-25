@@ -7,11 +7,17 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
+# Install 'serve' to serve static build
+RUN npm install -g serve
+
 # Copy the rest of the application files
 COPY . /app
+
+# Build the React app for production
+RUN npm run build
 
 # Expose the frontend port
 EXPOSE 3000
 
-# Start the frontend server
-CMD ["npm", "start"]
+# Serve the production build
+CMD ["serve", "-s", "build", "-l", "3000"]
