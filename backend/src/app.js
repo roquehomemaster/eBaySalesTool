@@ -1,4 +1,18 @@
+/**
+ * app.js
+ * -----------------------------------------------------------------------------
+ * Main entry point for the eBay Sales Tool backend Express application.
+ *
+ * - Configures middleware, routes, logging, and database connections.
+ * - Serves API endpoints and Swagger documentation.
+ *
+ * Author: eBay Sales Tool Team
+ * Last updated: 2025-07-10
+ * -----------------------------------------------------------------------------
+ */
+
 const express = require('express');
+const cors = require('cors');
 const { Pool } = require('pg');
 const listingRoutes = require('./routes/listingRoutes');
 const catalogRoutes = require('./routes/itemRoutes');
@@ -46,6 +60,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
+app.use(cors());
 app.use(express.json());
 app.use(listingRoutes);
 app.use('/api', catalogRoutes);
@@ -97,9 +112,7 @@ if (process.env.NODE_ENV !== 'test') {
         .then(() => console.log('PostgreSQL connected'))
         .catch(err => console.error('PostgreSQL connection error:', err));
 
-    sequelize.sync({ alter: true })
-        .then(() => console.log('Database synchronized'))
-        .catch(err => console.error('Database synchronization error:', err));
+    // Removed sequelize.sync({ alter: true }) to prevent Sequelize from auto-creating or altering tables. Use migrations only.
 }
 
 // Set up routes

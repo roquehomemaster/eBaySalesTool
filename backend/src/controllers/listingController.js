@@ -1,7 +1,19 @@
+/**
+ * listingController.js
+ * -----------------------------------------------------------------------------
+ * Controller functions for Listing API endpoints (CRUD, search, etc).
+ *
+ * Author: eBay Sales Tool Team
+ * Last updated: 2025-07-10
+ * -----------------------------------------------------------------------------
+ */
+
 const { Op } = require('sequelize');
 const Listing = require('../models/listingModel');
 
-// Create a new listing
+/**
+ * Create a new listing
+ */
 exports.createListing = async (req, res) => {
     try {
         const requiredFields = ['title', 'price', 'itemId'];
@@ -17,7 +29,9 @@ exports.createListing = async (req, res) => {
     }
 };
 
-// Get all listings (with optional filters and pagination)
+/**
+ * Get all listings (with optional filters and pagination)
+ */
 exports.getAllListings = async (req, res) => {
     try {
         const where = {};
@@ -35,11 +49,14 @@ exports.getAllListings = async (req, res) => {
             pageSize: limit
         });
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching listings' });
+        console.error('Error fetching listings:', error);
+        res.status(500).json({ message: 'Error fetching listings', error: error.message });
     }
 };
 
-// Get listing by ID
+/**
+ * Get listing by ID
+ */
 exports.getListingById = async (req, res) => {
     try {
         const listing = await Listing.findByPk(req.params.id);
@@ -50,7 +67,9 @@ exports.getListingById = async (req, res) => {
     }
 };
 
-// Update listing by ID
+/**
+ * Update listing by ID
+ */
 exports.updateListingById = async (req, res) => {
     try {
         const listing = await Listing.findByPk(req.params.id);
@@ -62,7 +81,9 @@ exports.updateListingById = async (req, res) => {
     }
 };
 
-// Delete listing by ID
+/**
+ * Delete listing by ID
+ */
 exports.deleteListingById = async (req, res) => {
     try {
         const listing = await Listing.findByPk(req.params.id);
@@ -74,7 +95,9 @@ exports.deleteListingById = async (req, res) => {
     }
 };
 
-// Search/filter listings
+/**
+ * Search/filter listings
+ */
 exports.searchListings = async (req, res) => {
     try {
         const { title, minPrice, maxPrice, status } = req.query;

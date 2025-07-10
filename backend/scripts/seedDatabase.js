@@ -117,6 +117,39 @@ async function seedDatabase() {
         await waitForDatabaseReadiness();
         log('Seeding database with test data...');
 
+        // Check that all required tables exist before seeding
+        const requiredTables = [
+            'Catalog',
+            'Listing',
+            'Ownership',
+            'OwnershipAgreements',
+            'HistoryLogs',
+            'sales',
+            'SalesHistory',
+            'CustomerDetails',
+            'FinancialTracking',
+            'CommunicationLogs',
+            'PerformanceMetrics'
+        ];
+        const missingTables = [];
+        for (const table of requiredTables) {
+            try {
+                const res = await pool.query(`SELECT to_regclass('public."${table}"') as exists`);
+                if (!res.rows[0].exists) {
+                    missingTables.push(table);
+                }
+            } catch (err) {
+                log(`Error checking table ${table}: ${err.message}`);
+                missingTables.push(table);
+            }
+        }
+        if (missingTables.length > 0) {
+            log(`ERROR: The following required tables are missing: ${missingTables.join(', ')}`);
+            process.exit(1);
+        } else {
+            log('All required tables exist.');
+        }
+
         if (!fs.existsSync(seedFilePath)) {
             throw new Error(`Seed file not found at ${seedFilePath}`);
         }
@@ -125,6 +158,30 @@ async function seedDatabase() {
         await pool.query(seedSQL);
 
         log('Database seeding completed successfully.');
+        // Check all seeded tables and log their status
+        let allOk = true;
+        for (const table of requiredTables) {
+            try {
+                const result = await pool.query(`SELECT COUNT(*) AS count FROM "${table}"`);
+                const count = parseInt(result.rows[0].count, 10);
+                if (count === 0) {
+                    log(`ERROR: ${table} table is empty after seeding.`);
+                    console.error(`ERROR: ${table} table is empty after seeding.`);
+                    allOk = false;
+                } else {
+                    log(`${table} table contains ${count} record(s) after seeding.`);
+                    console.log(`${table} table contains ${count} record(s) after seeding.`);
+                }
+            } catch (err) {
+                log(`ERROR: Failed to check ${table} table: ${err.message}`);
+                console.error(`ERROR: Failed to check ${table} table: ${err.message}`);
+                allOk = false;
+            }
+        }
+        if (!allOk) {
+            log('One or more tables failed seeding verification. Exiting with error.');
+            process.exit(1);
+        }
         console.log('Database seeding process completed successfully.');
     } catch (error) {
         log(`Error seeding database: ${error.message}`);

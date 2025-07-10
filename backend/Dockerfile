@@ -18,6 +18,9 @@ COPY package*.json ./
 COPY src ./src
 COPY database/seeds ./database/seeds
 
+# Copy swagger.json from project root into the backend image
+COPY ../swagger.json ./swagger.json
+
 # Expose the application port
 EXPOSE 3000
 

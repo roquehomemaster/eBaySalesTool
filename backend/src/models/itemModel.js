@@ -44,6 +44,9 @@ const Catalog = sequelize.define('Catalog', {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW
     }
+}, {
+    freezeTableName: true, // Prevent Sequelize from pluralizing the table name
+    timestamps: false // Disable Sequelize's automatic createdAt/updatedAt columns
 });
 
 module.exports = Catalog;

@@ -22,7 +22,6 @@ for /f "tokens=1,2,3,4,5*" %%a in ('docker ps -a --format "{{.Names}} {{.Status}
     if "%%a"=="postgres_db" (
         docker-compose -f f:\Dev\eBaySalesTool\docker-compose.yml down -v
         echo Existing Docker containers found. Bringing them down with -v.
-        REM Do not jump to :continue_build here; always proceed to bring up containers and health check
     )
 )
 
@@ -62,10 +61,10 @@ if %ERRORLEVEL% neq 0 (
 goto continue_build
 
 :continue_build
-REM Run the Node.js build script to handle all build logic, including conditional seeding
-node f:\Dev\eBaySalesTool\backend\scripts\build.js
+REM Run the Node.js seed script directly (build.js removed)
+node f:\Dev\eBaySalesTool\backend\scripts\seedDatabase.js
 if %ERRORLEVEL% neq 0 (
-    echo Error: Node.js build script failed.
+    echo Error: Node.js seed script failed.
     exit /b 1
 )
 

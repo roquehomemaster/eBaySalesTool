@@ -1,10 +1,6 @@
 -- Updated seed data to match new data structures
 
--- Insert SellingItem records
-INSERT INTO "SellingItem" (description, manufacturer, model, serial_number, product_page_link, dimensions, weight, condition, category, sku_barcode, images, specifications, warranty_information, compliance_and_certifications, manufacturer_info)
-VALUES
-('Vintage Camera', 'Canon', 'AE-1', '12345', 'http://example.com/camera', '{"x":10,"y":5,"z":3}', 1.2, 'Used', 'Electronics', 'CAM12345', '{"http://example.com/camera.jpg"}', '35mm film camera', NULL, NULL, NULL),
-('Antique Vase', 'Unknown', 'N/A', '67890', 'http://example.com/vase', '{"x":8,"y":8,"z":12}', 2.5, 'Good', 'Home Decor', 'VAS67890', '{"http://example.com/vase.jpg"}', 'Porcelain vase from the 19th century', NULL, NULL, NULL);
+
 
 -- Insert Ownership records
 INSERT INTO "Ownership" (ownership_type, first_name, last_name, address, telephone, email, company_name, company_address, company_telephone, company_email, assigned_contact_first_name, assigned_contact_last_name, assigned_contact_telephone, assigned_contact_email)
@@ -19,10 +15,13 @@ VALUES
 (2, 15.0, 200.0, 60, 'Manual renewal required');
 
 -- Insert HistoryLogs records
-INSERT INTO "HistoryLogs" (item_id, change_type, timestamp)
+INSERT INTO "HistoryLogs" (entity, entityId, action, changeDetails, user_id, createdAt)
 VALUES
-(1, 'Price updated', '2025-04-01 10:00:00'),
-(2, 'Description updated', '2025-04-02 11:00:00');
+('Listing', 1, 'update', '{"field": "price", "old": 100, "new": 150}', 1, '2025-04-01 10:00:00'),
+('Listing', 2, 'update', '{"field": "description", "old": "Old desc", "new": "New desc"}', 2, '2025-04-02 11:00:00'),
+('Ownership', 1, 'create', '{"field": "ownership_type", "new": "Self"}', 1, '2025-04-03 12:00:00'),
+('Ownership', 2, 'create', '{"field": "ownership_type", "new": "Company"}', 2, '2025-04-03 12:05:00')
+ON CONFLICT (entity, entityId, action, createdAt) DO NOTHING;
 
 -- Insert sales records
 INSERT INTO "sales" (item, price, soldDate, owner, negotiatedTerms)
@@ -36,11 +35,6 @@ VALUES
 (1, 'eBay', 'No returns', 'Great product!'),
 (2, 'Website', 'Returned once', 'Good quality');
 
--- Insert eBayInfo records
-INSERT INTO "eBayInfo" (item_id, listing_status, watchers, item_condition_description, payment_method, shipping_method)
-VALUES
-(1, 'Active', 5, 'Brand new in box', 'PayPal', 'Standard shipping'),
-(2, 'Ended', 2, 'Used but in good condition', 'Credit Card', 'Express shipping');
 
 -- Insert CustomerDetails records
 INSERT INTO "CustomerDetails" (purchase_date, purchase_method, shipping_preferences)

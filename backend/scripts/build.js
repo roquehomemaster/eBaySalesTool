@@ -243,11 +243,35 @@ function waitForAllContainers(config) {
 // --- Add robust seeding: TRUNCATE tables before seeding via API ---
 async function robustApiSeed() {
     const axios = require('axios');
-    const tablesToTruncate = [
+    // Only truncate tables that exist, to avoid errors if a table is missing (e.g., eBayInfo)
+    const allPossibleTables = [
         '"eBayInfo"', '"SalesHistory"', '"HistoryLogs"', '"OwnershipAgreements"', '"Ownership"',
-        '"SellingItem"', '"sales"', '"ItemMaster"', '"CustomerDetails"', '"FinancialTracking"',
+        '"sales"', '"CustomerDetails"', '"FinancialTracking"',
         '"CommunicationLogs"', '"PerformanceMetrics"', '"AppConfig"'
     ];
+    let tablesToTruncate = [];
+    try {
+        const { Client } = require('pg');
+        const client = new Client({
+            host: config.database.host,
+            port: config.database.port,
+            user: config.database.user,
+            password: config.database.password,
+            database: config.database.database
+        });
+        await client.connect();
+        for (const table of allPossibleTables) {
+            const tableName = table.replace(/"/g, '');
+            const res = await client.query(`SELECT to_regclass('public."${tableName}"') as exists`);
+            if (res.rows[0].exists) {
+                tablesToTruncate.push(table);
+            }
+        }
+        await client.end();
+    } catch (err) {
+        log('Error checking table existence before truncation: ' + err.message);
+        process.exit(1);
+    }
     try {
         log('Truncating all relevant tables before seeding...');
         const { Client } = require('pg');
@@ -432,11 +456,11 @@ async function main() {
     if (config.runApiTests === true) {
         log('runApiTests flag is true: running API tests...');
         try {
-            const testResultsPath = path.resolve(__dirname, '../../logs/test-results.txt');
+            const testResultsPath = path.resolve(__dirname, '../../logs/API-Test-Results.txt');
             const testCommand = `npx jest --runInBand --detectOpenHandles --forceExit --testPathPattern=tests > "${testResultsPath}" 2>&1`;
             log(`Running: ${testCommand}`);
             execSync(testCommand, { cwd: path.resolve(__dirname, '../'), stdio: 'inherit', shell: true });
-            log('API tests executed and results written to logs/test-results.txt');
+            log('API tests executed and results written to logs/API-Test-Results.txt');
             if (fs.existsSync(testResultsPath)) {
                 const apiResults = fs.readFileSync(testResultsPath, 'utf-8');
                 fs.appendFileSync(logFilePath, '\n===== API TEST RESULTS =====\n' + apiResults + '\n===========================\n');

@@ -1,3 +1,13 @@
+/**
+ * database.js
+ * -----------------------------------------------------------------------------
+ * Database connection and utility functions for Sequelize and pg Pool.
+ *
+ * Author: eBay Sales Tool Team
+ * Last updated: 2025-07-10
+ * -----------------------------------------------------------------------------
+ */
+
 const { Sequelize } = require('sequelize');
 const { Pool } = require('pg');
 const fs = require('fs');
@@ -5,7 +15,7 @@ const path = require('path');
 
 const pgHost = process.env.PG_HOST || (process.env.NODE_ENV === 'docker' ? 'database' : 'localhost');
 
-// DEBUG: Print Sequelize/Postgres config at runtime
+// Print Sequelize/Postgres config at runtime for debugging
 console.log('Sequelize config:', {
     database: process.env.PG_DATABASE || 'ebay_sales_tool',
     user: process.env.PG_USER || 'postgres',
@@ -16,6 +26,7 @@ console.log('Sequelize config:', {
     NODE_ENV: process.env.NODE_ENV
 });
 
+// Sequelize instance for ORM
 const sequelize = new Sequelize(
     process.env.PG_DATABASE || 'ebay_sales_tool',
     process.env.PG_USER || 'postgres',
@@ -28,6 +39,7 @@ const sequelize = new Sequelize(
     }
 );
 
+// pg Pool instance for raw queries
 const pool = new Pool({
     host: pgHost,
     max: 10,
@@ -37,6 +49,9 @@ const pool = new Pool({
     port: process.env.PG_PORT || 5432
 });
 
+/**
+ * Seed the database with test data if the test flag is set in AppConfig.
+ */
 async function seedDatabaseIfTestFlag() {
     try {
         const result = await pool.query("SELECT config_value FROM AppConfig WHERE config_key = 'testdata'");
