@@ -11,12 +11,12 @@ const router = express.Router();
  *     tags: [Customers]
  *     parameters:
  *       - in: query
- *         name: firstName
+ *         name: first_name
  *         schema:
  *           type: string
  *         description: Search by first name
  *       - in: query
- *         name: lastName
+ *         name: last_name
  *         schema:
  *           type: string
  *         description: Search by last name
@@ -52,9 +52,9 @@ router.get('/customers/search', customerController.searchCustomers);
  *           schema:
  *             type: object
  *             properties:
- *               firstName:
+ *               first_name:
  *                 type: string
- *               lastName:
+ *               last_name:
  *                 type: string
  *               email:
  *                 type: string

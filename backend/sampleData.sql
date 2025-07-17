@@ -22,10 +22,10 @@ INSERT INTO "AppConfig" (config_key, config_value, data_type) VALUES
 ('maintenance_mode', 'false', 'boolean')
 ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value;
 -- Insert HistoryLogs records (auditing changes, now with user reference)
-INSERT INTO "HistoryLogs" (entity, entityId, action, changeDetails, user_id, createdAt)
+INSERT INTO historylogs (entity, entity_id, action, change_details, user_account_id, created_at)
 VALUES
-('Listing', 1, 'update', '{"field": "price", "old": 100, "new": 150}', 1, '2025-04-01 10:00:00'),
-('Listing', 2, 'update', '{"field": "description", "old": "Old desc", "new": "New desc"}', 2, '2025-04-02 11:00:00'),
-('Ownership', 1, 'create', '{"field": "ownership_type", "new": "Self"}', 1, '2025-04-03 12:00:00'),
-('Ownership', 2, 'create', '{"field": "ownership_type", "new": "Company"}', 2, '2025-04-03 12:05:00')
-ON CONFLICT (entity, entityId, action, createdAt) DO NOTHING;
+('listing', 1, 'update', '{"field": "price", "old": 100, "new": 150}', 1, '2025-04-01 10:00:00'),
+('listing', 2, 'update', '{"field": "description", "old": "Old desc", "new": "New desc"}', 2, '2025-04-02 11:00:00'),
+('ownership', 1, 'create', '{"field": "ownership_type", "new": "Self"}', 1, '2025-04-03 12:00:00'),
+('ownership', 2, 'create', '{"field": "ownership_type", "new": "Company"}', 2, '2025-04-03 12:05:00')
+ON CONFLICT (entity, entity_id, action, created_at) DO NOTHING;

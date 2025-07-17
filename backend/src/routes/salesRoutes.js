@@ -20,7 +20,7 @@ const router = express.Router();
  *                 type: string
  *               price:
  *                 type: number
- *               soldDate:
+ *               sold_date:
  *                 type: string
  *                 format: date-time
  *               owner:

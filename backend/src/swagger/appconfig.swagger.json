@@ -1,0 +1,82 @@
+{
+  "paths": {
+    "/appconfig": {
+      "get": {
+        "summary": "Get all app config records",
+        "tags": ["AppConfig"],
+        "responses": {
+          "200": {
+            "description": "List of app config records",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/AppConfigArray"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create an app config record",
+        "tags": ["AppConfig"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/AppConfig"}
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Created"}
+        }
+      }
+    },
+    "/appconfig/{id}": {
+      "get": {
+        "summary": "Get an app config record by ID",
+        "tags": ["AppConfig"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {
+          "200": {"description": "App config record", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/AppConfig"}}}},
+          "404": {"description": "Not found"}
+        }
+      },
+      "put": {
+        "summary": "Update an app config record",
+        "tags": ["AppConfig"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/AppConfig"}}}
+        },
+        "responses": {"200": {"description": "Updated"}, "404": {"description": "Not found"}}
+      },
+      "delete": {
+        "summary": "Delete an app config record",
+        "tags": ["AppConfig"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"204": {"description": "Deleted"}, "404": {"description": "Not found"}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AppConfig": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "config_key": {"type": "string"},
+          "config_value": {"type": "string"},
+          "description": {"type": "string"},
+          "created_at": {"type": "string", "format": "date-time"},
+          "updated_at": {"type": "string", "format": "date-time"}
+        },
+        "required": ["config_key"]
+      },
+      "AppConfigArray": {
+        "type": "array",
+        "items": {"$ref": "#/components/schemas/AppConfig"}
+      }
+    }
+  }
+}

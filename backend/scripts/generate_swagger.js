@@ -64,9 +64,10 @@ for (const file of files) {
     if (doc.components) {
       mainSwagger.components = mainSwagger.components || {};
       for (const key of Object.keys(doc.components)) {
+        // Deep merge each sub-object (e.g., schemas, responses)
         mainSwagger.components[key] = {
           ...(mainSwagger.components[key] || {}),
-          ...doc.components[key],
+          ...(doc.components[key] || {}),
         };
       }
     }

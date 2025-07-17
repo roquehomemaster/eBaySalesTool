@@ -1,0 +1,86 @@
+{
+  "paths": {
+    "/orderdetails": {
+      "get": {
+        "summary": "Get all order details records",
+        "tags": ["OrderDetails"],
+        "responses": {
+          "200": {
+            "description": "List of order details records",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/OrderDetailsArray"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create an order details record",
+        "tags": ["OrderDetails"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/OrderDetails"}
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Created"}
+        }
+      }
+    },
+    "/orderdetails/{id}": {
+      "get": {
+        "summary": "Get an order details record by ID",
+        "tags": ["OrderDetails"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {
+          "200": {"description": "Order details record", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/OrderDetails"}}}},
+          "404": {"description": "Not found"}
+        }
+      },
+      "put": {
+        "summary": "Update an order details record",
+        "tags": ["OrderDetails"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/OrderDetails"}}}
+        },
+        "responses": {"200": {"description": "Updated"}, "404": {"description": "Not found"}}
+      },
+      "delete": {
+        "summary": "Delete an order details record",
+        "tags": ["OrderDetails"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"204": {"description": "Deleted"}, "404": {"description": "Not found"}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "OrderDetails": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "sales_id": {"type": "integer"},
+          "item_id": {"type": "integer"},
+          "quantity": {"type": "integer"},
+          "unit_price": {"type": "number", "format": "decimal"},
+          "discount": {"type": "number", "format": "decimal"},
+          "tax": {"type": "number", "format": "decimal"},
+          "total": {"type": "number", "format": "decimal"},
+          "created_at": {"type": "string", "format": "date-time"},
+          "updated_at": {"type": "string", "format": "date-time"}
+        },
+        "required": ["sales_id", "item_id", "quantity", "unit_price"]
+      },
+      "OrderDetailsArray": {
+        "type": "array",
+        "items": {"$ref": "#/components/schemas/OrderDetails"}
+      }
+    }
+  }
+}

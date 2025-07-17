@@ -119,22 +119,22 @@ async function seedDatabase() {
 
         // Check that all required tables exist before seeding
         const requiredTables = [
-            'Catalog',
-            'Listing',
-            'Ownership',
-            'OwnershipAgreements',
-            'HistoryLogs',
+            'catalog',
+            'listing',
+            'ownership',
+            'ownershipagreements',
+            'historylogs',
             'sales',
-            'SalesHistory',
-            'CustomerDetails',
-            'FinancialTracking',
-            'CommunicationLogs',
-            'PerformanceMetrics'
+            'saleshistory',
+            'customerdetails',
+            'financialtracking',
+            'communicationlogs',
+            'performancemetrics'
         ];
         const missingTables = [];
         for (const table of requiredTables) {
             try {
-                const res = await pool.query(`SELECT to_regclass('public."${table}"') as exists`);
+                const res = await pool.query(`SELECT to_regclass('public.${table}') as exists`);
                 if (!res.rows[0].exists) {
                     missingTables.push(table);
                 }
@@ -158,6 +158,14 @@ async function seedDatabase() {
         await pool.query(seedSQL);
 
         log('Database seeding completed successfully.');
+        // Patch: Ensure no listing row has null created_at or updated_at
+        try {
+            const updateRes = await pool.query(`UPDATE listing SET created_at = NOW() WHERE created_at IS NULL; UPDATE listing SET updated_at = NOW() WHERE updated_at IS NULL;`);
+            log('Patched listing table: set created_at/updated_at to NOW() where null.');
+        } catch (err) {
+            log(`ERROR: Failed to patch listing created_at/updated_at: ${err.message}`);
+            console.error(`ERROR: Failed to patch listing created_at/updated_at: ${err.message}`);
+        }
         // Check all seeded tables and log their status
         let allOk = true;
         for (const table of requiredTables) {

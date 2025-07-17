@@ -1,0 +1,85 @@
+{
+  "paths": {
+    "/returnhistory": {
+      "get": {
+        "summary": "Get all return history records",
+        "tags": ["ReturnHistory"],
+        "responses": {
+          "200": {
+            "description": "List of return history records",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ReturnHistoryArray"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a return history record",
+        "tags": ["ReturnHistory"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/ReturnHistory"}
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Created"}
+        }
+      }
+    },
+    "/returnhistory/{id}": {
+      "get": {
+        "summary": "Get a return history record by ID",
+        "tags": ["ReturnHistory"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {
+          "200": {"description": "Return history record", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ReturnHistory"}}}},
+          "404": {"description": "Not found"}
+        }
+      },
+      "put": {
+        "summary": "Update a return history record",
+        "tags": ["ReturnHistory"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ReturnHistory"}}}
+        },
+        "responses": {"200": {"description": "Updated"}, "404": {"description": "Not found"}}
+      },
+      "delete": {
+        "summary": "Delete a return history record",
+        "tags": ["ReturnHistory"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"204": {"description": "Deleted"}, "404": {"description": "Not found"}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ReturnHistory": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "sales_id": {"type": "integer"},
+          "return_date": {"type": "string", "format": "date-time"},
+          "reason": {"type": "string"},
+          "status": {"type": "string"},
+          "refund_amount": {"type": "number", "format": "decimal"},
+          "notes": {"type": "string"},
+          "created_at": {"type": "string", "format": "date-time"},
+          "updated_at": {"type": "string", "format": "date-time"}
+        },
+        "required": ["sales_id", "return_date"]
+      },
+      "ReturnHistoryArray": {
+        "type": "array",
+        "items": {"$ref": "#/components/schemas/ReturnHistory"}
+      }
+    }
+  }
+}

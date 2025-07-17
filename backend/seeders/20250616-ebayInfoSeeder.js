@@ -1,24 +1,26 @@
 module.exports = {
   up: async (queryInterface) => {
-    await queryInterface.bulkInsert('EbayInfo', [
+    await queryInterface.bulkInsert('ebayinfo', [
       {
-        accountId: 'acc123',
-        storeName: 'Test Store',
-        feedbackScore: 100,
-        positiveFeedbackPercent: 99.5,
-        sellerLevel: 'Top Rated',
-        defectRate: 0.1,
-        lateShipmentRate: 0.05,
-        transactionDefectRate: 0.02,
-        policyComplianceStatus: 'Compliant',
-        sellingLimits: JSON.stringify({ limit: 100 }),
-        apiStatus: 'Healthy',
-        lastSync: new Date()
+        account_id: 'acc123',
+        store_name: 'Test Store',
+        feedback_score: 100,
+        positive_feedback_percent: 99.5,
+        seller_level: 'Top Rated',
+        defect_rate: 0.1,
+        late_shipment_rate: 0.05,
+        transaction_defect_rate: 0.02,
+        policy_compliance_status: 'Compliant',
+        selling_limits: JSON.stringify({ limit: 100 }),
+        api_status: 'Healthy',
+        last_sync: new Date(),
+        created_at: new Date(),
+        updated_at: new Date()
       }
     ]);
   },
 
   down: async (queryInterface) => {
-    await queryInterface.bulkDelete('EbayInfo', null, {});
+    await queryInterface.bulkDelete('ebayinfo', null, {});
   }
 };

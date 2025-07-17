@@ -13,7 +13,7 @@ describe('Ownership API', () => {
   it('should create a new ownership', async () => {
     const res = await request(app)
       .post('/api/ownership')
-      .send({ ownership_type: 'Full' }); // use correct snake_case field
+      .send({ ownership_type: 'Full' });
     expect(res.statusCode).toBe(201);
     expect(res.body.ownership_type).toBe('Full');
     ownershipId = res.body.id;

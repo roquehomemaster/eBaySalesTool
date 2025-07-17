@@ -58,20 +58,20 @@ if %ERRORLEVEL% neq 0 (
     exit /b 1
 )
 
-goto continue_build
-
-:continue_build
-REM Run the Node.js seed script directly (build.js removed)
-node f:\Dev\eBaySalesTool\backend\scripts\seedDatabase.js
+docker exec -i postgres_db psql -U postgres -d ebay_sales_tool < f:/Dev/eBaySalesTool/backend/database/recreate_schema.sql
 if %ERRORLEVEL% neq 0 (
-    echo Error: Node.js seed script failed.
+    echo Error: Failed to run recreate_schema.sql.
     exit /b 1
 )
 
-REM Generate Swagger JSON documentation
-node "%~dp0generate_swagger.js"
+goto continue_build
+
+:continue_build
+
+REM Run the Node.js build script (handles seeding, API tests, and Swagger generation)
+node f:\Dev\eBaySalesTool\backend\scripts\build.js
 if %ERRORLEVEL% neq 0 (
-    echo Error: Swagger JSON generator script failed.
+    echo Error: Node.js build script failed.
     exit /b 1
 )
 

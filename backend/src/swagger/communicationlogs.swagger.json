@@ -1,0 +1,87 @@
+{
+  "paths": {
+    "/communicationlogs": {
+      "get": {
+        "summary": "Get all communication logs",
+        "tags": ["CommunicationLogs"],
+        "responses": {
+          "200": {
+            "description": "List of communication logs",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/CommunicationLogsArray"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a communication log",
+        "tags": ["CommunicationLogs"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/CommunicationLogs"}
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Created"}
+        }
+      }
+    },
+    "/communicationlogs/{id}": {
+      "get": {
+        "summary": "Get a communication log by ID",
+        "tags": ["CommunicationLogs"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {
+          "200": {"description": "Communication log", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CommunicationLogs"}}}},
+          "404": {"description": "Not found"}
+        }
+      },
+      "put": {
+        "summary": "Update a communication log",
+        "tags": ["CommunicationLogs"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CommunicationLogs"}}}
+        },
+        "responses": {"200": {"description": "Updated"}, "404": {"description": "Not found"}}
+      },
+      "delete": {
+        "summary": "Delete a communication log",
+        "tags": ["CommunicationLogs"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"204": {"description": "Deleted"}, "404": {"description": "Not found"}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CommunicationLogs": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "customer_id": {"type": "integer"},
+          "sales_id": {"type": "integer"},
+          "communication_date": {"type": "string", "format": "date-time"},
+          "channel": {"type": "string"},
+          "subject": {"type": "string"},
+          "message": {"type": "string"},
+          "response": {"type": "string"},
+          "status": {"type": "string"},
+          "created_at": {"type": "string", "format": "date-time"},
+          "updated_at": {"type": "string", "format": "date-time"}
+        },
+        "required": ["customer_id", "communication_date"]
+      },
+      "CommunicationLogsArray": {
+        "type": "array",
+        "items": {"$ref": "#/components/schemas/CommunicationLogs"}
+      }
+    }
+  }
+}

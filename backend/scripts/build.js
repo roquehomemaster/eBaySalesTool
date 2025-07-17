@@ -243,11 +243,11 @@ function waitForAllContainers(config) {
 // --- Add robust seeding: TRUNCATE tables before seeding via API ---
 async function robustApiSeed() {
     const axios = require('axios');
-    // Only truncate tables that exist, to avoid errors if a table is missing (e.g., eBayInfo)
+    // Only truncate tables that exist, to avoid errors if a table is missing (e.g., ebayinfo)
     const allPossibleTables = [
-        '"eBayInfo"', '"SalesHistory"', '"HistoryLogs"', '"OwnershipAgreements"', '"Ownership"',
-        '"sales"', '"CustomerDetails"', '"FinancialTracking"',
-        '"CommunicationLogs"', '"PerformanceMetrics"', '"AppConfig"'
+        'ebayinfo', 'saleshistory', 'historylogs', 'ownershipagreements', 'ownership',
+        'sales', 'customerdetails', 'financialtracking',
+        'communicationlogs', 'performancemetrics', 'appconfig'
     ];
     let tablesToTruncate = [];
     try {

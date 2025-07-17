@@ -16,16 +16,41 @@ const Listing = require('../models/listingModel');
  */
 exports.createListing = async (req, res) => {
     try {
-        const requiredFields = ['title', 'price', 'itemId'];
+        const requiredFields = ['title', 'listing_price', 'item_id'];
         for (const field of requiredFields) {
-            if (!req.body[field]) {
+            if (req.body[field] === undefined || req.body[field] === null) {
                 return res.status(400).json({ message: `Missing required field: ${field}` });
             }
         }
-        const newListing = await Listing.create(req.body);
-        res.status(201).json(newListing);
+        // Check if itemId exists in Catalog table for FK integrity BEFORE creating the listing
+        const Catalog = require('../models/catalogModel');
+        const item_id = req.body.item_id;
+        const catalogItem = await Catalog.findByPk(item_id);
+        if (!catalogItem) {
+            return res.status(400).json({ message: 'Invalid item_id: catalog item does not exist' });
+        }
+        // Prepare listing data only after validation
+        const listingData = {
+            title: req.body.title,
+            listing_price: req.body.listing_price,
+            item_id: item_id
+        };
+        const newListing = await Listing.create(listingData);
+        // Map DB fields to snake_case in response
+        const response = newListing.toJSON ? newListing.toJSON() : newListing;
+        res.status(201).json({
+            id: response.id,
+            title: response.title,
+            listing_price: response.listing_price,
+            item_id: response.item_id,
+            status: response.status,
+            created_at: response.created_at,
+            updated_at: response.updated_at
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Error creating listing' });
+        // Print full error for diagnostics
+        console.error('Error creating listing:', error, error?.message, error?.stack);
+        res.status(500).json({ message: 'Error creating listing', error: error?.message || String(error) });
     }
 };
 

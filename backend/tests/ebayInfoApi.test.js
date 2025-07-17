@@ -8,17 +8,17 @@ describe('eBay Info API', () => {
     await sequelize.sync({ force: true });
     await EbayInfo.create({
       accountId: 'acc123',
-      storeName: 'Test Store',
-      feedbackScore: 100,
-      positiveFeedbackPercent: 99.5,
-      sellingLimits: {},
-      lastSync: new Date().toISOString(),
-      sellerLevel: 'Top Rated',
-      defectRate: 0.1,
-      lateShipmentRate: 0.05,
-      transactionDefectRate: 0.02,
-      policyComplianceStatus: 'Compliant',
-      apiStatus: 'Healthy'
+      store_name: 'Test Store',
+      feedback_score: 100,
+      positive_feedback_percent: 99.5,
+      selling_limits: {},
+      last_sync: new Date().toISOString(),
+      seller_level: 'Top Rated',
+      defect_rate: 0.1,
+      late_shipment_rate: 0.05,
+      transaction_defect_rate: 0.02,
+      policy_compliance_status: 'Compliant',
+      api_status: 'Healthy'
     });
   });
 

@@ -1,0 +1,82 @@
+{
+  "paths": {
+    "/database_configuration": {
+      "get": {
+        "summary": "Get all database configuration records",
+        "tags": ["DatabaseConfiguration"],
+        "responses": {
+          "200": {
+            "description": "List of database configuration records",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/DatabaseConfigurationArray"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a database configuration record",
+        "tags": ["DatabaseConfiguration"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/DatabaseConfiguration"}
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Created"}
+        }
+      }
+    },
+    "/database_configuration/{id}": {
+      "get": {
+        "summary": "Get a database configuration record by ID",
+        "tags": ["DatabaseConfiguration"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {
+          "200": {"description": "Database configuration record", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatabaseConfiguration"}}}},
+          "404": {"description": "Not found"}
+        }
+      },
+      "put": {
+        "summary": "Update a database configuration record",
+        "tags": ["DatabaseConfiguration"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatabaseConfiguration"}}}
+        },
+        "responses": {"200": {"description": "Updated"}, "404": {"description": "Not found"}}
+      },
+      "delete": {
+        "summary": "Delete a database configuration record",
+        "tags": ["DatabaseConfiguration"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"204": {"description": "Deleted"}, "404": {"description": "Not found"}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DatabaseConfiguration": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "config_name": {"type": "string"},
+          "config_value": {"type": "string"},
+          "description": {"type": "string"},
+          "created_at": {"type": "string", "format": "date-time"},
+          "updated_at": {"type": "string", "format": "date-time"}
+        },
+        "required": ["config_name"]
+      },
+      "DatabaseConfigurationArray": {
+        "type": "array",
+        "items": {"$ref": "#/components/schemas/DatabaseConfiguration"}
+      }
+    }
+  }
+}

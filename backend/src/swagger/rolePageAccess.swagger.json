@@ -1,0 +1,80 @@
+{
+  "paths": {
+    "/rolePageAccess": {
+      "get": {
+        "summary": "Get all role page access records",
+        "tags": ["RolePageAccess"],
+        "responses": {
+          "200": {
+            "description": "List of role page access records",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/RolePageAccessArray"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a role page access record",
+        "tags": ["RolePageAccess"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/RolePageAccess"}
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Created"}
+        }
+      }
+    },
+    "/rolePageAccess/{id}": {
+      "get": {
+        "summary": "Get a role page access record by ID",
+        "tags": ["RolePageAccess"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {
+          "200": {"description": "Role page access record", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RolePageAccess"}}}},
+          "404": {"description": "Not found"}
+        }
+      },
+      "put": {
+        "summary": "Update a role page access record",
+        "tags": ["RolePageAccess"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RolePageAccess"}}}
+        },
+        "responses": {"200": {"description": "Updated"}, "404": {"description": "Not found"}}
+      },
+      "delete": {
+        "summary": "Delete a role page access record",
+        "tags": ["RolePageAccess"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"204": {"description": "Deleted"}, "404": {"description": "Not found"}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RolePageAccess": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "role_id": {"type": "integer"},
+          "page_id": {"type": "integer"},
+          "access": {"type": "string", "enum": ["none", "read", "read_write", "read_write_create", "full"]}
+        },
+        "required": ["role_id", "page_id", "access"]
+      },
+      "RolePageAccessArray": {
+        "type": "array",
+        "items": {"$ref": "#/components/schemas/RolePageAccess"}
+      }
+    }
+  }
+}

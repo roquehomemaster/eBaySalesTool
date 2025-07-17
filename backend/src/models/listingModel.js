@@ -12,40 +12,15 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../utils/database').sequelize;
 
-// Listing model definition
-const Listing = sequelize.define('Listing', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-    field: 'id'
-  },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    field: 'title'
-  },
-  price: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
-    field: 'price'
-  },
-  itemId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    field: 'itemid'
-  },
-  status: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    defaultValue: 'active',
-    field: 'status'
-  },
-  watchers: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-    field: 'watchers'
-  },
+
+// Listing model definition (fixed syntax)
+const Listing = sequelize.define('listing', {
+  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  title: { type: DataTypes.STRING, allowNull: false },
+  listing_price: { type: DataTypes.DECIMAL },
+  item_id: { type: DataTypes.INTEGER, references: { model: 'catalog', key: 'id' } },
+  status: { type: DataTypes.STRING },
+  watchers: { type: DataTypes.INTEGER },
   item_condition_description: {
     type: DataTypes.TEXT,
     allowNull: true,
@@ -61,18 +36,21 @@ const Listing = sequelize.define('Listing', {
     allowNull: true,
     field: 'shipping_method'
   },
-  createdAt: {
+  created_at: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
-    field: 'createdat'
+    field: 'created_at'
   },
-  updatedAt: {
+  updated_at: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
-    field: 'updatedat'
+    field: 'updated_at'
   }
 }, {
-  freezeTableName: true // Prevent Sequelize from pluralizing table name
+  freezeTableName: true, // Prevent Sequelize from pluralizing table name
+  timestamps: true,
+  createdAt: 'created_at',
+  updatedAt: 'updated_at'
 });
 
 module.exports = Listing;

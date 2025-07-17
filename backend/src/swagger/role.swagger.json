@@ -1,0 +1,78 @@
+{
+  "paths": {
+    "/role": {
+      "get": {
+        "summary": "Get all roles",
+        "tags": ["Role"],
+        "responses": {
+          "200": {
+            "description": "List of roles",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/RoleArray"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a role",
+        "tags": ["Role"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/Role"}
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Created"}
+        }
+      }
+    },
+    "/role/{id}": {
+      "get": {
+        "summary": "Get a role by ID",
+        "tags": ["Role"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {
+          "200": {"description": "Role", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Role"}}}},
+          "404": {"description": "Not found"}
+        }
+      },
+      "put": {
+        "summary": "Update a role",
+        "tags": ["Role"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Role"}}}
+        },
+        "responses": {"200": {"description": "Updated"}, "404": {"description": "Not found"}}
+      },
+      "delete": {
+        "summary": "Delete a role",
+        "tags": ["Role"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"204": {"description": "Deleted"}, "404": {"description": "Not found"}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Role": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "name": {"type": "string"}
+        },
+        "required": ["name"]
+      },
+      "RoleArray": {
+        "type": "array",
+        "items": {"$ref": "#/components/schemas/Role"}
+      }
+    }
+  }
+}

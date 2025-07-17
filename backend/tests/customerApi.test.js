@@ -23,16 +23,16 @@ describe('Customer API', () => {
     // Seed the Customer table for tests
     await Customer.bulkCreate([
       {
-        firstName: 'John',
-        lastName: 'Doe',
+        first_name: 'John',
+        last_name: 'Doe',
         email: 'john@example.com',
         phone: '555-1234',
         address: '123 Main St',
         status: 'active'
       },
       {
-        firstName: 'Jane',
-        lastName: 'Smith',
+        first_name: 'Jane',
+        last_name: 'Smith',
         email: 'jane@example.com',
         phone: '555-5678',
         address: '456 Elm St',
@@ -46,10 +46,10 @@ describe('Customer API', () => {
     console.log('DEBUG: Current schema:', schemaResult[0]?.schema);
     // Try a raw select from Customer
     try {
-      const [customerRows] = await sequelize.query('SELECT * FROM "Customer"');
-      console.log('DEBUG: Raw select from Customer after sync:', customerRows);
+      const [customerRows] = await sequelize.query('SELECT * FROM customerdetails');
+      console.log('DEBUG: Raw select from customerdetails after sync:', customerRows);
     } catch (err) {
-      console.error('DEBUG: Error selecting from Customer after sync:', err.message);
+      console.error('DEBUG: Error selecting from customerdetails after sync:', err.message);
     }
   });
 
@@ -62,16 +62,16 @@ describe('Customer API', () => {
   it('should create a new customer', async () => {
     const res = await request(app)
       .post('/api/customers')
-      .send({ firstName: 'John', lastName: 'Doe', email: 'john.unique@example.com' }); // Use unique email
+      .send({ first_name: 'John', last_name: 'Doe', email: 'john.unique@example.com' }); // Use unique email
     expect(res.statusCode).toBe(201);
-    expect(res.body.firstName).toBe('John');
+    expect(res.body.first_name).toBe('John');
     customerId = res.body.id;
-    // Try a raw select from Customer after create
+    // Try a raw select from customerdetails after create
     try {
-      const [customerRows] = await sequelize.query('SELECT * FROM "Customer"');
-      console.log('DEBUG: Raw select from Customer after create:', customerRows);
+      const [customerRows] = await sequelize.query('SELECT * FROM customerdetails');
+      console.log('DEBUG: Raw select from customerdetails after create:', customerRows);
     } catch (err) {
-      console.error('DEBUG: Error selecting from Customer after create:', err.message);
+      console.error('DEBUG: Error selecting from customerdetails after create:', err.message);
     }
   });
 
@@ -82,7 +82,7 @@ describe('Customer API', () => {
   });
 
   it('should search customers', async () => {
-    const res = await request(app).get('/api/customers/search?firstName=John');
+    const res = await request(app).get('/api/customers/search?first_name=John');
     if (res.statusCode !== 200) {
       console.error('SEARCH CUSTOMERS ERROR:', res.body);
     }
@@ -99,9 +99,9 @@ describe('Customer API', () => {
   it('should update a customer by ID', async () => {
     const res = await request(app)
       .put(`/api/customers/${customerId}`)
-      .send({ lastName: 'Smith' });
+      .send({ last_name: 'Smith' });
     expect(res.statusCode).toBe(200);
-    expect(res.body.lastName).toBe('Smith');
+    expect(res.body.last_name).toBe('Smith');
   });
 
   it('should delete a customer by ID', async () => {

@@ -5,7 +5,7 @@ const Customer = require('../models/customerModel');
 exports.createCustomer = async (req, res) => {
     try {
         // Input validation for required fields
-        const requiredFields = ['firstName', 'lastName', 'email'];
+        const requiredFields = ['first_name', 'last_name', 'email'];
         for (const field of requiredFields) {
             if (!req.body[field]) {
                 return res.status(400).json({ message: `Missing required field: ${field}` });
@@ -109,12 +109,12 @@ exports.bulkDeleteCustomers = async (req, res) => {
 // Search/filter customers
 exports.searchCustomers = async (req, res) => {
     try {
-        const { firstName, lastName, email } = req.query;
+        const { first_name, last_name, email } = req.query;
         const where = {};
         // Use iLike for Postgres, like for others (e.g., SQLite)
         const likeOperator = Customer.sequelize.getDialect() === 'postgres' ? Op.iLike : Op.like;
-        if (firstName) { where.firstName = { [likeOperator]: `%${firstName}%` }; }
-        if (lastName) { where.lastName = { [likeOperator]: `%${lastName}%` }; }
+        if (first_name) { where.first_name = { [likeOperator]: `%${first_name}%` }; }
+        if (last_name) { where.last_name = { [likeOperator]: `%${last_name}%` }; }
         if (email) { where.email = { [likeOperator]: `%${email}%` }; }
         let customers = [];
         try {

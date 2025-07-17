@@ -1,0 +1,87 @@
+{
+  "paths": {
+    "/sales": {
+      "get": {
+        "summary": "Get all sales records",
+        "tags": ["Sales"],
+        "responses": {
+          "200": {
+            "description": "List of sales records",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/SalesArray"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a sales record",
+        "tags": ["Sales"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/Sales"}
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Created"}
+        }
+      }
+    },
+    "/sales/{id}": {
+      "get": {
+        "summary": "Get a sales record by ID",
+        "tags": ["Sales"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {
+          "200": {"description": "Sales record", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Sales"}}}},
+          "404": {"description": "Not found"}
+        }
+      },
+      "put": {
+        "summary": "Update a sales record",
+        "tags": ["Sales"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Sales"}}}
+        },
+        "responses": {"200": {"description": "Updated"}, "404": {"description": "Not found"}}
+      },
+      "delete": {
+        "summary": "Delete a sales record",
+        "tags": ["Sales"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"204": {"description": "Deleted"}, "404": {"description": "Not found"}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Sales": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "listing_id": {"type": "integer"},
+          "sold_price": {"type": "number", "format": "decimal"},
+          "soldDate": {"type": "string", "format": "date-time"},
+          "sold_shipping_collected": {"type": "number", "format": "decimal"},
+          "taxes": {"type": "number", "format": "decimal"},
+          "owner_id": {"type": "integer"},
+          "negotiated_terms": {"type": "string"},
+          "negotiated_terms_calculation": {"type": "number", "format": "decimal"},
+          "sales_channel": {"type": "string"},
+          "customer_feedback": {"type": "string"}
+        },
+        "required": ["listing_id", "sold_price"]
+      },
+      "SalesArray": {
+        "type": "array",
+        "items": {"$ref": "#/components/schemas/Sales"}
+      }
+    }
+  }
+}

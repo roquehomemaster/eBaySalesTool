@@ -1,0 +1,78 @@
+{
+  "paths": {
+    "/page": {
+      "get": {
+        "summary": "Get all pages",
+        "tags": ["Page"],
+        "responses": {
+          "200": {
+            "description": "List of pages",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/PageArray"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a page",
+        "tags": ["Page"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/Page"}
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Created"}
+        }
+      }
+    },
+    "/page/{id}": {
+      "get": {
+        "summary": "Get a page by ID",
+        "tags": ["Page"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {
+          "200": {"description": "Page", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Page"}}}},
+          "404": {"description": "Not found"}
+        }
+      },
+      "put": {
+        "summary": "Update a page",
+        "tags": ["Page"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Page"}}}
+        },
+        "responses": {"200": {"description": "Updated"}, "404": {"description": "Not found"}}
+      },
+      "delete": {
+        "summary": "Delete a page",
+        "tags": ["Page"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"204": {"description": "Deleted"}, "404": {"description": "Not found"}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Page": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "name": {"type": "string"}
+        },
+        "required": ["name"]
+      },
+      "PageArray": {
+        "type": "array",
+        "items": {"$ref": "#/components/schemas/Page"}
+      }
+    }
+  }
+}

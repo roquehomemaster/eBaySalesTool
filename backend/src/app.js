@@ -32,6 +32,15 @@ const path = require('path');
 const winston = require('winston');
 // Auth models (roles, users, pages, access matrix)
 const { User, Role, Page, RolePageAccess } = require('./models/authModels');
+const returnhistoryRoutes = require('./routes/returnhistoryRoutes');
+const orderdetailsRoutes = require('./routes/orderdetailsRoutes');
+const financialtrackingRoutes = require('./routes/financialtrackingRoutes');
+const communicationlogsRoutes = require('./routes/communicationlogsRoutes');
+const performancemetricsRoutes = require('./routes/performancemetricsRoutes');
+const appconfigRoutes = require('./routes/appconfigRoutes');
+const database_configurationRoutes = require('./routes/database_configurationRoutes');
+const shippinglogRoutes = require('./routes/shippinglogRoutes');
+const ownershipagreementsRoutes = require('./routes/ownershipagreementsRoutes');
 
 // Ensure the logs directory exists BEFORE logger is created
 const logDir = '/usr/src/app/logs';
@@ -69,6 +78,15 @@ app.use('/api', salesRoutes);
 app.use('/api', customerRoutes);
 app.use('/api/ebay', ebayInfoRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/returnhistory', returnhistoryRoutes);
+app.use('/api/orderdetails', orderdetailsRoutes);
+app.use('/api/financialtracking', financialtrackingRoutes);
+app.use('/api/communicationlogs', communicationlogsRoutes);
+app.use('/api/performancemetrics', performancemetricsRoutes);
+app.use('/api/appconfig', appconfigRoutes);
+app.use('/api/database_configuration', database_configurationRoutes);
+app.use('/api/shippinglog', shippinglogRoutes);
+app.use('/api/ownershipagreements', ownershipagreementsRoutes);
 
 // Swagger configuration (merged)
 const mergedSwagger = require('./swagger/mergedSwagger');

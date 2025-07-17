@@ -1,5 +1,5 @@
 const express = require('express');
-const { User, Role, Page, RolePageAccess } = require('../models/authModels');
+const { ApplicationAccount, Role, Page, RolePageAccess } = require('../models/authModels');
 const router = express.Router();
 
 // --- Role CRUD ---
@@ -118,9 +118,11 @@ router.delete('/role-page-access/:id', async (req, res) => {
 });
 
 // --- User CRUD (basic, for admin use) ---
+
+// Use ApplicationAccount for user CRUD
 router.get('/users', async (req, res) => {
   try {
-    const users = await User.findAll({ include: [Role] });
+    const users = await ApplicationAccount.findAll({ include: [Role] });
     res.json(users);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -129,7 +131,7 @@ router.get('/users', async (req, res) => {
 
 router.post('/users', async (req, res) => {
   try {
-    const user = await User.create(req.body);
+    const user = await ApplicationAccount.create(req.body);
     res.status(201).json(user);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -138,7 +140,7 @@ router.post('/users', async (req, res) => {
 
 router.put('/users/:id', async (req, res) => {
   try {
-    const user = await User.findByPk(req.params.id);
+    const user = await ApplicationAccount.findByPk(req.params.id);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -151,7 +153,7 @@ router.put('/users/:id', async (req, res) => {
 
 router.delete('/users/:id', async (req, res) => {
   try {
-    const user = await User.findByPk(req.params.id);
+    const user = await ApplicationAccount.findByPk(req.params.id);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }

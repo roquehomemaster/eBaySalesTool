@@ -19,7 +19,7 @@ describe('Catalog API', () => {
         manufacturer: 'TestCo',
         model: 'T1000',
         serial_number: 'SN123',
-        sku_barcode: 'SKU12345'
+        sku_barcode: `SKU${Date.now()}A`
       });
     expect(res.statusCode).toBe(201);
     expect(res.body).toHaveProperty('id');
@@ -47,7 +47,7 @@ describe('Catalog API', () => {
         manufacturer: 'TestCo',
         model: 'T1000',
         serial_number: 'SN124',
-        sku_barcode: 'SKU12345' // duplicate
+        sku_barcode: `SKU${Date.now()}A` // duplicate
       });
     expect(res.statusCode).toBe(409);
     expect(res.body.message).toMatch(/Duplicate SKU/);
@@ -114,7 +114,7 @@ describe('Catalog API', () => {
     // Try to update second catalog entry to use the first entry's SKU
     const res2 = await request(app)
       .put(`/api/catalog/${secondId}`)
-      .send({ sku_barcode: 'SKU12345' });
+      .send({ sku_barcode: `SKU${Date.now()}A` });
     expect(res2.statusCode).toBe(409);
     expect(res2.body.message).toMatch(/Duplicate SKU/);
   });
