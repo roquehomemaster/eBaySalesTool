@@ -2,8 +2,10 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import './NavTabs.css';
 
+
 const tabs = [
-  { label: 'Items', path: '/' },
+  { label: 'Listing', path: '/listings' },
+  { label: 'Catalog', path: '/catalog' },
   { label: 'Sales', path: '/sales' },
   { label: 'Reports', path: '/reports' },
 ];
@@ -16,7 +18,7 @@ const NavTabs = () => (
           <NavLink
             to={tab.path}
             className={({ isActive }) => isActive ? 'active' : ''}
-            end={tab.path === '/'}
+            end={tab.path === '/listings'}
           >
             {tab.label}
           </NavLink>

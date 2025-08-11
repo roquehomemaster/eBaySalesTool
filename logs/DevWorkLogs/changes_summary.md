@@ -7,12 +7,12 @@ This document outlines the changes made to the eBaySalesTool backend build, data
 
 ### 1. Log File Relocation & Renaming
 - Moved all build and API test logs to a single directory: `logs/ApplicationLogs/`.
-- Renamed `logs/test-results.txt` to `logs/ApplicationLogs/API-Test-Results.logs`.
+- Renamed `logs/test-results.txt` to `logs/API-Test-Results.txt`.
 - Moved `backend/scripts/build.log` to `logs/ApplicationLogs/build.log`.
 
 ### 2. Build & Test Process Improvements
 - Ensured the build process logs all steps, environment variables, and results to `build.log`.
-- API test results are now appended to `API-Test-Results.logs` for each build.
+- API test results are now written to `logs/API-Test-Results.txt` for each build.
 - All references in scripts and code to the old log file locations have been updated to use the new paths (if not, update as needed).
 
 ### 3. Container & Database Reliability
@@ -32,7 +32,7 @@ This document outlines the changes made to the eBaySalesTool backend build, data
 
 ## File Locations
 - **Build log:** `logs/ApplicationLogs/build.log`
-- **API test results:** `logs/ApplicationLogs/API-Test-Results.logs`
+- **API test results:** `logs/API-Test-Results.txt`
 
 ## Outstanding/Optional
 - Address the missing `users` table and related foreign key errors in migrations if required.

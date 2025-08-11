@@ -4,12 +4,21 @@
 This project is developed and tested on a Windows 11 machine using WSL2 to run Docker containers. All Docker-based services (backend, database, frontend) are built and executed within the WSL2 environment. This setup may affect file paths, volume mounts, and networking behavior compared to native Linux or macOS environments.
 
 ## Project Overview
-The eBay Sales Tool is a full-stack web application designed to assist users in managing eBay sales, tracking items, and conducting product research. It includes a backend API, a frontend user interface, and a database for storing sales and product data.
+The eBay Sales Tool is a full-stack web application designed to assist users in managing eBay sales, tracking eBay listings, and maintaining a growing product catalog. It includes a backend API, a frontend user interface, and a database for storing sales, catalog, and listing data.
+
+## Data Model Overview
+
+
+**Catalog**: The master list of all products ever tracked, regardless of whether they were ever listed on eBay. This table grows over time and serves as a historical record of all products.
+
+**Listing**: Tracks all eBay listings, past or present, regardless of their status (active, sold, ended, etc.). Each entry corresponds to an eBay listing. Not every catalog item must have a corresponding Listing, but every Listing should reference a product in the Catalog.
+
+**HistoryLogs**: Records all changes to tracked entities (such as Listing, Customer, etc.) for auditing purposes. Each log entry includes the entity name, entity ID, action performed, details of the change, the user (by Ownership ID) who made the change, and the timestamp. This ensures all changes are auditable and attributable to a specific user.
 
 ## Features
-- **Backend**: Built with Node.js and Express, providing RESTful APIs for managing sales, items, and ownership.
-- **Frontend**: Developed with React, offering a user-friendly interface for data entry, sales tracking, and product research.
-- **Database**: Uses MongoDB for storing sales and item data.
+- **Backend**: Built with Node.js and Express, providing RESTful APIs for managing sales, catalog, listings, and ownership.
+- **Frontend**: Developed with React, offering a user-friendly interface for catalog management, sales tracking, and product research.
+- **Database**: Uses PostgreSQL for storing sales, catalog, and listing data.
 - **Dockerized**: Fully containerized setup for easy deployment and development.
 - **Swagger Documentation**: API documentation available at `/api-docs`.
 
@@ -88,7 +97,7 @@ To build the project, follow these steps:
 **Note:**
 - The backend/database build and the frontend build are now independent. Use the appropriate script for each (see below).
 - API tests and database seeding are both controlled by configuration flags in `backend/build.json` (see below). The Node.js build script handles these steps and logs the results in `backend/scripts/build.log`.
-- API test results are written to `logs/test-results.txt`.
+- API test results are written to `logs/API-Test-Results.txt`.
 - The build will fail if any test fails or if any test suite is empty.
 - The `run_build.bat` script in `backend/scripts` is the official and only supported backend build script.
 - Any other build scripts or folders (e.g., `build/scripts`) are deprecated and should not be used.
@@ -111,7 +120,7 @@ The following flags in `backend/build.json` control build-time testing and seedi
   "runApiTests": true,
   "testdata": true
 ```
-- If `runApiTests` is `true`, API tests are executed automatically during the build and results are saved to `logs/test-results.txt`. If `false`, API tests are skipped.
+- If `runApiTests` is `true`, API tests are executed automatically during the build and results are saved to `logs/API-Test-Results.txt`. If `false`, API tests are skipped.
 - If `testdata` is `true`, the database is truncated and seeded with test data after API tests complete. If `false`, seeding is skipped.
 
 **Important:**
@@ -125,8 +134,7 @@ The execution of backend API tests during the build is controlled by the `runApi
 ```
   "runApiTests": true
 ```
-- If `true`, API tests are executed automatically during the build and results are saved to `logs/test-results.txt`.
-- If `false`, API tests are skipped.
+- If `true`, API tests are executed automatically during the build and results are saved to `logs/API-Test-Results.txt`. If `false`, API tests are skipped.
 
 You can change this flag to enable or disable API test execution as needed.
 

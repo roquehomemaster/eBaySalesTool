@@ -1,0 +1,85 @@
+{
+  "paths": {
+    "/listing": {
+      "get": {
+        "summary": "Get all listings",
+        "tags": ["Listing"],
+        "responses": {
+          "200": {
+            "description": "List of listings",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ListingArray"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a listing",
+        "tags": ["Listing"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/Listing"}
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Created"}
+        }
+      }
+    },
+    "/listing/{id}": {
+      "get": {
+        "summary": "Get a listing by ID",
+        "tags": ["Listing"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {
+          "200": {"description": "Listing", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Listing"}}}},
+          "404": {"description": "Not found"}
+        }
+      },
+      "put": {
+        "summary": "Update a listing",
+        "tags": ["Listing"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Listing"}}}
+        },
+        "responses": {"200": {"description": "Updated"}, "404": {"description": "Not found"}}
+      },
+      "delete": {
+        "summary": "Delete a listing",
+        "tags": ["Listing"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"204": {"description": "Deleted"}, "404": {"description": "Not found"}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Listing": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "catalog_id": {"type": "integer"},
+          "listing_title": {"type": "string"},
+          "listing_price": {"type": "number", "format": "decimal"},
+          "listing_status": {"type": "string"},
+          "listing_date": {"type": "string", "format": "date-time"},
+          "expiration_date": {"type": "string", "format": "date-time"},
+          "created_at": {"type": "string", "format": "date-time"},
+          "updated_at": {"type": "string", "format": "date-time"}
+        },
+        "required": ["catalog_id", "listing_title", "listing_price"]
+      },
+      "ListingArray": {
+        "type": "array",
+        "items": {"$ref": "#/components/schemas/Listing"}
+      }
+    }
+  }
+}

@@ -2,6 +2,7 @@
   "runApiTests": true,
   "database": {
     "host": "localhost",
+    "host_local": "localhost",
     "user": "postgres",
     "password": "password",
     "database": "ebay_sales_tool",

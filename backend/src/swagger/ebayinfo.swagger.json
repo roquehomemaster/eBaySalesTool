@@ -1,0 +1,91 @@
+{
+  "paths": {
+    "/ebayinfo": {
+      "get": {
+        "summary": "Get all eBay info records",
+        "tags": ["EbayInfo"],
+        "responses": {
+          "200": {
+            "description": "List of eBay info records",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/EbayInfoArray"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create an eBay info record",
+        "tags": ["EbayInfo"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/EbayInfo"}
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Created"}
+        }
+      }
+    },
+    "/ebayinfo/{id}": {
+      "get": {
+        "summary": "Get an eBay info record by ID",
+        "tags": ["EbayInfo"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {
+          "200": {"description": "eBay info record", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/EbayInfo"}}}},
+          "404": {"description": "Not found"}
+        }
+      },
+      "put": {
+        "summary": "Update an eBay info record",
+        "tags": ["EbayInfo"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/EbayInfo"}}}
+        },
+        "responses": {"200": {"description": "Updated"}, "404": {"description": "Not found"}}
+      },
+      "delete": {
+        "summary": "Delete an eBay info record",
+        "tags": ["EbayInfo"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"204": {"description": "Deleted"}, "404": {"description": "Not found"}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EbayInfo": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "account_id": {"type": "string"},
+          "store_name": {"type": "string"},
+          "feedback_score": {"type": "integer"},
+          "positive_feedback_percent": {"type": "number", "format": "float"},
+          "seller_level": {"type": "string"},
+          "defect_rate": {"type": "number", "format": "float"},
+          "late_shipment_rate": {"type": "number", "format": "float"},
+          "transaction_defect_rate": {"type": "number", "format": "float"},
+          "policy_compliance_status": {"type": "string"},
+          "selling_limits": {"type": "object"},
+          "api_status": {"type": "string"},
+          "last_sync": {"type": "string", "format": "date-time"},
+          "created_at": {"type": "string", "format": "date-time"},
+          "updated_at": {"type": "string", "format": "date-time"}
+        },
+        "required": ["account_id"]
+      },
+      "EbayInfoArray": {
+        "type": "array",
+        "items": {"$ref": "#/components/schemas/EbayInfo"}
+      }
+    }
+  }
+}

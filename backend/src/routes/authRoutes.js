@@ -1,12 +1,16 @@
 const express = require('express');
-const { User, Role, Page, RolePageAccess } = require('../models/authModels');
+const { ApplicationAccount, Role, Page, RolePageAccess } = require('../models/authModels');
 const router = express.Router();
 
 // --- Role CRUD ---
 router.get('/roles', async (req, res) => {
   try {
     const roles = await Role.findAll();
-    res.json(roles);
+    // Return only snake_case PKs
+    res.json(roles.map(role => ({
+      role_id: role.role_id,
+      name: role.name
+    })));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -15,9 +19,9 @@ router.get('/roles', async (req, res) => {
 router.post('/roles', async (req, res) => {
   try {
     const role = await Role.create({ name: req.body.name });
-    res.status(201).json(role);
+    res.status(201).json({ role_id: role.role_id, name: role.name });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: err.message, details: err.errors || undefined });
   }
 });
 
@@ -29,9 +33,9 @@ router.put('/roles/:id', async (req, res) => {
     }
     role.name = req.body.name;
     await role.save();
-    res.json(role);
+    res.json({ role_id: role.role_id, name: role.name });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: err.message, details: err.errors || undefined });
   }
 });
 
@@ -44,7 +48,7 @@ router.delete('/roles/:id', async (req, res) => {
     await role.destroy();
     res.json({ message: 'Role deleted' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message, details: err.errors || undefined });
   }
 });
 
@@ -52,7 +56,10 @@ router.delete('/roles/:id', async (req, res) => {
 router.get('/pages', async (req, res) => {
   try {
     const pages = await Page.findAll();
-    res.json(pages);
+    res.json(pages.map(page => ({
+      page_id: page.page_id,
+      name: page.name
+    })));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -61,9 +68,9 @@ router.get('/pages', async (req, res) => {
 router.post('/pages', async (req, res) => {
   try {
     const page = await Page.create({ name: req.body.name });
-    res.status(201).json(page);
+    res.status(201).json({ page_id: page.page_id, name: page.name });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: err.message, details: err.errors || undefined });
   }
 });
 
@@ -71,7 +78,12 @@ router.post('/pages', async (req, res) => {
 router.get('/role-page-access', async (req, res) => {
   try {
     const matrix = await RolePageAccess.findAll({ include: [Role, Page] });
-    res.json(matrix);
+    res.json(matrix.map(access => ({
+      access_id: access.access_id,
+      role_id: access.role_id,
+      page_id: access.page_id,
+      access: access.access
+    })));
   } catch (err) {
     console.error('Error in GET /role-page-access:', err);
     res.status(500).json({ error: err.message, details: err });
@@ -85,9 +97,14 @@ router.post('/role-page-access', async (req, res) => {
       page_id: req.body.page_id,
       access: req.body.access
     });
-    res.status(201).json(access);
+    res.status(201).json({
+      access_id: access.access_id,
+      role_id: access.role_id,
+      page_id: access.page_id,
+      access: access.access
+    });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: err.message, details: err.errors || undefined });
   }
 });
 
@@ -98,7 +115,12 @@ router.put('/role-page-access/:id', async (req, res) => {
       return res.status(404).json({ error: 'Access entry not found' });
     }
     await access.update({ access: req.body.access });
-    res.json(access);
+    res.json({
+      access_id: access.access_id,
+      role_id: access.role_id,
+      page_id: access.page_id,
+      access: access.access
+    });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -113,15 +135,22 @@ router.delete('/role-page-access/:id', async (req, res) => {
     await access.destroy();
     res.json({ message: 'Access entry deleted' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message, details: err.errors || undefined });
   }
 });
 
 // --- User CRUD (basic, for admin use) ---
+
+// Use ApplicationAccount for user CRUD
 router.get('/users', async (req, res) => {
   try {
-    const users = await User.findAll({ include: [Role] });
-    res.json(users);
+    const users = await ApplicationAccount.findAll({ include: [Role] });
+    res.json(users.map(user => ({
+      user_account_id: user.user_account_id,
+      username: user.username,
+      email: user.email,
+      role_id: user.role_id
+    })));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -129,8 +158,13 @@ router.get('/users', async (req, res) => {
 
 router.post('/users', async (req, res) => {
   try {
-    const user = await User.create(req.body);
-    res.status(201).json(user);
+    const user = await ApplicationAccount.create(req.body);
+    res.status(201).json({
+      user_account_id: user.user_account_id,
+      username: user.username,
+      email: user.email,
+      role_id: user.role_id
+    });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -138,12 +172,17 @@ router.post('/users', async (req, res) => {
 
 router.put('/users/:id', async (req, res) => {
   try {
-    const user = await User.findByPk(req.params.id);
+    const user = await ApplicationAccount.findByPk(req.params.id);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
     await user.update(req.body);
-    res.json(user);
+    res.json({
+      user_account_id: user.user_account_id,
+      username: user.username,
+      email: user.email,
+      role_id: user.role_id
+    });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -151,7 +190,7 @@ router.put('/users/:id', async (req, res) => {
 
 router.delete('/users/:id', async (req, res) => {
   try {
-    const user = await User.findByPk(req.params.id);
+    const user = await ApplicationAccount.findByPk(req.params.id);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }

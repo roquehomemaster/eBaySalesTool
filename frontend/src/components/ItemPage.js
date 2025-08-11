@@ -50,7 +50,7 @@ const ItemPage = () => {
                     {items.length > 0 ? (
                         <ul>
                             {items.map((item) => (
-                                <li key={item.id} onClick={() => handleItemClick(item)}>
+                                <li key={item.item_id} onClick={() => handleItemClick(item)}>
                                     {item.description}
                                 </li>
                             ))}
@@ -67,7 +67,7 @@ const ItemPage = () => {
                             <p><strong>Manufacturer:</strong> {selectedItem.manufacturer_info}</p>
                             <p><strong>Size:</strong> {selectedItem.size}</p>
                             <p><strong>Weight:</strong> {selectedItem.weight}</p>
-                            <p><strong>Condition:</strong> {selectedItem.condition}</p>
+                            <p><strong>Condition:</strong> {selectedItem.item_condition}</p>
                             <p><strong>Category:</strong> {selectedItem.category}</p>
                             <p><strong>SKU/Barcode:</strong> {selectedItem.sku_barcode}</p>
                             <button>Save Changes</button>

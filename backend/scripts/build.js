@@ -49,8 +49,8 @@ function setEnvironmentVariablesFromConfig(config) {
             (fs.existsSync('/proc/1/cgroup') && fs.readFileSync('/proc/1/cgroup', 'utf-8').includes('docker'));
     } catch (e) {}
     // Use service name in Docker, static IP on host
-    const dbHost = inDocker ? 'postgres_db' : config.database.host;
-    process.env.PG_HOST = dbHost;
+    // Always use 'localhost' for PG_HOST unless running inside Docker
+    process.env.PG_HOST = inDocker ? 'postgres_db' : 'localhost';
     process.env.PG_PORT = config.database.port;
     process.env.PG_USER = config.database.user;
     process.env.PG_PASSWORD = config.database.password;
@@ -60,7 +60,7 @@ function setEnvironmentVariablesFromConfig(config) {
     process.env.POSTGRES_DB_IP = config.network.postgresDbIp;
     process.env.BACKEND_IP = config.network.backendIp;
     process.env.FRONTEND_IP = config.network.frontendIp;
-    config.database.host = dbHost;
+    // Remove dbHost reference, already set above if needed
 }
 
 const { maxRetries, retryDelay, healthCheckRetries, healthCheckDelay } = config.constants;
@@ -243,11 +243,42 @@ function waitForAllContainers(config) {
 // --- Add robust seeding: TRUNCATE tables before seeding via API ---
 async function robustApiSeed() {
     const axios = require('axios');
-    const tablesToTruncate = [
-        '"eBayInfo"', '"SalesHistory"', '"HistoryLogs"', '"OwnershipAgreements"', '"Ownership"',
-        '"SellingItem"', '"sales"', '"ItemMaster"', '"CustomerDetails"', '"FinancialTracking"',
-        '"CommunicationLogs"', '"PerformanceMetrics"', '"AppConfig"'
+    // Only truncate tables that exist, to avoid errors if a table is missing (e.g., ebayinfo)
+    const allPossibleTables = [
+        // Core master tables first to clear potential PK/sequence conflicts
+        'catalog', 'listing', 'roles', 'application_account', 'customer',
+        // Domain tables
+        'ownership', 'ownershipagreements', 'sales', 'saleshistory', 'order_details',
+        'shippinglog', 'financialtracking', 'customerdetails', 'product_research',
+        'communicationlogs', 'performancemetrics', 'returnhistory',
+        // Config and auxiliary
+        'appconfig', 'database_configuration',
+        // eBay info snapshot table
+        'ebayinfo', 'historylogs'
     ];
+    let tablesToTruncate = [];
+    try {
+        const { Client } = require('pg');
+        const client = new Client({
+            host: config.database.host,
+            port: config.database.port,
+            user: config.database.user,
+            password: config.database.password,
+            database: config.database.database
+        });
+        await client.connect();
+        for (const table of allPossibleTables) {
+            const tableName = table.replace(/"/g, '');
+            const res = await client.query(`SELECT to_regclass('public."${tableName}"') as exists`);
+            if (res.rows[0].exists) {
+                tablesToTruncate.push(table);
+            }
+        }
+        await client.end();
+    } catch (err) {
+        log('Error checking table existence before truncation: ' + err.message);
+        process.exit(1);
+    }
     try {
         log('Truncating all relevant tables before seeding...');
         const { Client } = require('pg');
@@ -429,14 +460,37 @@ async function main() {
     await startDockerContainers(config);
     await verifyAllContainersHealth();
     await waitForDatabaseReadiness(config);
+    // Always seed the database before tests to ensure a known state for testing
+    if (config.testdata === true) {
+        log('Seeding database before tests to ensure a known state for testing...');
+        await robustApiSeed();
+    } else {
+        log('testdata flag is not true: skipping pre-test database seeding.');
+    }
     if (config.runApiTests === true) {
         log('runApiTests flag is true: running API tests...');
         try {
-            const testResultsPath = path.resolve(__dirname, '../../logs/test-results.txt');
+            const testResultsPath = path.resolve(__dirname, '../../logs/API-Test-Results.txt');
+            // Windows-compatible environment variable assignment
+            // Use 'localhost' for PG_HOST on host, 'postgres_db' inside Docker
+            let inDocker = false;
+            try {
+                inDocker = fs.existsSync('/.dockerenv') ||
+                    (fs.existsSync('/proc/1/cgroup') && fs.readFileSync('/proc/1/cgroup', 'utf-8').includes('docker'));
+            } catch (e) {}
+            // Always set PG_HOST=localhost for Jest tests run on host
+            const testEnv = {
+                ...process.env,
+                PG_HOST: 'localhost',
+                PG_USER: 'postgres',
+                PG_PASSWORD: 'password',
+                PG_DATABASE: 'ebay_sales_tool',
+                PG_PORT: '5432'
+            };
             const testCommand = `npx jest --runInBand --detectOpenHandles --forceExit --testPathPattern=tests > "${testResultsPath}" 2>&1`;
             log(`Running: ${testCommand}`);
-            execSync(testCommand, { cwd: path.resolve(__dirname, '../'), stdio: 'inherit', shell: true });
-            log('API tests executed and results written to logs/test-results.txt');
+            execSync(testCommand, { cwd: path.resolve(__dirname, '../'), stdio: 'inherit', shell: true, env: testEnv });
+            log('API tests executed and results written to logs/API-Test-Results.txt');
             if (fs.existsSync(testResultsPath)) {
                 const apiResults = fs.readFileSync(testResultsPath, 'utf-8');
                 fs.appendFileSync(logFilePath, '\n===== API TEST RESULTS =====\n' + apiResults + '\n===========================\n');
@@ -450,13 +504,6 @@ async function main() {
         }
     } else {
         log('runApiTests flag is not true: skipping API tests.');
-    }
-    // Always seed the database after tests to ensure a known state for development
-    if (config.testdata === true) {
-        log('Seeding database after tests to ensure a known state for development...');
-        await robustApiSeed();
-    } else {
-        log('testdata flag is not true: skipping post-test database seeding.');
     }
     log('Build process completed successfully.');
 }

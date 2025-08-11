@@ -1,0 +1,84 @@
+{
+  "paths": {
+    "/application_account": {
+      "get": {
+        "summary": "Get all application accounts",
+        "tags": ["ApplicationAccount"],
+        "responses": {
+          "200": {
+            "description": "List of application accounts",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ApplicationAccountArray"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create an application account",
+        "tags": ["ApplicationAccount"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/ApplicationAccount"}
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Created"}
+        }
+      }
+    },
+    "/application_account/{user_account_id}": {
+      "get": {
+        "summary": "Get an application account by ID",
+        "tags": ["ApplicationAccount"],
+        "parameters": [{"name": "user_account_id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {
+          "200": {"description": "ApplicationAccount", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ApplicationAccount"}}}},
+          "404": {"description": "Not found"}
+        }
+      },
+      "put": {
+        "summary": "Update an application account",
+        "tags": ["ApplicationAccount"],
+        "parameters": [{"name": "user_account_id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ApplicationAccount"}}}
+        },
+        "responses": {"200": {"description": "Updated"}, "404": {"description": "Not found"}}
+      },
+      "delete": {
+        "summary": "Delete an application account",
+        "tags": ["ApplicationAccount"],
+        "parameters": [{"name": "user_account_id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"204": {"description": "Deleted"}, "404": {"description": "Not found"}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApplicationAccount": {
+        "type": "object",
+        "properties": {
+          "user_account_id": {"type": "integer"},
+          "username": {"type": "string"},
+          "email": {"type": "string"},
+          "password_hash": {"type": "string"},
+          "role_id": {"type": "integer"},
+          "status": {"type": "string"},
+          "created_at": {"type": "string", "format": "date-time"},
+          "updated_at": {"type": "string", "format": "date-time"}
+        },
+        "required": ["username", "email", "password_hash"]
+      },
+      "ApplicationAccountArray": {
+        "type": "array",
+        "items": {"$ref": "#/components/schemas/ApplicationAccount"}
+      }
+    }
+  }
+}

@@ -29,9 +29,9 @@ backend\scripts\run_build.bat
    This will rebuild the backend, apply migrations, and seed the database as needed.
 
 ## Recent Changes (June 2025)
-1. Created a new `ItemTable` component to fetch and display items from `/api/items`.
-2. Added a `getItems()` method to the frontend API service.
-3. Updated `App.js` to render `ItemTable` at the root route (`/`).
+1. Created a new `CatalogTable` component to fetch and display catalog entries from `/api/catalog`.
+2. Added a `getCatalog()` method to the frontend API service.
+3. Updated `App.js` to render `CatalogTable` at the root route (`/`).
 4. Rebuilt the frontend with `npm run build` and restarted the dev server to ensure the latest code was served.
 5. Confirmed the correct UI is now displayed.
 6. **Separated UI and backend build processes for reliability.**

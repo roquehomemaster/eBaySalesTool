@@ -1,3 +1,16 @@
+# Standard Operating Procedure (SOP) for Code Comments
+
+## Code Commenting SOP
+
+1. **All scripts, especially build, migration, and merge scripts, must include clear comments at the top explaining their purpose, usage, and any ordering or dependency requirements.**
+2. **Any non-trivial logic, edge case handling, or error catching must be explained with inline comments.**
+3. **If a script is part of a multi-step process (e.g., Swagger merge before backend start), this must be documented in the comments.**
+4. **If a script uses synchronous or asynchronous file operations, the reason and any implications for build order must be commented.**
+5. **Manual edits to generated files (like swagger.json) are discouraged and this should be stated in the comments.**
+6. **All new scripts and major changes must be reviewed for adequate commenting before merging.**
+
+> "Commenting code is not optional. It is a required part of our SOP to ensure maintainability, onboarding, and robust automation."
+
 # Experimental Code and Scripts Policy
 
 **Practice:**

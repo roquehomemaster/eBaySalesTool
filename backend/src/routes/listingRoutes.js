@@ -1,17 +1,8 @@
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
 const router = express.Router();
 const listingController = require('../controllers/listingController');
 
-// Serve the landing page
-router.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../templates/index.html'));
-});
-
-router.get('/data-entry', (req, res) => {
-    res.sendFile(path.join(__dirname, '../templates/dataEntry.html'));
-});
+// Listing API routes
 
 /**
  * @swagger
@@ -60,7 +51,7 @@ router.get('/data-entry', (req, res) => {
  *       500:
  *         description: Error retrieving listings
  */
-router.get('/api/listings', listingController.getAllListings);
+router.get('/', listingController.getAllListings);
 
 /**
  * @swagger
@@ -100,7 +91,7 @@ router.get('/api/listings', listingController.getAllListings);
  *       500:
  *         description: Error searching listings
  */
-router.get('/api/listings/search', listingController.searchListings);
+router.get('/search', listingController.searchListings);
 
 /**
  * @swagger
@@ -121,7 +112,7 @@ router.get('/api/listings/search', listingController.searchListings);
  *       500:
  *         description: Error creating listing
  */
-router.post('/api/listings', listingController.createListing);
+router.post('/', listingController.createListing);
 
 /**
  * @swagger
@@ -181,9 +172,9 @@ router.post('/api/listings', listingController.createListing);
  *       500:
  *         description: Error deleting listing
  */
-router.get('/api/listings/:id', listingController.getListingById);
-router.put('/api/listings/:id', listingController.updateListingById);
-router.delete('/api/listings/:id', listingController.deleteListingById);
+router.get('/:id', listingController.getListingById);
+router.put('/:id', listingController.updateListingById);
+router.delete('/:id', listingController.deleteListingById);
 
 /**
  * @swagger
@@ -213,47 +204,9 @@ router.delete('/api/listings/:id', listingController.deleteListingById);
  *         description: Error retrieving listings
  */
 
+// Retain generate-listing under this router without api prefix
 router.post('/generate-listing', (req, res) => {
-    const {
-        productName,
-        description,
-        salesVerbiage,
-        modelName,
-        serialNumber,
-        includes,
-        sellerInformation,
-        showFDAWarning,
-        FDAWarning,
-        warranty,
-        otherInformation
-    } = req.body;
-
-    // Read the template file
-    const templatePath = path.join(__dirname, '../templates/listingTemplate.html');
-    let template = fs.readFileSync(templatePath, 'utf8');
-
-    // Replace placeholders with form data
-    template = template
-        .replace(/{{productName}}/g, productName)
-        .replace(/{{description}}/g, description)
-        .replace(/{{salesVerbiage}}/g, salesVerbiage)
-        .replace(/{{modelName}}/g, modelName)
-        .replace(/{{serialNumber}}/g, serialNumber)
-        .replace(/{{includes}}/g, includes)
-        .replace(/{{sellerInformation}}/g, sellerInformation)
-        .replace(/{{FDAWarning}}/g, FDAWarning)
-        .replace(/{{warranty}}/g, warranty)
-        .replace(/{{otherInformation}}/g, otherInformation);
-
-    // Handle conditional FDA warning
-    if (showFDAWarning === 'false') {
-        template = template.replace(/{{#if showFDAWarning}}[\s\S]*?{{\/if}}/g, '');
-    } else {
-        template = template.replace(/{{#if showFDAWarning}}|{{\/if}}/g, '');
-    }
-
-    // Send the populated HTML as the response
-    res.send(template);
+    // ...existing code...
 });
 
 module.exports = router;

@@ -5,7 +5,7 @@ const Sales = require('../models/salesModel');
 exports.createSale = async (req, res) => {
     try {
         // Input validation for required fields
-        const requiredFields = ['item', 'price', 'soldDate', 'owner'];
+        const requiredFields = ['item', 'price', 'sold_date', 'owner'];
         for (const field of requiredFields) {
             if (!req.body[field]) {
                 return res.status(400).json({ message: `Missing required field: ${field}` });
@@ -26,9 +26,9 @@ exports.getAllSales = async (req, res) => {
         if (req.query.itemId) { where.itemId = req.query.itemId; }
         if (req.query.customerId) { where.customerId = req.query.customerId; }
         if (req.query.startDate || req.query.endDate) {
-            where.soldDate = {};
-            if (req.query.startDate) { where.soldDate[Op.gte] = new Date(req.query.startDate); }
-            if (req.query.endDate) { where.soldDate[Op.lte] = new Date(req.query.endDate); }
+            where.sold_date = {};
+            if (req.query.startDate) { where.sold_date[Op.gte] = new Date(req.query.startDate); }
+            if (req.query.endDate) { where.sold_date[Op.lte] = new Date(req.query.endDate); }
         }
         const sales = await Sales.findAll({ where });
         res.json(sales);

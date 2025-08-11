@@ -1,6 +1,6 @@
 DEBUG: Registered models: [
   "Listing",
-  "Item",
+  "Catalog",
   "Ownership",
   "Sales",
   "Customer",
@@ -38,8 +38,8 @@ DEBUG: Raw select from Customer after sync: [
     "phone": "555-1234",
     "address": "123 Main St",
     "status": "active",
-    "createdAt": "2025-06-25T14:02:51.105Z",
-    "updatedAt": "2025-06-25T14:02:51.105Z"
+    "createdAt": "2025-07-10T19:18:51.069Z",
+    "updatedAt": "2025-07-10T19:18:51.069Z"
   },
   {
     "id": 2,
@@ -49,8 +49,8 @@ DEBUG: Raw select from Customer after sync: [
     "phone": "555-5678",
     "address": "456 Elm St",
     "status": "active",
-    "createdAt": "2025-06-25T14:02:51.105Z",
-    "updatedAt": "2025-06-25T14:02:51.105Z"
+    "createdAt": "2025-07-10T19:18:51.069Z",
+    "updatedAt": "2025-07-10T19:18:51.069Z"
   }
 ]
 DEBUG: Raw select from Customer after create: [
@@ -62,8 +62,8 @@ DEBUG: Raw select from Customer after create: [
     "phone": "555-1234",
     "address": "123 Main St",
     "status": "active",
-    "createdAt": "2025-06-25T14:02:51.105Z",
-    "updatedAt": "2025-06-25T14:02:51.105Z"
+    "createdAt": "2025-07-10T19:18:51.069Z",
+    "updatedAt": "2025-07-10T19:18:51.069Z"
   },
   {
     "id": 2,
@@ -73,8 +73,8 @@ DEBUG: Raw select from Customer after create: [
     "phone": "555-5678",
     "address": "456 Elm St",
     "status": "active",
-    "createdAt": "2025-06-25T14:02:51.105Z",
-    "updatedAt": "2025-06-25T14:02:51.105Z"
+    "createdAt": "2025-07-10T19:18:51.069Z",
+    "updatedAt": "2025-07-10T19:18:51.069Z"
   },
   {
     "id": 3,
@@ -84,8 +84,8 @@ DEBUG: Raw select from Customer after create: [
     "phone": null,
     "address": null,
     "status": "active",
-    "createdAt": "2025-06-25T14:02:51.150Z",
-    "updatedAt": "2025-06-25T14:02:51.150Z"
+    "createdAt": "2025-07-10T19:18:51.117Z",
+    "updatedAt": "2025-07-10T19:18:51.118Z"
   }
 ]
 PASS tests/customerApi.test.js
@@ -109,7 +109,15 @@ PASS tests/customerApi.test.js
 
       at Object.log (src/app.js:28:13)
 
-PASS tests/ownershipApi.test.js
+Error in createCatalog: Error: 
+    at Query.run (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\dialects\postgres\query.js:76:25)
+    at F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\sequelize.js:650:28
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at PostgresQueryInterface.insert (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\dialects\abstract\query-interface.js:795:21)
+    at model.save (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\model.js:4154:35)
+    at Function.create (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\model.js:2305:12)
+    at Object.<anonymous>.exports.createCatalog (F:\Dev\eBaySalesTool\backend\src\controllers\itemController.js:14:28)
+PASS tests/itemApi.test.js
   ● Console
 
     console.log
@@ -130,15 +138,7 @@ PASS tests/ownershipApi.test.js
 
       at Object.log (src/app.js:28:13)
 
-Error in createItem: Error: 
-    at Query.run (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\dialects\postgres\query.js:76:25)
-    at F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\sequelize.js:650:28
-    at processTicksAndRejections (node:internal/process/task_queues:95:5)
-    at PostgresQueryInterface.insert (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\dialects\abstract\query-interface.js:795:21)
-    at model.save (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\model.js:4154:35)
-    at Function.create (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\model.js:2305:12)
-    at Object.<anonymous>.exports.createItem (F:\Dev\eBaySalesTool\backend\src\controllers\itemController.js:14:25)
-PASS tests/itemApi.test.js
+PASS tests/ownershipApi.test.js
   ● Console
 
     console.log
@@ -227,5 +227,5 @@ PASS src/tests/customerApi.test.js
 Test Suites: 7 passed, 7 total
 Tests:       49 passed, 49 total
 Snapshots:   0 total
-Time:        5.1 s
+Time:        5.737 s, estimated 19 s
 Ran all test suites matching /tests/i.

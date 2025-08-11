@@ -1,13 +1,13 @@
 const express = require('express');
-const itemController = require('../controllers/itemController');
+const catalogController = require('../controllers/itemController');
 
 const router = express.Router();
 
 /**
  * @swagger
- * /api/items:
+ * /api/catalog:
  *   post:
- *     summary: Create a new item
+ *     summary: Create a new catalog entry
  *     requestBody:
  *       required: true
  *       content:
@@ -73,7 +73,7 @@ const router = express.Router();
  *                 description: Specifications of the item
  *     responses:
  *       201:
- *         description: Item created successfully
+ *         description: Catalog entry created successfully
  *         content:
  *           application/json:
  *             schema:
@@ -81,7 +81,7 @@ const router = express.Router();
  *               properties:
  *                 _id:
  *                   type: string
- *                   description: The ID of the created item
+ *                   description: The ID of the created catalog entry
  *                 name:
  *                   type: string
  *                   description: The name of the item
@@ -101,24 +101,21 @@ const router = express.Router();
  *                   type: string
  *                   description: The serial number of the item
  *       500:
- *         description: Error creating item
+ *         description: Error creating catalog entry
  */
 
-// Create a new item
-router.post('/items', itemController.createItem);
-// Get all items (with optional filters and pagination)
-router.get('/items', itemController.getAllItems);
-// Get item by ID
-router.get('/items/:id', itemController.getItemById);
-// Update item by ID
-router.put('/items/:id', itemController.updateItemById);
-// Delete item by ID
-router.delete('/items/:id', itemController.deleteItemById);
-// Bulk update items
-router.put('/items/bulk', itemController.bulkUpdateItems);
-// Bulk delete items
-router.delete('/items/bulk', itemController.bulkDeleteItems);
-// Search/filter items
-router.get('/items/search', itemController.searchItems);
+
+// Correct RESTful routes for /api/catalog
+router.post('/', catalogController.createCatalog);
+router.get('/', catalogController.getAllCatalog);
+router.get('/:item_id', catalogController.getCatalogById);
+router.put('/:item_id', catalogController.updateCatalogById);
+router.delete('/:item_id', catalogController.deleteCatalogById);
+// Bulk update catalog entries
+router.put('/bulk', catalogController.bulkUpdateCatalog);
+// Bulk delete catalog entries
+router.delete('/bulk', catalogController.bulkDeleteCatalog);
+// Search/filter catalog
+router.get('/search', catalogController.searchCatalog);
 
 module.exports = router;

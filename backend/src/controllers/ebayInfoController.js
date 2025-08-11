@@ -7,17 +7,17 @@ const { Op } = require('sequelize');
 // Get eBay info from DB
 exports.getEbayInfo = async (req, res) => {
     try {
-        const info = await EbayInfo.findOne();
+    const info = await EbayInfo.findOne({ order: [['last_sync', 'DESC']] });
         if (!info) {
             return res.status(404).json({ message: 'eBay info not found' });
         }
         res.json({
-            accountId: info.accountId,
-            storeName: info.storeName,
-            feedbackScore: info.feedbackScore,
-            positiveFeedbackPercent: info.positiveFeedbackPercent,
-            sellingLimits: info.sellingLimits,
-            lastSync: info.lastSync
+            accountId: info.account_id,
+            storeName: info.store_name,
+            feedbackScore: info.feedback_score,
+            positiveFeedbackPercent: info.positive_feedback_percent,
+            sellingLimits: info.selling_limits,
+            lastSync: info.last_sync
         });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching eBay info' });
@@ -26,17 +26,17 @@ exports.getEbayInfo = async (req, res) => {
 
 exports.getPerformance = async (req, res) => {
     try {
-        const info = await EbayInfo.findOne();
+    const info = await EbayInfo.findOne({ order: [['last_sync', 'DESC']] });
         if (!info) {
             return res.status(404).json({ message: 'eBay info not found' });
         }
         res.json({
-            sellerLevel: info.sellerLevel,
-            defectRate: info.defectRate,
-            lateShipmentRate: info.lateShipmentRate,
-            transactionDefectRate: info.transactionDefectRate,
-            policyComplianceStatus: info.policyComplianceStatus,
-            lastSync: info.lastSync
+            sellerLevel: info.seller_level,
+            defectRate: info.defect_rate,
+            lateShipmentRate: info.late_shipment_rate,
+            transactionDefectRate: info.transaction_defect_rate,
+            policyComplianceStatus: info.policy_compliance_status,
+            lastSync: info.last_sync
         });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching eBay performance' });
@@ -45,13 +45,13 @@ exports.getPerformance = async (req, res) => {
 
 exports.getApiStatus = async (req, res) => {
     try {
-        const info = await EbayInfo.findOne();
+    const info = await EbayInfo.findOne({ order: [['last_sync', 'DESC']] });
         if (!info) {
             return res.status(404).json({ message: 'eBay info not found' });
         }
         res.json({
-            apiStatus: info.apiStatus,
-            lastSync: info.lastSync
+            apiStatus: info.api_status,
+            lastSync: info.last_sync
         });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching eBay API status' });
@@ -78,12 +78,28 @@ exports.searchEbayInfo = async (req, res) => {
     try {
         const { storeName, minFeedbackScore, maxFeedbackScore } = req.query;
         const where = {};
-        if (storeName) { where.storeName = { [Op.iLike]: `%${storeName}%` }; }
-        if (minFeedbackScore || maxFeedbackScore) { where.feedbackScore = {}; }
-        if (minFeedbackScore) { where.feedbackScore[Op.gte] = parseInt(minFeedbackScore, 10); }
-        if (maxFeedbackScore) { where.feedbackScore[Op.lte] = parseInt(maxFeedbackScore, 10); }
+        // Map camelCase query param to DB field name
+        if (storeName) { where.store_name = { [Op.iLike]: `%${storeName}%` }; }
+        if (minFeedbackScore || maxFeedbackScore) { where.feedback_score = {}; }
+        if (minFeedbackScore) { where.feedback_score[Op.gte] = parseInt(minFeedbackScore, 10); }
+        if (maxFeedbackScore) { where.feedback_score[Op.lte] = parseInt(maxFeedbackScore, 10); }
         const infos = await EbayInfo.findAll({ where });
-        res.json(infos);
+        // Map DB fields to camelCase in response
+        const mapped = infos.map(info => ({
+            accountId: info.account_id,
+            storeName: info.store_name,
+            feedbackScore: info.feedback_score,
+            positiveFeedbackPercent: info.positive_feedback_percent,
+            sellerLevel: info.seller_level,
+            defectRate: info.defect_rate,
+            lateShipmentRate: info.late_shipment_rate,
+            transactionDefectRate: info.transaction_defect_rate,
+            policyComplianceStatus: info.policy_compliance_status,
+            sellingLimits: info.selling_limits,
+            apiStatus: info.api_status,
+            lastSync: info.last_sync
+        }));
+        res.json(mapped);
     } catch (error) {
         res.status(500).json({ message: 'Error searching eBay info' });
     }

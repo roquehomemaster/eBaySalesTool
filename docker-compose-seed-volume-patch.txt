@@ -1,0 +1,10 @@
+# Patch for docker-compose.yml to mount the correct seed directory into the backend container
+# Add this under the backend: service volumes section:
+#
+#      - ./database/seeds:/usr/src/app/database/seeds:ro
+#
+# This ensures the backend container always has the latest seed file from your workspace.
+# After applying, run:
+#   docker compose down
+#   docker compose up --build
+# Then reseed the database from the backend context.

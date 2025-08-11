@@ -1,0 +1,84 @@
+{
+  "paths": {
+    "/ownership": {
+      "get": {
+        "summary": "Get all ownership records",
+        "tags": ["Ownership"],
+        "responses": {
+          "200": {
+            "description": "List of ownership records",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/OwnershipArray"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create an ownership record",
+        "tags": ["Ownership"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/Ownership"}
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Created"}
+        }
+      }
+    },
+    "/ownership/{id}": {
+      "get": {
+        "summary": "Get an ownership record by ID",
+        "tags": ["Ownership"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {
+          "200": {"description": "Ownership record", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Ownership"}}}},
+          "404": {"description": "Not found"}
+        }
+      },
+      "put": {
+        "summary": "Update an ownership record",
+        "tags": ["Ownership"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Ownership"}}}
+        },
+        "responses": {"200": {"description": "Updated"}, "404": {"description": "Not found"}}
+      },
+      "delete": {
+        "summary": "Delete an ownership record",
+        "tags": ["Ownership"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"204": {"description": "Deleted"}, "404": {"description": "Not found"}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Ownership": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "user_account_id": {"type": "integer"},
+          "catalog_id": {"type": "integer"},
+          "ownership_percentage": {"type": "number", "format": "float"},
+          "ownership_type": {"type": "string"},
+          "agreement_id": {"type": "integer"},
+          "created_at": {"type": "string", "format": "date-time"},
+          "updated_at": {"type": "string", "format": "date-time"}
+        },
+        "required": ["user_account_id", "catalog_id", "ownership_percentage"]
+      },
+      "OwnershipArray": {
+        "type": "array",
+        "items": {"$ref": "#/components/schemas/Ownership"}
+      }
+    }
+  }
+}

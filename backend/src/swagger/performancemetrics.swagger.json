@@ -1,0 +1,84 @@
+{
+  "paths": {
+    "/performancemetrics": {
+      "get": {
+        "summary": "Get all performance metrics records",
+        "tags": ["PerformanceMetrics"],
+        "responses": {
+          "200": {
+            "description": "List of performance metrics records",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/PerformanceMetricsArray"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a performance metrics record",
+        "tags": ["PerformanceMetrics"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/PerformanceMetrics"}
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Created"}
+        }
+      }
+    },
+    "/performancemetrics/{id}": {
+      "get": {
+        "summary": "Get a performance metrics record by ID",
+        "tags": ["PerformanceMetrics"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {
+          "200": {"description": "Performance metrics record", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/PerformanceMetrics"}}}},
+          "404": {"description": "Not found"}
+        }
+      },
+      "put": {
+        "summary": "Update a performance metrics record",
+        "tags": ["PerformanceMetrics"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/PerformanceMetrics"}}}
+        },
+        "responses": {"200": {"description": "Updated"}, "404": {"description": "Not found"}}
+      },
+      "delete": {
+        "summary": "Delete a performance metrics record",
+        "tags": ["PerformanceMetrics"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"204": {"description": "Deleted"}, "404": {"description": "Not found"}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PerformanceMetrics": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "user_account_id": {"type": "integer"},
+          "metric_date": {"type": "string", "format": "date-time"},
+          "metric_type": {"type": "string"},
+          "metric_value": {"type": "number", "format": "decimal"},
+          "notes": {"type": "string"},
+          "created_at": {"type": "string", "format": "date-time"},
+          "updated_at": {"type": "string", "format": "date-time"}
+        },
+        "required": ["user_account_id", "metric_date"]
+      },
+      "PerformanceMetricsArray": {
+        "type": "array",
+        "items": {"$ref": "#/components/schemas/PerformanceMetrics"}
+      }
+    }
+  }
+}

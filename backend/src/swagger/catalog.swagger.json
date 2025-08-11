@@ -1,0 +1,84 @@
+{
+  "paths": {
+    "/catalog": {
+      "get": {
+        "summary": "Get all catalog items",
+        "tags": ["Catalog"],
+        "responses": {
+          "200": {
+            "description": "List of catalog items",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/CatalogArray"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a catalog item",
+        "tags": ["Catalog"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/Catalog"}
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Created"}
+        }
+      }
+    },
+    "/catalog/{id}": {
+      "get": {
+        "summary": "Get a catalog item by ID",
+        "tags": ["Catalog"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {
+          "200": {"description": "Catalog item", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Catalog"}}}},
+          "404": {"description": "Not found"}
+        }
+      },
+      "put": {
+        "summary": "Update a catalog item",
+        "tags": ["Catalog"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Catalog"}}}
+        },
+        "responses": {"200": {"description": "Updated"}, "404": {"description": "Not found"}}
+      },
+      "delete": {
+        "summary": "Delete a catalog item",
+        "tags": ["Catalog"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"204": {"description": "Deleted"}, "404": {"description": "Not found"}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Catalog": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "description": {"type": "string"},
+          "manufacturer": {"type": "string"},
+          "model": {"type": "string"},
+          "serial_number": {"type": "string"},
+          "sku_barcode": {"type": "string"},
+          "created_at": {"type": "string", "format": "date-time"},
+          "updated_at": {"type": "string", "format": "date-time"}
+        },
+        "required": ["sku_barcode"]
+      },
+      "CatalogArray": {
+        "type": "array",
+        "items": {"$ref": "#/components/schemas/Catalog"}
+      }
+    }
+  }
+}

@@ -1,6 +1,17 @@
+/**
+ * ownershipModel.js
+ * -----------------------------------------------------------------------------
+ * Sequelize model definition for the Ownership table.
+ *
+ * Author: eBay Sales Tool Team
+ * Last updated: 2025-07-10
+ * -----------------------------------------------------------------------------
+ */
+
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../src/utils/database');
 
+// Ownership model definition
 const Ownership = sequelize.define('Ownership', {
   id: {
     type: DataTypes.INTEGER,

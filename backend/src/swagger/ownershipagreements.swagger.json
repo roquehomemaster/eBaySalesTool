@@ -1,0 +1,85 @@
+{
+  "paths": {
+    "/ownershipagreements": {
+      "get": {
+        "summary": "Get all ownership agreements",
+        "tags": ["OwnershipAgreements"],
+        "responses": {
+          "200": {
+            "description": "List of ownership agreements",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/OwnershipAgreementsArray"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create an ownership agreement",
+        "tags": ["OwnershipAgreements"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/OwnershipAgreements"}
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Created"}
+        }
+      }
+    },
+    "/ownershipagreements/{id}": {
+      "get": {
+        "summary": "Get an ownership agreement by ID",
+        "tags": ["OwnershipAgreements"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {
+          "200": {"description": "Ownership agreement", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/OwnershipAgreements"}}}},
+          "404": {"description": "Not found"}
+        }
+      },
+      "put": {
+        "summary": "Update an ownership agreement",
+        "tags": ["OwnershipAgreements"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/OwnershipAgreements"}}}
+        },
+        "responses": {"200": {"description": "Updated"}, "404": {"description": "Not found"}}
+      },
+      "delete": {
+        "summary": "Delete an ownership agreement",
+        "tags": ["OwnershipAgreements"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"204": {"description": "Deleted"}, "404": {"description": "Not found"}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "OwnershipAgreements": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "agreement_name": {"type": "string"},
+          "agreement_type": {"type": "string"},
+          "start_date": {"type": "string", "format": "date-time"},
+          "end_date": {"type": "string", "format": "date-time"},
+          "status": {"type": "string"},
+          "notes": {"type": "string"},
+          "created_at": {"type": "string", "format": "date-time"},
+          "updated_at": {"type": "string", "format": "date-time"}
+        },
+        "required": ["agreement_name", "agreement_type"]
+      },
+      "OwnershipAgreementsArray": {
+        "type": "array",
+        "items": {"$ref": "#/components/schemas/OwnershipAgreements"}
+      }
+    }
+  }
+}

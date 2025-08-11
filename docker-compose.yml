@@ -22,6 +22,7 @@ services:
       - ./backend/database/migrations:/usr/src/app/migrations:ro
       - ./backend/seeders:/usr/src/app/seeders:ro
       - ./backend/tests:/usr/src/app/tests:ro
+      - ./database/seeds:/usr/src/app/database/seeds:ro
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:5000/api/health || exit 1"]
       interval: 10s

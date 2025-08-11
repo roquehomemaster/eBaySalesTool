@@ -1,0 +1,239 @@
+PASS tests/ebayInfoApi.test.js
+PASS tests/itemApi.test.js
+  ● Console
+
+    console.error
+      Error in createCatalog: Error: 
+          at Query.run (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\dialects\postgres\query.js:76:25)
+          at F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\sequelize.js:650:28
+          at processTicksAndRejections (node:internal/process/task_queues:95:5)
+          at PostgresQueryInterface.insert (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\dialects\abstract\query-interface.js:795:21)
+          at model.save (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\model.js:4154:35)
+          at Function.create (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\model.js:2305:12)
+          at Object.<anonymous>.exports.createCatalog (F:\Dev\eBaySalesTool\backend\src\controllers\itemController.js:15:28) {
+        name: 'SequelizeUniqueConstraintError',
+        errors: [
+          ValidationErrorItem {
+            message: 'sku_barcode must be unique',
+            type: 'unique violation',
+            path: 'sku_barcode',
+            value: 'SKU-DUPLICATE-TEST',
+            origin: 'DB',
+            instance: [catalog],
+            validatorKey: 'not_unique',
+            validatorName: null,
+            validatorArgs: []
+          }
+        ],
+        parent: error: duplicate key value violates unique constraint "catalog_sku_barcode_key"
+            at Parser.parseErrorMessage (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\parser.ts:369:69)
+            at Parser.handlePacket (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\parser.ts:187:21)
+            at Parser.parse (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\parser.ts:102:30)
+            at Socket.<anonymous> (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\index.ts:7:48)
+            at Socket.emit (node:events:517:28)
+            at addChunk (node:internal/streams/readable:368:12)
+            at readableAddChunk (node:internal/streams/readable:341:9)
+            at Socket.Readable.push (node:internal/streams/readable:278:10)
+            at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+          length: 234,
+          severity: 'ERROR',
+          code: '23505',
+          detail: 'Key (sku_barcode)=(SKU-DUPLICATE-TEST) already exists.',
+          hint: undefined,
+          position: undefined,
+          internalPosition: undefined,
+          internalQuery: undefined,
+          where: undefined,
+          schema: 'public',
+          table: 'catalog',
+          column: undefined,
+          dataType: undefined,
+          constraint: 'catalog_sku_barcode_key',
+          file: 'nbtinsert.c',
+          line: '664',
+          routine: '_bt_check_unique',
+          sql: 'INSERT INTO "catalog" ("item_id","description","manufacturer","model","serial_number","sku_barcode","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6,$7) RETURNING "item_id","description","manufacturer","model","serial_number","sku_barcode","created_at","updated_at";',
+          parameters: [
+            'Test Catalog 3',
+            'TestCo',
+            'T1000',
+            'SN125',
+            'SKU-DUPLICATE-TEST',
+            '2025-08-11 13:33:51.633 +00:00',
+            '2025-08-11 13:33:51.633 +00:00'
+          ]
+        },
+        original: error: duplicate key value violates unique constraint "catalog_sku_barcode_key"
+            at Parser.parseErrorMessage (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\parser.ts:369:69)
+            at Parser.handlePacket (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\parser.ts:187:21)
+            at Parser.parse (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\parser.ts:102:30)
+            at Socket.<anonymous> (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\index.ts:7:48)
+            at Socket.emit (node:events:517:28)
+            at addChunk (node:internal/streams/readable:368:12)
+            at readableAddChunk (node:internal/streams/readable:341:9)
+            at Socket.Readable.push (node:internal/streams/readable:278:10)
+            at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
+          length: 234,
+          severity: 'ERROR',
+          code: '23505',
+          detail: 'Key (sku_barcode)=(SKU-DUPLICATE-TEST) already exists.',
+          hint: undefined,
+          position: undefined,
+          internalPosition: undefined,
+          internalQuery: undefined,
+          where: undefined,
+          schema: 'public',
+          table: 'catalog',
+          column: undefined,
+          dataType: undefined,
+          constraint: 'catalog_sku_barcode_key',
+          file: 'nbtinsert.c',
+          line: '664',
+          routine: '_bt_check_unique',
+          sql: 'INSERT INTO "catalog" ("item_id","description","manufacturer","model","serial_number","sku_barcode","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6,$7) RETURNING "item_id","description","manufacturer","model","serial_number","sku_barcode","created_at","updated_at";',
+          parameters: [
+            'Test Catalog 3',
+            'TestCo',
+            'T1000',
+            'SN125',
+            'SKU-DUPLICATE-TEST',
+            '2025-08-11 13:33:51.633 +00:00',
+            '2025-08-11 13:33:51.633 +00:00'
+          ]
+        },
+        fields: { sku_barcode: 'SKU-DUPLICATE-TEST' },
+        sql: 'INSERT INTO "catalog" ("item_id","description","manufacturer","model","serial_number","sku_barcode","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6,$7) RETURNING "item_id","description","manufacturer","model","serial_number","sku_barcode","created_at","updated_at";'
+      }
+
+    [0m [90m 17 |[39m     } [36mcatch[39m (error) {
+     [90m 18 |[39m         [90m// Hide raw error details from client and log server-side[39m
+    [31m[1m>[22m[39m[90m 19 |[39m         console[33m.[39merror([32m'Error in createCatalog:'[39m[33m,[39m error)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 20 |[39m         [36mif[39m (error[33m.[39mname [33m===[39m [32m'SequelizeUniqueConstraintError'[39m) {
+     [90m 21 |[39m             [36mreturn[39m res[33m.[39mstatus([35m409[39m)[33m.[39mjson({ message[33m:[39m [32m'Duplicate SKU/Barcode'[39m })[33m;[39m
+     [90m 22 |[39m         }[0m
+
+      at error (src/controllers/itemController.js:19:17)
+
+PASS src/tests/authApi.test.js
+  ● Console
+
+    console.log
+      DEBUG: Created role for user test: {
+        created_at: 2025-08-11T17:33:52.726Z,
+        updated_at: 2025-08-11T17:33:52.726Z,
+        role_id: 4,
+        name: 'user_role_824373',
+        description: null
+      } role_id: 4
+
+      at Object.log (src/tests/authApi.test.js:203:15)
+
+PASS tests/listingApi.test.js
+PASS tests/customerApi.test.js
+PASS tests/ownershipApi.test.js
+PASS src/tests/customerApi.test.js
+
+Test Suites: 7 passed, 7 total
+Tests:       49 passed, 49 total
+Snapshots:   0 total
+Time:        6.228 s, estimated 7 s
+Ran all test suites matching /tests/i.
+
+Jest has detected the following 6 open handles potentially keeping Jest from exiting:
+
+  ●  TCPWRAP
+
+    [0m [90m  8 |[39m     jest[33m.[39msetTimeout([35m60000[39m)[33m;[39m
+     [90m  9 |[39m     [90m// Use API endpoint to seed and reset the database inside the container[39m
+    [31m[1m>[22m[39m[90m 10 |[39m     [36mconst[39m res [33m=[39m [36mawait[39m request(app)[33m.[39mpost([32m'/api/populate-database'[39m)[33m;[39m
+     [90m    |[39m                                    [31m[1m^[22m[39m
+     [90m 11 |[39m     [36mif[39m (res[33m.[39mstatusCode [33m!==[39m [35m200[39m) {
+     [90m 12 |[39m       [36mthrow[39m [36mnew[39m [33mError[39m([32m`Database seeding failed: ${res.statusCode} ${JSON.stringify(res.body)}`[39m)[33m;[39m
+     [90m 13 |[39m     }[0m
+
+      at Test.serverAddress (node_modules/supertest/lib/test.js:63:35)
+      at new Test (node_modules/supertest/lib/test.js:49:14)
+      at Object.obj.<computed> [as post] (node_modules/supertest/index.js:39:18)
+      at Object.post (tests/ebayInfoApi.test.js:10:36)
+
+
+  ●  TCPWRAP
+
+    [0m [90m 10 |[39m     jest[33m.[39msetTimeout([35m60000[39m)[33m;[39m
+     [90m 11 |[39m     [90m// Use API endpoint to seed and reset the database inside the container[39m
+    [31m[1m>[22m[39m[90m 12 |[39m     [36mconst[39m res [33m=[39m [36mawait[39m request(app)[33m.[39mpost([32m'/api/populate-database'[39m)[33m;[39m
+     [90m    |[39m                                    [31m[1m^[22m[39m
+     [90m 13 |[39m     [36mif[39m (res[33m.[39mstatusCode [33m!==[39m [35m200[39m) {
+     [90m 14 |[39m       [36mthrow[39m [36mnew[39m [33mError[39m([32m`Database seeding failed: ${res.statusCode} ${JSON.stringify(res.body)}`[39m)[33m;[39m
+     [90m 15 |[39m     }[0m
+
+      at Test.serverAddress (node_modules/supertest/lib/test.js:63:35)
+      at new Test (node_modules/supertest/lib/test.js:49:14)
+      at Object.obj.<computed> [as post] (node_modules/supertest/index.js:39:18)
+      at Object.post (tests/itemApi.test.js:12:36)
+
+
+  ●  TCPWRAP
+
+    [0m [90m 19 |[39m     jest[33m.[39msetTimeout([35m60000[39m)[33m;[39m
+     [90m 20 |[39m     [90m// Use API endpoint to seed and reset the database inside the container[39m
+    [31m[1m>[22m[39m[90m 21 |[39m     [36mconst[39m res [33m=[39m [36mawait[39m request(app)[33m.[39mpost([32m'/api/populate-database'[39m)[33m;[39m
+     [90m    |[39m                                    [31m[1m^[22m[39m
+     [90m 22 |[39m     [36mif[39m (res[33m.[39mstatusCode [33m!==[39m [35m200[39m) {
+     [90m 23 |[39m       [36mthrow[39m [36mnew[39m [33mError[39m([32m`Database seeding failed: ${res.statusCode} ${JSON.stringify(res.body)}`[39m)[33m;[39m
+     [90m 24 |[39m     }[0m
+
+      at Test.serverAddress (node_modules/supertest/lib/test.js:63:35)
+      at new Test (node_modules/supertest/lib/test.js:49:14)
+      at Object.obj.<computed> [as post] (node_modules/supertest/index.js:39:18)
+      at Object.post (src/tests/authApi.test.js:21:36)
+
+
+  ●  TCPWRAP
+
+    [0m [90m 11 |[39m     jest[33m.[39msetTimeout([35m60000[39m)[33m;[39m
+     [90m 12 |[39m     [90m// Use API endpoint to seed and reset the database inside the container[39m
+    [31m[1m>[22m[39m[90m 13 |[39m     [36mconst[39m res [33m=[39m [36mawait[39m request(app)[33m.[39mpost([32m'/api/populate-database'[39m)[33m;[39m
+     [90m    |[39m                                    [31m[1m^[22m[39m
+     [90m 14 |[39m     [36mif[39m (res[33m.[39mstatusCode [33m!==[39m [35m200[39m) {
+     [90m 15 |[39m       [36mthrow[39m [36mnew[39m [33mError[39m([32m`Database seeding failed: ${res.statusCode} ${JSON.stringify(res.body)}`[39m)[33m;[39m
+     [90m 16 |[39m     }[0m
+
+      at Test.serverAddress (node_modules/supertest/lib/test.js:63:35)
+      at new Test (node_modules/supertest/lib/test.js:49:14)
+      at Object.obj.<computed> [as post] (node_modules/supertest/index.js:39:18)
+      at Object.post (tests/listingApi.test.js:13:36)
+
+
+  ●  TCPWRAP
+
+    [0m [90m 13 |[39m     jest[33m.[39msetTimeout([35m60000[39m)[33m;[39m
+     [90m 14 |[39m     [90m// Use API endpoint to seed and reset the database inside the container[39m
+    [31m[1m>[22m[39m[90m 15 |[39m     [36mconst[39m res [33m=[39m [36mawait[39m request(app)[33m.[39mpost([32m'/api/populate-database'[39m)[33m;[39m
+     [90m    |[39m                                    [31m[1m^[22m[39m
+     [90m 16 |[39m     [36mif[39m (res[33m.[39mstatusCode [33m!==[39m [35m200[39m) {
+     [90m 17 |[39m       [36mthrow[39m [36mnew[39m [33mError[39m([32m`Database seeding failed: ${res.statusCode} ${JSON.stringify(res.body)}`[39m)[33m;[39m
+     [90m 18 |[39m     }[0m
+
+      at Test.serverAddress (node_modules/supertest/lib/test.js:63:35)
+      at new Test (node_modules/supertest/lib/test.js:49:14)
+      at Object.obj.<computed> [as post] (node_modules/supertest/index.js:39:18)
+      at Object.post (tests/customerApi.test.js:15:36)
+
+
+  ●  TCPWRAP
+
+    [0m [90m  8 |[39m     jest[33m.[39msetTimeout([35m60000[39m)[33m;[39m
+     [90m  9 |[39m     [90m// Use API endpoint to seed and reset the database inside the container[39m
+    [31m[1m>[22m[39m[90m 10 |[39m     [36mconst[39m res [33m=[39m [36mawait[39m request(app)[33m.[39mpost([32m'/api/populate-database'[39m)[33m;[39m
+     [90m    |[39m                                    [31m[1m^[22m[39m
+     [90m 11 |[39m     [36mif[39m (res[33m.[39mstatusCode [33m!==[39m [35m200[39m) {
+     [90m 12 |[39m       [36mthrow[39m [36mnew[39m [33mError[39m([32m`Database seeding failed: ${res.statusCode} ${JSON.stringify(res.body)}`[39m)[33m;[39m
+     [90m 13 |[39m     }[0m
+
+      at Test.serverAddress (node_modules/supertest/lib/test.js:63:35)
+      at new Test (node_modules/supertest/lib/test.js:49:14)
+      at Object.obj.<computed> [as post] (node_modules/supertest/index.js:39:18)
+      at Object.post (tests/ownershipApi.test.js:10:36)
+

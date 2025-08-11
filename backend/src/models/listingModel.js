@@ -1,37 +1,56 @@
+/**
+ * listingModel.js
+ * -----------------------------------------------------------------------------
+ * Sequelize model definition for the Listing table.
+ * Maps JS camelCase fields to DB snake_case/column names.
+ *
+ * Author: eBay Sales Tool Team
+ * Last updated: 2025-07-10
+ * -----------------------------------------------------------------------------
+ */
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('../utils/database').sequelize;
 
-const Listing = sequelize.define('Listing', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true
+
+// Listing model definition (fixed syntax)
+const Listing = sequelize.define('listing', {
+  listing_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  title: { type: DataTypes.STRING, allowNull: false },
+  listing_price: { type: DataTypes.DECIMAL },
+  item_id: { type: DataTypes.INTEGER, references: { model: 'catalog', key: 'item_id' } },
+  status: { type: DataTypes.STRING },
+  watchers: { type: DataTypes.INTEGER },
+  item_condition_description: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    field: 'item_condition_description'
   },
-  title: {
+  payment_method: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true,
+    field: 'payment_method'
   },
-  price: {
-    type: DataTypes.FLOAT,
-    allowNull: false
+  shipping_method: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    field: 'shipping_method'
   },
-  itemId: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
-  status: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    defaultValue: 'active'
-  },
-  createdAt: {
+  created_at: {
     type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
+    defaultValue: DataTypes.NOW,
+    field: 'created_at'
   },
-  updatedAt: {
+  updated_at: {
     type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
+    defaultValue: DataTypes.NOW,
+    field: 'updated_at'
   }
+}, {
+  freezeTableName: true, // Prevent Sequelize from pluralizing table name
+  timestamps: true,
+  createdAt: 'created_at',
+  updatedAt: 'updated_at'
 });
 
 module.exports = Listing;

@@ -336,3 +336,21 @@ This project uses Docker Compose for backend, frontend, and database orchestrati
 ## Debugging and Issue Resolution
 - If you encounter backend startup issues (e.g., `MODULE_NOT_FOUND`, logger errors, or database connection problems), refer to the logs and use the helpers for diagnostics.
 - Do not add test or debug code directly to production files; use the helpers.
+
+## Running Jest API Tests and Capturing Output
+
+To run a specific Jest test file and capture detailed output for debugging, use the following command in PowerShell:
+
+```
+npx jest --runInBand --detectOpenHandles --forceExit --testPathPattern=ownershipApi.test.js > "f:\Dev\eBaySalesTool\logs\API-Test-Results.txt" 2>&1
+```
+
+**Explanation:**
+- `npx jest`: Runs Jest using npx (no global install required).
+- `--runInBand`: Runs tests serially (one at a time), useful for debugging and avoiding race conditions.
+- `--detectOpenHandles`: Helps detect async resource leaks.
+- `--forceExit`: Forces Jest to exit after tests complete.
+- `--testPathPattern=ownershipApi.test.js`: Runs only the specified test file.
+- `> "f:\Dev\eBaySalesTool\logs\API-Test-Results.txt" 2>&1`: Redirects all output (stdout and stderr) to a log file for review.
+
+This command is ideal for capturing all logs and errors during test execution for troubleshooting.

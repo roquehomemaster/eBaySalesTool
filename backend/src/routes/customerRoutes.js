@@ -11,12 +11,12 @@ const router = express.Router();
  *     tags: [Customers]
  *     parameters:
  *       - in: query
- *         name: firstName
+ *         name: first_name
  *         schema:
  *           type: string
  *         description: Search by first name
  *       - in: query
- *         name: lastName
+ *         name: last_name
  *         schema:
  *           type: string
  *         description: Search by last name
@@ -37,7 +37,7 @@ const router = express.Router();
  *       500:
  *         description: Server error
  */
-router.get('/customers/search', customerController.searchCustomers);
+router.get('/search', customerController.searchCustomers);
 
 /**
  * @swagger
@@ -52,9 +52,9 @@ router.get('/customers/search', customerController.searchCustomers);
  *           schema:
  *             type: object
  *             properties:
- *               firstName:
+ *               first_name:
  *                 type: string
- *               lastName:
+ *               last_name:
  *                 type: string
  *               email:
  *                 type: string
@@ -74,7 +74,7 @@ router.get('/customers/search', customerController.searchCustomers);
  *       500:
  *         description: Server error
  */
-router.post('/customers', customerController.createCustomer);
+router.post('/', customerController.createCustomer);
 
 /**
  * @swagger
@@ -119,7 +119,7 @@ router.post('/customers', customerController.createCustomer);
  *       500:
  *         description: Server error
  */
-router.get('/customers', customerController.getAllCustomers);
+router.get('/', customerController.getAllCustomers);
 
 /**
  * @swagger
@@ -142,7 +142,7 @@ router.get('/customers', customerController.getAllCustomers);
  *       500:
  *         description: Server error
  */
-router.get('/customers/:id', customerController.getCustomerById);
+router.get('/:id', customerController.getCustomerById);
 
 /**
  * @swagger
@@ -173,7 +173,7 @@ router.get('/customers/:id', customerController.getCustomerById);
  *       500:
  *         description: Server error
  */
-router.put('/customers/:id', customerController.updateCustomerById);
+router.put('/:id', customerController.updateCustomerById);
 
 /**
  * @swagger
@@ -196,7 +196,7 @@ router.put('/customers/:id', customerController.updateCustomerById);
  *       500:
  *         description: Server error
  */
-router.delete('/customers/:id', customerController.deleteCustomerById);
+router.delete('/:id', customerController.deleteCustomerById);
 
 /**
  * @swagger
@@ -246,7 +246,7 @@ router.delete('/customers/:id', customerController.deleteCustomerById);
  *       500:
  *         description: Server error
  */
-router.put('/customers/bulk', customerController.bulkUpdateCustomers);
-router.delete('/customers/bulk', customerController.bulkDeleteCustomers);
+router.put('/bulk', customerController.bulkUpdateCustomers);
+router.delete('/bulk', customerController.bulkDeleteCustomers);
 
 module.exports = router;

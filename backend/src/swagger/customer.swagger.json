@@ -1,0 +1,85 @@
+{
+  "paths": {
+    "/customer": {
+      "get": {
+        "summary": "Get all customers",
+        "tags": ["Customer"],
+        "responses": {
+          "200": {
+            "description": "List of customers",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/CustomerArray"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a customer",
+        "tags": ["Customer"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/Customer"}
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Created"}
+        }
+      }
+    },
+    "/customer/{id}": {
+      "get": {
+        "summary": "Get a customer by ID",
+        "tags": ["Customer"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {
+          "200": {"description": "Customer", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Customer"}}}},
+          "404": {"description": "Not found"}
+        }
+      },
+      "put": {
+        "summary": "Update a customer",
+        "tags": ["Customer"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Customer"}}}
+        },
+        "responses": {"200": {"description": "Updated"}, "404": {"description": "Not found"}}
+      },
+      "delete": {
+        "summary": "Delete a customer",
+        "tags": ["Customer"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"204": {"description": "Deleted"}, "404": {"description": "Not found"}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "firstName": {"type": "string"},
+          "lastName": {"type": "string"},
+          "email": {"type": "string"},
+          "phone": {"type": "string"},
+          "address": {"type": "string"},
+          "status": {"type": "string"},
+          "createdAt": {"type": "string", "format": "date-time"},
+          "updatedAt": {"type": "string", "format": "date-time"}
+        },
+        "required": ["email"]
+      },
+      "CustomerArray": {
+        "type": "array",
+        "items": {"$ref": "#/components/schemas/Customer"}
+      }
+    }
+  }
+}

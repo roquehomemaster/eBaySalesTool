@@ -1,0 +1,87 @@
+{
+  "paths": {
+    "/financialtracking": {
+      "get": {
+        "summary": "Get all financial tracking records",
+        "tags": ["FinancialTracking"],
+        "responses": {
+          "200": {
+            "description": "List of financial tracking records",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/FinancialTrackingArray"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a financial tracking record",
+        "tags": ["FinancialTracking"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/FinancialTracking"}
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Created"}
+        }
+      }
+    },
+    "/financialtracking/{id}": {
+      "get": {
+        "summary": "Get a financial tracking record by ID",
+        "tags": ["FinancialTracking"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {
+          "200": {"description": "Financial tracking record", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/FinancialTracking"}}}},
+          "404": {"description": "Not found"}
+        }
+      },
+      "put": {
+        "summary": "Update a financial tracking record",
+        "tags": ["FinancialTracking"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/FinancialTracking"}}}
+        },
+        "responses": {"200": {"description": "Updated"}, "404": {"description": "Not found"}}
+      },
+      "delete": {
+        "summary": "Delete a financial tracking record",
+        "tags": ["FinancialTracking"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"204": {"description": "Deleted"}, "404": {"description": "Not found"}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "FinancialTracking": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "sales_id": {"type": "integer"},
+          "payment_received": {"type": "number", "format": "decimal"},
+          "payment_date": {"type": "string", "format": "date-time"},
+          "payout_status": {"type": "string"},
+          "payout_date": {"type": "string", "format": "date-time"},
+          "fees": {"type": "number", "format": "decimal"},
+          "net_amount": {"type": "number", "format": "decimal"},
+          "notes": {"type": "string"},
+          "created_at": {"type": "string", "format": "date-time"},
+          "updated_at": {"type": "string", "format": "date-time"}
+        },
+        "required": ["sales_id"]
+      },
+      "FinancialTrackingArray": {
+        "type": "array",
+        "items": {"$ref": "#/components/schemas/FinancialTracking"}
+      }
+    }
+  }
+}

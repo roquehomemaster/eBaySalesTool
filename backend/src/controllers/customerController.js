@@ -5,14 +5,16 @@ const Customer = require('../models/customerModel');
 exports.createCustomer = async (req, res) => {
     try {
         // Input validation for required fields
-        const requiredFields = ['firstName', 'lastName', 'email'];
+        const requiredFields = ['first_name', 'last_name', 'email'];
         for (const field of requiredFields) {
             if (!req.body[field]) {
                 return res.status(400).json({ message: `Missing required field: ${field}` });
             }
         }
-        const newCustomer = await Customer.create(req.body);
-        res.status(201).json(newCustomer);
+    const newCustomer = await Customer.create(req.body);
+    const created = newCustomer.get({ plain: true });
+    // Include an `id` alias for tests expecting `id`
+    res.status(201).json({ ...created, id: created.customer_id });
     } catch (error) {
         if (error.name === 'SequelizeUniqueConstraintError') {
             res.status(409).json({ message: 'Duplicate email' });
@@ -46,9 +48,10 @@ exports.getAllCustomers = async (req, res) => {
 // Get customer by ID
 exports.getCustomerById = async (req, res) => {
     try {
-        const customer = await Customer.findByPk(req.params.id);
+    const customer = await Customer.findByPk(req.params.id);
         if (!customer) { return res.status(404).json({ message: 'Customer not found' }); }
-        res.json(customer);
+    const plain = customer.get({ plain: true });
+    res.json({ ...plain, id: plain.customer_id });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching customer' });
     }
@@ -57,10 +60,11 @@ exports.getCustomerById = async (req, res) => {
 // Update customer by ID
 exports.updateCustomerById = async (req, res) => {
     try {
-        const customer = await Customer.findByPk(req.params.id);
+    const customer = await Customer.findByPk(req.params.id);
         if (!customer) { return res.status(404).json({ message: 'Customer not found' }); }
-        await customer.update(req.body);
-        res.json(customer);
+    await customer.update(req.body);
+    const plain = customer.get({ plain: true });
+    res.json({ ...plain, id: plain.customer_id });
     } catch (error) {
         res.status(500).json({ message: 'Error updating customer' });
     }
@@ -81,11 +85,11 @@ exports.deleteCustomerById = async (req, res) => {
 // Bulk update customers (optional)
 exports.bulkUpdateCustomers = async (req, res) => {
     try {
-        const { ids, ...updateFields } = req.body;
+    const { ids, ...updateFields } = req.body;
         if (!Array.isArray(ids) || ids.length === 0) {
             return res.status(400).json({ message: 'No IDs provided for bulk update.' });
         }
-        const [updated] = await Customer.update(updateFields, { where: { id: ids } });
+    const [updated] = await Customer.update(updateFields, { where: { customer_id: ids } });
         res.json({ updated });
     } catch (error) {
         res.status(500).json({ message: 'Error bulk updating customers' });
@@ -95,11 +99,11 @@ exports.bulkUpdateCustomers = async (req, res) => {
 // Bulk delete customers (optional)
 exports.bulkDeleteCustomers = async (req, res) => {
     try {
-        const { ids } = req.body;
+    const { ids } = req.body;
         if (!Array.isArray(ids) || ids.length === 0) {
             return res.status(400).json({ message: 'No IDs provided for bulk delete.' });
         }
-        const deleted = await Customer.destroy({ where: { id: ids } });
+    const deleted = await Customer.destroy({ where: { customer_id: ids } });
         res.json({ deleted });
     } catch (error) {
         res.status(500).json({ message: 'Error bulk deleting customers' });
@@ -109,12 +113,12 @@ exports.bulkDeleteCustomers = async (req, res) => {
 // Search/filter customers
 exports.searchCustomers = async (req, res) => {
     try {
-        const { firstName, lastName, email } = req.query;
+        const { first_name, last_name, email } = req.query;
         const where = {};
         // Use iLike for Postgres, like for others (e.g., SQLite)
         const likeOperator = Customer.sequelize.getDialect() === 'postgres' ? Op.iLike : Op.like;
-        if (firstName) { where.firstName = { [likeOperator]: `%${firstName}%` }; }
-        if (lastName) { where.lastName = { [likeOperator]: `%${lastName}%` }; }
+        if (first_name) { where.first_name = { [likeOperator]: `%${first_name}%` }; }
+        if (last_name) { where.last_name = { [likeOperator]: `%${last_name}%` }; }
         if (email) { where.email = { [likeOperator]: `%${email}%` }; }
         let customers = [];
         try {

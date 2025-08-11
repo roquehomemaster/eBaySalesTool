@@ -1,0 +1,1 @@
+-- Disabled legacy script: use database/seeds/ via backend seeding utilities

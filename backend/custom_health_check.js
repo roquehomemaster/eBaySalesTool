@@ -5,7 +5,7 @@ const exec = util.promisify(require('child_process').exec);
 
 const pool = new Pool({
     user: process.env.PG_USER || 'postgres',
-    host: process.env.PG_HOST || 'postgres_db',
+    host: process.env.PG_HOST || 'localhost',
     database: process.env.PG_DATABASE || 'ebay_sales_tool',
     password: process.env.PG_PASSWORD || 'password',
     port: process.env.PG_PORT || 5432,

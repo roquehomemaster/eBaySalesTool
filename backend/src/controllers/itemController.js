@@ -1,8 +1,9 @@
-const Item = require('../models/itemModel');
+// Use the canonical catalog model (either file defines same table/shape). Prefer catalogModel.
+const Catalog = require('../models/catalogModel');
 const { Op } = require('sequelize');
 
-// Create a new item
-exports.createItem = async (req, res) => {
+// Create a new catalog entry
+exports.createCatalog = async (req, res) => {
     try {
         // Basic validation for required fields
         const requiredFields = ['description', 'manufacturer', 'model', 'serial_number', 'sku_barcode'];
@@ -11,20 +12,20 @@ exports.createItem = async (req, res) => {
                 return res.status(400).json({ message: `Missing required field: ${field}` });
             }
         }
-        const newItem = await Item.create(req.body);
-        res.status(201).json(newItem);
+        const newCatalog = await Catalog.create(req.body);
+        res.status(201).json(newCatalog);
     } catch (error) {
         // Hide raw error details from client and log server-side
-        console.error('Error in createItem:', error);
+        console.error('Error in createCatalog:', error);
         if (error.name === 'SequelizeUniqueConstraintError') {
             return res.status(409).json({ message: 'Duplicate SKU/Barcode' });
         }
-        res.status(500).json({ message: 'Error creating item' });
+        res.status(500).json({ message: 'Error creating catalog entry', error: error.message, details: error.errors || undefined });
     }
 };
 
-// Get all items (with optional filters and pagination)
-exports.getAllItems = async (req, res) => {
+// Get all catalog entries (with optional filters and pagination)
+exports.getAllCatalog = async (req, res) => {
     try {
         const where = {};
         if (req.query.status) { where.status = req.query.status; }
@@ -33,86 +34,86 @@ exports.getAllItems = async (req, res) => {
         const page = parseInt(req.query.page, 10) || 1;
         const limit = parseInt(req.query.limit, 10) || 10;
         const offset = (page - 1) * limit;
-        const { count, rows } = await Item.findAndCountAll({ where, offset, limit });
+        const { count, rows } = await Catalog.findAndCountAll({ where, offset, limit });
         res.json({
-            items: rows,
+            catalog: rows,
             total: count,
             page,
             pageSize: limit
         });
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching items' });
+        res.status(500).json({ message: 'Error fetching catalog', error: error.message });
     }
 };
 
-// Get item by ID
-exports.getItemById = async (req, res) => {
+// Get catalog entry by ID
+exports.getCatalogById = async (req, res) => {
     try {
-        const item = await Item.findByPk(req.params.id);
-        if (!item) { return res.status(404).json({ message: 'Item not found' }); }
-        res.json(item);
+        const catalog = await Catalog.findByPk(req.params.item_id);
+        if (!catalog) { return res.status(404).json({ message: 'Catalog entry not found' }); }
+        res.json(catalog);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching item' });
+        res.status(500).json({ message: 'Error fetching catalog entry', error: error.message });
     }
 };
 
-// Update item by ID
-exports.updateItemById = async (req, res) => {
+// Update catalog entry by ID
+exports.updateCatalogById = async (req, res) => {
     try {
-        const item = await Item.findByPk(req.params.id);
-        if (!item) { return res.status(404).json({ message: 'Item not found' }); }
-        await item.update(req.body);
-        res.json(item);
+        const catalog = await Catalog.findByPk(req.params.item_id);
+        if (!catalog) { return res.status(404).json({ message: 'Catalog entry not found' }); }
+        await catalog.update(req.body);
+        res.json(catalog);
     } catch (error) {
         if (error.name === 'SequelizeUniqueConstraintError') {
             return res.status(409).json({ message: 'Duplicate SKU/Barcode' });
         }
-        res.status(500).json({ message: 'Error updating item' });
+        res.status(500).json({ message: 'Error updating catalog entry', error: error.message, details: error.errors || undefined });
     }
 };
 
-// Delete item by ID
-exports.deleteItemById = async (req, res) => {
+// Delete catalog entry by ID
+exports.deleteCatalogById = async (req, res) => {
     try {
-        const item = await Item.findByPk(req.params.id);
-        if (!item) { return res.status(404).json({ message: 'Item not found' }); }
-        await item.destroy();
-        res.json({ message: 'Item deleted successfully.' });
+        const catalog = await Catalog.findByPk(req.params.item_id);
+        if (!catalog) { return res.status(404).json({ message: 'Catalog entry not found' }); }
+        await catalog.destroy();
+        res.json({ message: 'Catalog entry deleted successfully.' });
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting item' });
+        res.status(500).json({ message: 'Error deleting catalog entry', error: error.message });
     }
 };
 
-// Bulk update items (optional)
-exports.bulkUpdateItems = async (req, res) => {
+// Bulk update catalog entries (optional)
+exports.bulkUpdateCatalog = async (req, res) => {
     try {
-        const { ids, ...updateFields } = req.body;
-        if (!Array.isArray(ids) || ids.length === 0) {
-            return res.status(400).json({ message: 'No IDs provided for bulk update.' });
+        const { item_ids, ...updateFields } = req.body;
+        if (!Array.isArray(item_ids) || item_ids.length === 0) {
+            return res.status(400).json({ message: 'No item_ids provided for bulk update.' });
         }
-        const [updated] = await Item.update(updateFields, { where: { id: ids } });
+        const [updated] = await Catalog.update(updateFields, { where: { item_id: item_ids } });
         res.json({ updated });
     } catch (error) {
-        res.status(500).json({ message: 'Error bulk updating items' });
+        res.status(500).json({ message: 'Error bulk updating catalog', error: error.message });
     }
 };
 
-// Bulk delete items (optional)
-exports.bulkDeleteItems = async (req, res) => {
+// Bulk delete catalog entries (optional)
+exports.bulkDeleteCatalog = async (req, res) => {
     try {
         const { ids } = req.body;
         if (!Array.isArray(ids) || ids.length === 0) {
             return res.status(400).json({ message: 'No IDs provided for bulk delete.' });
         }
-        const deleted = await Item.destroy({ where: { id: ids } });
+        const deleted = await Catalog.destroy({ where: { id: ids } });
         res.json({ deleted });
     } catch (error) {
-        res.status(500).json({ message: 'Error bulk deleting items' });
+        res.status(500).json({ message: 'Error bulk deleting catalog', error: error.message });
     }
 };
 
-// Search/filter items (optional)
-exports.searchItems = async (req, res) => {
+// Search/filter catalog (optional)
+exports.searchCatalog = async (req, res) => {
     try {
         const { name, sku, minPrice, maxPrice, category } = req.query;
         const where = {};
@@ -122,9 +123,9 @@ exports.searchItems = async (req, res) => {
         if (minPrice || maxPrice) { where.price = {}; }
         if (minPrice) { where.price = { ...where.price, [Op.gte]: parseFloat(minPrice) }; }
         if (maxPrice) { where.price = { ...where.price, [Op.lte]: parseFloat(maxPrice) }; }
-        const items = await Item.findAll({ where });
-        res.json(items);
+        const catalog = await Catalog.findAll({ where });
+        res.json(catalog);
     } catch (error) {
-        res.status(500).json({ message: 'Error searching items' });
+        res.status(500).json({ message: 'Error searching catalog', error: error.message });
     }
 };

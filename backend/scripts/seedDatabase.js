@@ -6,8 +6,10 @@ const configPath = path.join(__dirname, '../build.json');
 const seedLogFilePath = path.join(__dirname, 'seedDatabase.log');
 
 function log(message) {
-    fs.appendFileSync(seedLogFilePath, `${new Date().toISOString()} - ${message}\n`);
-    console.log(message);
+        fs.appendFileSync(seedLogFilePath, `${new Date().toISOString()} - ${message}\n`);
+        if ((process.env.LOG_LEVEL || 'info') !== 'silent') {
+            console.log(message);
+        }
 }
 
 let databaseConfig;
@@ -41,12 +43,14 @@ databaseConfig = {
 databaseConfig.host = databaseConfig.host.trim();
 
 // Log environment variables to confirm their application
-console.log('Environment Variables:', {
-    PG_HOST: process.env.PG_HOST,
-    PG_PORT: process.env.PG_PORT,
-    PG_USER: process.env.PG_USER,
-    PG_DATABASE: process.env.PG_DATABASE
-});
+if ((process.env.LOG_LEVEL || 'info') === 'debug') {
+    console.log('Environment Variables:', {
+        PG_HOST: process.env.PG_HOST,
+        PG_PORT: process.env.PG_PORT,
+        PG_USER: process.env.PG_USER,
+        PG_DATABASE: process.env.PG_DATABASE
+    });
+}
 
 console.log('Database configuration:', {
     host: databaseConfig.host,
@@ -117,6 +121,39 @@ async function seedDatabase() {
         await waitForDatabaseReadiness();
         log('Seeding database with test data...');
 
+        // Check that all required tables exist before seeding
+        const requiredTables = [
+            'catalog',
+            'listing',
+            'ownership',
+            'ownershipagreements',
+            'historylogs',
+            'sales',
+            'saleshistory',
+            'customerdetails',
+            'financialtracking',
+            'communicationlogs',
+            'performancemetrics'
+        ];
+        const missingTables = [];
+        for (const table of requiredTables) {
+            try {
+                const res = await pool.query(`SELECT to_regclass('public.${table}') as exists`);
+                if (!res.rows[0].exists) {
+                    missingTables.push(table);
+                }
+            } catch (err) {
+                log(`Error checking table ${table}: ${err.message}`);
+                missingTables.push(table);
+            }
+        }
+        if (missingTables.length > 0) {
+            log(`ERROR: The following required tables are missing: ${missingTables.join(', ')}`);
+            process.exit(1);
+        } else {
+            log('All required tables exist.');
+        }
+
         if (!fs.existsSync(seedFilePath)) {
             throw new Error(`Seed file not found at ${seedFilePath}`);
         }
@@ -125,7 +162,38 @@ async function seedDatabase() {
         await pool.query(seedSQL);
 
         log('Database seeding completed successfully.');
-        console.log('Database seeding process completed successfully.');
+        // Patch: Ensure no listing row has null created_at or updated_at
+        try {
+            const updateRes = await pool.query(`UPDATE listing SET created_at = NOW() WHERE created_at IS NULL; UPDATE listing SET updated_at = NOW() WHERE updated_at IS NULL;`);
+            log('Patched listing table: set created_at/updated_at to NOW() where null.');
+        } catch (err) {
+            log(`ERROR: Failed to patch listing created_at/updated_at: ${err.message}`);
+            console.error(`ERROR: Failed to patch listing created_at/updated_at: ${err.message}`);
+        }
+        // Check all seeded tables and log their status
+        let allOk = true;
+        for (const table of requiredTables) {
+            try {
+                const result = await pool.query(`SELECT COUNT(*) AS count FROM "${table}"`);
+                const count = parseInt(result.rows[0].count, 10);
+                if (count === 0) {
+                    log(`ERROR: ${table} table is empty after seeding.`);
+                    console.error(`ERROR: ${table} table is empty after seeding.`);
+                    allOk = false;
+                } else {
+                    log(`${table} table contains ${count} record(s) after seeding.`);
+                }
+            } catch (err) {
+                log(`ERROR: Failed to check ${table} table: ${err.message}`);
+                console.error(`ERROR: Failed to check ${table} table: ${err.message}`);
+                allOk = false;
+            }
+        }
+        if (!allOk) {
+            log('One or more tables failed seeding verification. Exiting with error.');
+            process.exit(1);
+        }
+    log('Database seeding process completed successfully.');
     } catch (error) {
         log(`Error seeding database: ${error.message}`);
         process.exit(1);
