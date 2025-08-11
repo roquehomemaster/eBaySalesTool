@@ -30,11 +30,44 @@ const ListingTable = () => {
   );
 
   const detailsRenderer = (listing) => {
-    // Fetch aggregated details on-demand per selected listing
-    // Simple client component below to display grouped data
     const Details = () => {
       const [data, setData] = React.useState(null);
       const [error, setError] = React.useState(null);
+
+      // Label and formatting helpers
+      const prettify = (k) => (k || '').replace(/_/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase());
+      const omit = new Set(['created_at','updated_at','id','listing_id','item_id','sale_id','ownership_id','ownershipagreement_id','performancemetric_id','shippinglog_id','financialtracking_id','customerdetail_id']);
+      const currency = new Set(['listing_price','sold_price','sold_shipping_collected','taxes','negotiated_terms_calculation','shipping_collected','shipping_label_costs','additional_shipping_costs_material','shipping_total','sold_total','taxes_collected','actual_shipping_costs','net_proceeds_calculation','final_evaluation_calculation_used','terms_calculation','customer_payout','our_profit','minimum_sale_price','total_sales','average_sale_price']);
+      const looksLikeDateKey = (k) => /date|_at$|date$|time$/i.test(k);
+      const fmtCurrency = (v) => {
+        const num = typeof v === 'string' ? Number(v) : v;
+        return Number.isFinite(num) ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num) : v;
+      };
+      const fmtVal = (k, v) => {
+        if (v === null || v === undefined) {
+          return '-';
+        }
+        if (currency.has(k)) {
+          return fmtCurrency(v);
+        }
+        if (typeof v === 'string') {
+          const d = new Date(v);
+          if ((looksLikeDateKey(k) || /\d{4}-\d{2}-\d{2}/.test(v)) && !isNaN(d.getTime())) {
+            return d.toLocaleString();
+          }
+        }
+        return String(v);
+      };
+      const entriesFromObj = (obj, keysOrder) => {
+        if (!obj) {
+          return [];
+        }
+        const entries = keysOrder && keysOrder.length
+          ? keysOrder.filter(k => obj[k] !== undefined && !omit.has(k)).map(k => [k, obj[k]])
+          : Object.entries(obj).filter(([k]) => !omit.has(k));
+        return entries.map(([k, v]) => [prettify(k), fmtVal(k, v)]);
+      };
+
       React.useEffect(() => {
         let active = true;
         (async () => {
@@ -56,8 +89,8 @@ const ListingTable = () => {
         <div style={{ marginTop: 12 }}>
           <h4 style={{ margin: '6px 0' }}>{title}</h4>
           <table className="kv-table"><tbody>
-            {(rows || Object.entries(obj || {})).map(([k, v]) => (
-              <tr key={k}><td className="kv-key">{String(k)}</td><td className="kv-val">{typeof v === 'object' ? JSON.stringify(v) : String(v ?? '-')}</td></tr>
+            {(rows || entriesFromObj(obj)).map(([k, v]) => (
+              <tr key={k}><td className="kv-key">{String(k)}</td><td className="kv-val">{String(v)}</td></tr>
             ))}
           </tbody></table>
         </div>
@@ -73,35 +106,92 @@ const ListingTable = () => {
       return (
         <div>
           <h3>Listing Details</h3>
-          <Section title="Listing" obj={data.listing} />
-          <Section title="Catalog Item" obj={data.catalog} />
-          <Section title="Shipping Log" rows={(data.shippinglog||[]).flatMap((r, i) => Object.entries(r).map(([k,v]) => [[`${i+1}.${k}`, v]] )).flat()} />
-          <Section title="Order Details" rows={(data.order_details||[]).flatMap((r, i) => Object.entries(r).map(([k,v]) => [[`${i+1}.${k}`, v]] )).flat()} />
-          <Section title="Financial Tracking" rows={(data.financialtracking||[]).flatMap((r, i) => Object.entries(r).map(([k,v]) => [[`${i+1}.${k}`, v]] )).flat()} />
-          <Section title="Returns" rows={(data.returnhistory||[]).flatMap((r, i) => Object.entries(r).map(([k,v]) => [[`${i+1}.${k}`, v]] )).flat()} />
-          <Section title="Performance Metrics" obj={data.performancemetrics} />
-          <div style={{ marginTop: 12 }}>
-            <h4 style={{ margin: '6px 0' }}>Sales and Ownership</h4>
-            {(data.sales || []).map((s, idx) => (
-              <div key={s.sale_id || idx} style={{ marginBottom: 10 }}>
-                <Section title={`Sale #${s.sale_id || idx+1}`} obj={s} />
-                {/* Ownership for this sale if ownership_id present */}
-                {s.ownership_id && (
-                  <Section
-                    title={`Ownership (ID ${s.ownership_id})`}
-                    obj={(data.ownerships || []).find(o => o.ownership_id === s.ownership_id) || {}}
-                  />
-                )}
-                {s.ownership_id && (
-                  <Section
-                    title={`Ownership Agreement(s)`}
-                    rows={(data.ownershipagreements || []).filter(a => a.ownership_id === s.ownership_id)
-                      .flatMap((r, i) => Object.entries(r).map(([k,v]) => [[`${i+1}.${k}`, v]] )).flat()}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
+
+          {/* 1) eBay Listing */}
+          <Section
+            title="eBay Listing"
+            rows={entriesFromObj(data.listing, ['title','status','listing_price','payment_method','shipping_method','watchers','item_condition_description'])}
+          />
+
+          {/* 2) Product details */}
+          <Section
+            title="Product Details"
+            rows={entriesFromObj(data.catalog, ['manufacturer','model','description','serial_number','sku_barcode'])}
+          />
+
+          {/* 3) Ownership details */}
+          {(data.ownerships || []).length > 0 && (
+            <div>
+              <h4 style={{ margin: '6px 0' }}>Ownership Details</h4>
+              {(data.ownerships || []).map((o, i) => (
+                <Section
+                  key={o.ownership_id || i}
+                  title={`Owner ${o.first_name || ''} ${o.last_name || ''}`.trim() || `Owner ${i+1}`}
+                  rows={entriesFromObj(o, ['ownership_type','first_name','last_name','email','telephone','address','company_name'])}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* 4) Contract details */}
+          {(data.ownershipagreements || []).length > 0 && (
+            <div>
+              <h4 style={{ margin: '6px 0' }}>Contract Details</h4>
+              {(data.ownershipagreements || []).map((a, i) => (
+                <Section
+                  key={a.ownershipagreement_id || i}
+                  title={`Agreement ${a.ownershipagreement_id || i+1}`}
+                  rows={entriesFromObj(a, ['commission_percentage','minimum_sale_price','duration_of_agreement','renewal_terms'])}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* 5) Sales details */}
+          {(data.sales || []).length > 0 && (
+            <div>
+              <h4 style={{ margin: '6px 0' }}>Sales Details</h4>
+              {(data.sales || []).map((s, idx) => {
+                const fin = (data.financialtracking || []).filter(f => f.sale_id === s.sale_id);
+                const ship = (data.shippinglog || []);
+                const order = (data.order_details || []);
+                const ret = (data.returnhistory || []);
+                return (
+                  <div key={s.sale_id || idx} style={{ marginBottom: 12 }}>
+                    <Section
+                      title={`Sale ${s.sale_id ? `#${s.sale_id}` : `#${idx+1}`}`}
+                      rows={entriesFromObj(s, ['sold_price','sold_date','sold_shipping_collected','taxes','sales_channel','customer_feedback','negotiated_terms','negotiated_terms_calculation'])}
+                    />
+                    {fin.length > 0 && (
+                      <Section
+                        title="Financial Summary"
+                        rows={entriesFromObj(fin[0], ['sold_total','taxes_collected','actual_shipping_costs','net_proceeds_calculation','customer_payout','our_profit'])}
+                      />
+                    )}
+                    {idx === 0 && ship.length > 0 && (
+                      <Section
+                        title="Shipping"
+                        rows={entriesFromObj(ship[0], ['shipping_collected','shipping_label_costs','additional_shipping_costs_material','shipping_total'])}
+                      />
+                    )}
+                    {idx === 0 && order.length > 0 && (
+                      <Section
+                        title="Order"
+                        rows={entriesFromObj(order[0], ['purchase_date','date_shipped','date_received','date_out_of_warranty','purchase_method','shipping_preferences'])}
+                      />
+                    )}
+                    {idx === 0 && ret.length > 0 && (
+                      <Section
+                        title="Return"
+                        rows={entriesFromObj(ret[0], ['return_reasoning','return_request_date','return_approved_date','return_received_date','return_decision_notes'])}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
           <style>{`
             .kv-table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             .kv-table td { border-bottom: 1px solid #eee; padding: 6px 8px; vertical-align: top; }
