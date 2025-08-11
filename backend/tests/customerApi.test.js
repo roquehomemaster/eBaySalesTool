@@ -10,16 +10,24 @@ const EbayInfo = require('../src/models/ebayInfoModel');
 
 describe('Customer API', () => {
   beforeAll(async () => {
-    // Print all registered models before sync
-    console.log('DEBUG: Registered models:', Object.keys(sequelize.models));
-    // Print Sequelize config
-    console.log('DEBUG: Sequelize config:', sequelize.config);
-    console.log('DEBUG: Sequelize dialect:', sequelize.getDialect());
-    // Ensure model is registered and force sync in public schema
-    await sequelize.sync({ force: true });
-    // Print tables after sync
-    const [results] = await sequelize.query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
-    console.log('DEBUG: Tables in public schema after sync:', results.map(r => r.table_name));
+    jest.setTimeout(60000);
+    // Use API endpoint to seed and reset the database inside the container
+    const res = await request(app).post('/api/populate-database');
+    if (res.statusCode !== 200) {
+      throw new Error(`Database seeding failed: ${res.statusCode} ${JSON.stringify(res.body)}`);
+    }
+    if (process.env.VERBOSE_TESTS === '1') {
+      // Print all registered models before sync
+      console.log('DEBUG: Registered models:', Object.keys(sequelize.models));
+      // Print Sequelize config
+      console.log('DEBUG: Sequelize config:', sequelize.config);
+      console.log('DEBUG: Sequelize dialect:', sequelize.getDialect());
+    }
+  // Print tables after sync (robust via pg_tables)
+  const [pgTables] = await sequelize.query("SELECT tablename FROM pg_tables WHERE schemaname = 'public'");
+  if (process.env.VERBOSE_TESTS === '1') {
+    console.log('DEBUG: Tables in public schema after sync:', pgTables.map(r => r.tablename));
+  }
     // Seed the Customer table for tests
     await Customer.bulkCreate([
       {
@@ -42,16 +50,20 @@ describe('Customer API', () => {
     // DEBUG: Print current database, schema, and all tables to verify Customer table exists
     const [dbResult] = await sequelize.query('SELECT current_database() as db');
     const [schemaResult] = await sequelize.query("SELECT current_schema() as schema");
-    console.log('DEBUG: Current database:', dbResult[0]?.db);
-    console.log('DEBUG: Current schema:', schemaResult[0]?.schema);
+    if (process.env.VERBOSE_TESTS === '1') {
+      console.log('DEBUG: Current database:', dbResult[0]?.db);
+      console.log('DEBUG: Current schema:', schemaResult[0]?.schema);
+    }
     // Try a raw select from Customer
     try {
       const [customerRows] = await sequelize.query('SELECT * FROM customerdetails');
-      console.log('DEBUG: Raw select from customerdetails after sync:', customerRows);
+      if (process.env.VERBOSE_TESTS === '1') {
+        console.log('DEBUG: Raw select from customerdetails after sync:', customerRows);
+      }
     } catch (err) {
       console.error('DEBUG: Error selecting from customerdetails after sync:', err.message);
     }
-  });
+  }, 60000);
 
   afterAll(async () => {
     await sequelize.close();
@@ -69,7 +81,9 @@ describe('Customer API', () => {
     // Try a raw select from customerdetails after create
     try {
       const [customerRows] = await sequelize.query('SELECT * FROM customerdetails');
-      console.log('DEBUG: Raw select from customerdetails after create:', customerRows);
+      if (process.env.VERBOSE_TESTS === '1') {
+        console.log('DEBUG: Raw select from customerdetails after create:', customerRows);
+      }
     } catch (err) {
       console.error('DEBUG: Error selecting from customerdetails after create:', err.message);
     }

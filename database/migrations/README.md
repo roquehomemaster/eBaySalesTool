@@ -12,26 +12,36 @@ This directory contains SQL scripts for initializing and migrating the database 
 3. **Testing**:
    - Test each script independently before adding it to this directory.
 
-## Current Scripts
-- `01a_create_owners_table.sql`: Creates the owners table.
-- `01_init.sql`: Initial database setup.
-- `02_sampleData.sql`: Inserts sample data.
+## Current Scripts (canonical only)
+- `01_init.sql`: Initial database setup (SOP-compliant, snake_case).
+- `03_create_customer_table.sql`: Customer table.
+- `03_create_eBayInfo.sql`: ebayinfo table (drops legacy "eBayInfo").
 - `03_fix_ownership_enum.sql`: Fixes ownership enum values.
-- `04_auth_roles_permissions.sql`: Adds roles and permissions.
 - `04_auth_roles_permissions_seed.sql`: Seeds roles and permissions data.
-- `05_add_user_security_fields.sql`: Adds security fields to the user table.
-- `06_create_userlog_table.sql`: Creates the user log table.
 - `07_create_ownerships_table.sql`: Creates the ownerships table.
-- `08_create_catalog_table.sql`: Creates the Catalog table (formerly Items).
-- `09_create_owners_table.sql`: Creates the owners table (duplicate, consider removing).
-- `10_add_address_to_owners.sql`: Adds address fields to the owners table.
-- `11_create_owners_table.sql`: Creates the owners table (duplicate, consider removing).
+- `08_create_items_table.sql` or `08_create_catalog_table.sql`: Creates the catalog table.
+- `99_drop_catalogs_table.sql`: Drops legacy Catalogs table if present.
+
 
 ## Data Model Note
-- The `Catalog` table is the master list of all products ever tracked, regardless of eBay listing status. The `SellingItem` table tracks all eBay listings, past or present, and references products in the Catalog.
 
-## Cleanup Required
-- Review and remove duplicate scripts, such as `09_create_owners_table.sql` and `11_create_owners_table.sql`.
+The `Catalog` table is the master list of all products ever tracked, regardless of eBay listing status. The `Listing` table tracks all eBay listings, past or present, and references products in the Catalog.
+
+The `HistoryLogs` table records all changes to tracked entities (such as Listing, Customer, etc.) for auditing purposes. Each log entry includes:
+- The entity name (e.g., 'Listing')
+- The entity's ID
+- The action performed (e.g., create, update, delete)
+- Details of the change
+- The user (by Ownership ID) who made the change
+- The timestamp of the change
+
+This ensures all changes are auditable and attributable to a specific user.
+
+## Cleanup Status
+- Legacy init/seed scripts removed from this folder: `init.sql`, `sampleData.sql`, `02_sampleData.sql`.
+- Duplicates and non-canonical files should not be placed here. If additional cleanup is needed, move files to `database/legacy/` or delete them.
 
 ## Notes
-- Ensure the `db_data` volume is removed before rebuilding the container to apply changes.
+- Ensure the `db_data` volume is removed before rebuilding the container to apply changes on a fresh init.
+- Only SQL files present in this folder at first container startup are auto-run by Postgres (alphabetical order).
+- Do NOT place seed data here. Use `database/seeds/` and application seeders.

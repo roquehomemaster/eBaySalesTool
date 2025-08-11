@@ -104,21 +104,18 @@ const router = express.Router();
  *         description: Error creating catalog entry
  */
 
-// Create a new catalog entry
-router.post('/catalog', catalogController.createCatalog);
-// Get all catalog entries (with optional filters and pagination)
-router.get('/catalog', catalogController.getAllCatalog);
-// Get catalog entry by ID
-router.get('/catalog/:id', catalogController.getCatalogById);
-// Update catalog entry by ID
-router.put('/catalog/:id', catalogController.updateCatalogById);
-// Delete catalog entry by ID
-router.delete('/catalog/:id', catalogController.deleteCatalogById);
+
+// Correct RESTful routes for /api/catalog
+router.post('/', catalogController.createCatalog);
+router.get('/', catalogController.getAllCatalog);
+router.get('/:item_id', catalogController.getCatalogById);
+router.put('/:item_id', catalogController.updateCatalogById);
+router.delete('/:item_id', catalogController.deleteCatalogById);
 // Bulk update catalog entries
-router.put('/catalog/bulk', catalogController.bulkUpdateCatalog);
+router.put('/bulk', catalogController.bulkUpdateCatalog);
 // Bulk delete catalog entries
-router.delete('/catalog/bulk', catalogController.bulkDeleteCatalog);
+router.delete('/bulk', catalogController.bulkDeleteCatalog);
 // Search/filter catalog
-router.get('/catalog/search', catalogController.searchCatalog);
+router.get('/search', catalogController.searchCatalog);
 
 module.exports = router;

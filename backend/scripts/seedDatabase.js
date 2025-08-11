@@ -6,8 +6,10 @@ const configPath = path.join(__dirname, '../build.json');
 const seedLogFilePath = path.join(__dirname, 'seedDatabase.log');
 
 function log(message) {
-    fs.appendFileSync(seedLogFilePath, `${new Date().toISOString()} - ${message}\n`);
-    console.log(message);
+        fs.appendFileSync(seedLogFilePath, `${new Date().toISOString()} - ${message}\n`);
+        if ((process.env.LOG_LEVEL || 'info') !== 'silent') {
+            console.log(message);
+        }
 }
 
 let databaseConfig;
@@ -41,12 +43,14 @@ databaseConfig = {
 databaseConfig.host = databaseConfig.host.trim();
 
 // Log environment variables to confirm their application
-console.log('Environment Variables:', {
-    PG_HOST: process.env.PG_HOST,
-    PG_PORT: process.env.PG_PORT,
-    PG_USER: process.env.PG_USER,
-    PG_DATABASE: process.env.PG_DATABASE
-});
+if ((process.env.LOG_LEVEL || 'info') === 'debug') {
+    console.log('Environment Variables:', {
+        PG_HOST: process.env.PG_HOST,
+        PG_PORT: process.env.PG_PORT,
+        PG_USER: process.env.PG_USER,
+        PG_DATABASE: process.env.PG_DATABASE
+    });
+}
 
 console.log('Database configuration:', {
     host: databaseConfig.host,
@@ -178,7 +182,6 @@ async function seedDatabase() {
                     allOk = false;
                 } else {
                     log(`${table} table contains ${count} record(s) after seeding.`);
-                    console.log(`${table} table contains ${count} record(s) after seeding.`);
                 }
             } catch (err) {
                 log(`ERROR: Failed to check ${table} table: ${err.message}`);
@@ -190,7 +193,7 @@ async function seedDatabase() {
             log('One or more tables failed seeding verification. Exiting with error.');
             process.exit(1);
         }
-        console.log('Database seeding process completed successfully.');
+    log('Database seeding process completed successfully.');
     } catch (error) {
         log(`Error seeding database: ${error.message}`);
         process.exit(1);

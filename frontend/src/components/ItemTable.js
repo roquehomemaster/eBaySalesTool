@@ -12,12 +12,21 @@ const CatalogTable = () => {
         const fetchCatalog = async () => {
             try {
                 const response = await apiService.getCatalog();
-                setCatalog(response.catalog || response); // handle both {catalog:[]} and []
-                if ((response.catalog && response.catalog.length === 0) || (Array.isArray(response) && response.length === 0)) {
+                // Accepts: { catalog: [...] }, [...], or { ...paginated, catalog: [...] }
+                let entries = [];
+                if (Array.isArray(response)) {
+                    entries = response;
+                } else if (response && Array.isArray(response.catalog)) {
+                    entries = response.catalog;
+                } else if (response && response.data && Array.isArray(response.data.catalog)) {
+                    entries = response.data.catalog;
+                }
+                setCatalog(entries);
+                if (!entries.length) {
                     setMessage('No catalog entries available');
                     setMessageType('info');
                 } else {
-                    setMessage(null); // clear any previous error or info
+                    setMessage(null);
                 }
             } catch (error) {
                 setMessage('Error fetching catalog. Please try again later.');
@@ -47,7 +56,7 @@ const CatalogTable = () => {
                             <tr key={entry.id || entry._id}>
                                 <td>{entry.description}</td>
                                 <td>{entry.sku_barcode}</td>
-                                <td>{entry.category}</td>
+                                <td>{entry.category || ''}</td>
                                 <td>{entry.manufacturer}</td>
                                 <td>{entry.model}</td>
                             </tr>

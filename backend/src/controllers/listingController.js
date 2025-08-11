@@ -23,7 +23,7 @@ exports.createListing = async (req, res) => {
             }
         }
         // Check if itemId exists in Catalog table for FK integrity BEFORE creating the listing
-        const Catalog = require('../models/catalogModel');
+        const Catalog = require('../models/itemModel'); // Use itemModel.js for catalog lookups
         const item_id = req.body.item_id;
         const catalogItem = await Catalog.findByPk(item_id);
         if (!catalogItem) {
@@ -39,7 +39,7 @@ exports.createListing = async (req, res) => {
         // Map DB fields to snake_case in response
         const response = newListing.toJSON ? newListing.toJSON() : newListing;
         res.status(201).json({
-            id: response.id,
+            listing_id: response.listing_id,
             title: response.title,
             listing_price: response.listing_price,
             item_id: response.item_id,
@@ -61,14 +61,19 @@ exports.getAllListings = async (req, res) => {
     try {
         const where = {};
         if (req.query.status) { where.status = req.query.status; }
-        if (req.query.itemId) { where.itemId = req.query.itemId; }
+        if (req.query.item_id) { where.item_id = req.query.item_id; }
         // Pagination
         const page = parseInt(req.query.page, 10) || 1;
         const limit = parseInt(req.query.limit, 10) || 10;
         const offset = (page - 1) * limit;
         const { count, rows } = await Listing.findAndCountAll({ where, offset, limit });
+        // Map all listings to snake_case PK
         res.json({
-            listings: rows,
+            listings: rows.map(l => {
+                const obj = l.toJSON ? l.toJSON() : l;
+                delete obj.id;
+                return obj;
+            }),
             total: count,
             page,
             pageSize: limit
@@ -86,7 +91,9 @@ exports.getListingById = async (req, res) => {
     try {
         const listing = await Listing.findByPk(req.params.id);
         if (!listing) { return res.status(404).json({ message: 'Listing not found' }); }
-        res.json(listing);
+        const obj = listing.toJSON ? listing.toJSON() : listing;
+        delete obj.id;
+        res.json(obj);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching listing' });
     }
@@ -100,7 +107,9 @@ exports.updateListingById = async (req, res) => {
         const listing = await Listing.findByPk(req.params.id);
         if (!listing) { return res.status(404).json({ message: 'Listing not found' }); }
         await listing.update(req.body);
-        res.json(listing);
+        const obj = listing.toJSON ? listing.toJSON() : listing;
+        delete obj.id;
+        res.json(obj);
     } catch (error) {
         res.status(500).json({ message: 'Error updating listing' });
     }
@@ -125,15 +134,20 @@ exports.deleteListingById = async (req, res) => {
  */
 exports.searchListings = async (req, res) => {
     try {
-        const { title, minPrice, maxPrice, status } = req.query;
+        const { title, min_listing_price, max_listing_price, status } = req.query;
         const where = {};
         if (title) { where.title = { [Op.iLike]: `%${title}%` }; }
         if (status) { where.status = status; }
-        if (minPrice || maxPrice) { where.price = {}; }
-        if (minPrice) { where.price[Op.gte] = parseFloat(minPrice); }
-        if (maxPrice) { where.price[Op.lte] = parseFloat(maxPrice); }
+        if (min_listing_price || max_listing_price) { where.listing_price = {}; }
+        if (min_listing_price) { where.listing_price[Op.gte] = parseFloat(min_listing_price); }
+        if (max_listing_price) { where.listing_price[Op.lte] = parseFloat(max_listing_price); }
         const listings = await Listing.findAll({ where });
-        res.json(listings);
+        // Map all listings to snake_case PK
+        res.json(listings.map(l => {
+            const obj = l.toJSON ? l.toJSON() : l;
+            delete obj.id;
+            return obj;
+        }));
     } catch (error) {
         res.status(500).json({ message: 'Error searching listings' });
     }

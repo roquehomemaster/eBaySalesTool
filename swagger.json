@@ -1,553 +1,22 @@
 {
-  "openapi": "3.0.0",
-  "info": {
-    "title": "eBay Sales Tool API",
-    "version": "1.0.0",
-    "description": "API documentation for the eBay Sales Tool"
-  },
-  "servers": [
-    {
-      "url": "http://localhost:5000",
-      "description": "Local server"
-    }
-  ],
   "paths": {
-    "/api/customers/search": {
+    "/api/auth/roles": {
       "get": {
-        "summary": "Search/filter customers",
+        "summary": "Get all roles",
         "tags": [
-          "Customers"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "firstName",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Search by first name"
-          },
-          {
-            "in": "query",
-            "name": "lastName",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Search by last name"
-          },
-          {
-            "in": "query",
-            "name": "email",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Search by email"
-          }
+          "Auth"
         ],
         "responses": {
           "200": {
-            "description": "List of customers matching search",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Customer"
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server error"
+            "description": "List of roles"
           }
         }
-      }
-    },
-    "/api/customers": {
+      },
       "post": {
-        "summary": "Create a new customer",
+        "summary": "Create a new role",
         "tags": [
-          "Customers"
+          "Auth"
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "firstName": {
-                    "type": "string"
-                  },
-                  "lastName": {
-                    "type": "string"
-                  },
-                  "email": {
-                    "type": "string"
-                  },
-                  "phone": {
-                    "type": "string"
-                  },
-                  "address": {
-                    "type": "string"
-                  },
-                  "status": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Customer created successfully"
-          },
-          "400": {
-            "description": "Validation error"
-          },
-          "409": {
-            "description": "Duplicate email"
-          },
-          "500": {
-            "description": "Server error"
-          }
-        }
-      },
-      "get": {
-        "summary": "Get all customers (with optional filters and pagination)",
-        "tags": [
-          "Customers"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "status",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Filter by customer status"
-          },
-          {
-            "in": "query",
-            "name": "page",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Page number for pagination"
-          },
-          {
-            "in": "query",
-            "name": "limit",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Page size for pagination"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Paginated list of customers",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "customers": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Customer"
-                      }
-                    },
-                    "total": {
-                      "type": "integer"
-                    },
-                    "page": {
-                      "type": "integer"
-                    },
-                    "pageSize": {
-                      "type": "integer"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server error"
-          }
-        }
-      }
-    },
-    "/api/customers/{id}": {
-      "get": {
-        "summary": "Get customer by ID",
-        "tags": [
-          "Customers"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Customer ID"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Customer found"
-          },
-          "404": {
-            "description": "Customer not found"
-          },
-          "500": {
-            "description": "Server error"
-          }
-        }
-      },
-      "put": {
-        "summary": "Update customer by ID",
-        "tags": [
-          "Customers"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Customer ID"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Customer updated"
-          },
-          "400": {
-            "description": "Validation error"
-          },
-          "404": {
-            "description": "Customer not found"
-          },
-          "500": {
-            "description": "Server error"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete customer by ID",
-        "tags": [
-          "Customers"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Customer ID"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Customer deleted successfully"
-          },
-          "404": {
-            "description": "Customer not found"
-          },
-          "500": {
-            "description": "Server error"
-          }
-        }
-      }
-    },
-    "/api/customers/bulk": {
-      "put": {
-        "summary": "Bulk update customers",
-        "tags": [
-          "Customers"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "ids": {
-                    "type": "array",
-                    "items": {
-                      "type": "integer"
-                    }
-                  },
-                  "status": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Number of customers updated"
-          },
-          "400": {
-            "description": "No IDs provided"
-          },
-          "500": {
-            "description": "Server error"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Bulk delete customers",
-        "tags": [
-          "Customers"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "ids": {
-                    "type": "array",
-                    "items": {
-                      "type": "integer"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Number of customers deleted"
-          },
-          "400": {
-            "description": "No IDs provided"
-          },
-          "500": {
-            "description": "Server error"
-          }
-        }
-      }
-    },
-    "/api/ebay/info": {
-      "get": {
-        "summary": "Get eBay account info",
-        "tags": [
-          "eBayInfo"
-        ],
-        "responses": {
-          "200": {
-            "description": "eBay account info",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "accountId": {
-                      "type": "string"
-                    },
-                    "storeName": {
-                      "type": "string"
-                    },
-                    "feedbackScore": {
-                      "type": "integer"
-                    },
-                    "positiveFeedbackPercent": {
-                      "type": "number"
-                    },
-                    "sellingLimits": {
-                      "type": "object"
-                    },
-                    "lastSync": {
-                      "type": "string",
-                      "format": "date-time"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/ebay/info/search": {
-      "get": {
-        "summary": "Search/filter eBay info",
-        "tags": [
-          "eBayInfo"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "storeName",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Search by store name"
-          },
-          {
-            "in": "query",
-            "name": "minFeedbackScore",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Minimum feedback score"
-          },
-          {
-            "in": "query",
-            "name": "maxFeedbackScore",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Maximum feedback score"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of eBay info matching search",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/EbayInfo"
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Error searching eBay info"
-          }
-        }
-      }
-    },
-    "/api/ebay/performance": {
-      "get": {
-        "summary": "Get seller performance metrics",
-        "tags": [
-          "eBayInfo"
-        ],
-        "responses": {
-          "200": {
-            "description": "Seller performance metrics",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "sellerLevel": {
-                      "type": "string"
-                    },
-                    "defectRate": {
-                      "type": "number"
-                    },
-                    "lateShipmentRate": {
-                      "type": "number"
-                    },
-                    "transactionDefectRate": {
-                      "type": "number"
-                    },
-                    "policyComplianceStatus": {
-                      "type": "string"
-                    },
-                    "lastSync": {
-                      "type": "string",
-                      "format": "date-time"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/ebay/status": {
-      "get": {
-        "summary": "Get eBay API health/status",
-        "tags": [
-          "eBayInfo"
-        ],
-        "responses": {
-          "200": {
-            "description": "eBay API status",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "apiStatus": {
-                      "type": "string"
-                    },
-                    "lastSync": {
-                      "type": "string",
-                      "format": "date-time"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/ebay/sync": {
-      "post": {
-        "summary": "Manually trigger eBay info & performance sync",
-        "tags": [
-          "eBayInfo"
-        ],
-        "responses": {
-          "200": {
-            "description": "Sync started",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    },
-                    "status": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/catalog": {
-      "post": {
-        "summary": "Create a new catalog entry",
         "requestBody": {
           "required": true,
           "content": {
@@ -556,80 +25,7 @@
                 "type": "object",
                 "properties": {
                   "name": {
-                    "type": "string",
-                    "description": "The name of the item"
-                  },
-                  "price": {
-                    "type": "number",
-                    "description": "The price of the item"
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "A description of the item"
-                  },
-                  "manufacturer_info": {
-                    "type": "string",
-                    "description": "Additional information about the manufacturer"
-                  },
-                  "manufacturer": {
-                    "type": "string",
-                    "description": "The manufacturer of the item"
-                  },
-                  "model": {
-                    "type": "string",
-                    "description": "The model of the item"
-                  },
-                  "serial_number": {
-                    "type": "string",
-                    "description": "The serial number of the item"
-                  },
-                  "product_page_link": {
-                    "type": "string",
-                    "description": "A link to the product page"
-                  },
-                  "dimension": {
-                    "type": "object",
-                    "properties": {
-                      "x": {
-                        "type": "number",
-                        "description": "The length of the item"
-                      },
-                      "y": {
-                        "type": "number",
-                        "description": "The width of the item"
-                      },
-                      "z": {
-                        "type": "number",
-                        "description": "The height of the item"
-                      }
-                    }
-                  },
-                  "weight": {
-                    "type": "number",
-                    "description": "The weight of the item"
-                  },
-                  "condition": {
-                    "type": "string",
-                    "description": "The condition of the item"
-                  },
-                  "category": {
-                    "type": "string",
-                    "description": "The category of the item"
-                  },
-                  "sku_barcode": {
-                    "type": "string",
-                    "description": "The SKU or barcode of the item"
-                  },
-                  "images": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "description": "A list of image URLs for the item"
-                  },
-                  "specifications": {
-                    "type": "string",
-                    "description": "Specifications of the item"
+                    "type": "string"
                   }
                 }
               }
@@ -638,310 +34,30 @@
         },
         "responses": {
           "201": {
-            "description": "Catalog entry created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "_id": {
-                      "type": "string",
-                      "description": "The ID of the created catalog entry"
-                    },
-                    "name": {
-                      "type": "string",
-                      "description": "The name of the item"
-                    },
-                    "price": {
-                      "type": "number",
-                      "description": "The price of the item"
-                    },
-                    "description": {
-                      "type": "string",
-                      "description": "A description of the item"
-                    },
-                    "manufacturer": {
-                      "type": "string",
-                      "description": "The manufacturer of the item"
-                    },
-                    "model": {
-                      "type": "string",
-                      "description": "The model of the item"
-                    },
-                    "serial_number": {
-                      "type": "string",
-                      "description": "The serial number of the item"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Error creating catalog entry"
-          }
-        }
-      }
-    },
-    "/api/listings": {
-      "get": {
-        "summary": "Retrieve all listings",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "status",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Filter by listing status"
-          },
-          {
-            "in": "query",
-            "name": "itemId",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Filter by item ID"
-          },
-          {
-            "in": "query",
-            "name": "page",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Page number for pagination"
-          },
-          {
-            "in": "query",
-            "name": "limit",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Page size for pagination"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A list of all listings",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "properties": {
-                    "listings": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Listing"
-                      }
-                    },
-                    "total": {
-                      "type": "integer"
-                    },
-                    "page": {
-                      "type": "integer"
-                    },
-                    "pageSize": {
-                      "type": "integer"
-                    }
-                  },
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "description": "The listing ID"
-                      },
-                      "title": {
-                        "type": "string",
-                        "description": "The title of the listing"
-                      },
-                      "price": {
-                        "type": "number",
-                        "description": "The price of the listing"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Error retrieving listings"
-          }
-        }
-      },
-      "post": {
-        "summary": "Create a new listing",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Listing"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Listing created successfully"
+            "description": "Role created"
           },
           "400": {
             "description": "Validation error"
-          },
-          "500": {
-            "description": "Error creating listing"
           }
         }
       }
     },
-    "/api/listings/search": {
-      "get": {
-        "summary": "Search/filter listings",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "title",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Search by title"
-          },
-          {
-            "in": "query",
-            "name": "minPrice",
-            "schema": {
-              "type": "number"
-            },
-            "description": "Minimum price"
-          },
-          {
-            "in": "query",
-            "name": "maxPrice",
-            "schema": {
-              "type": "number"
-            },
-            "description": "Maximum price"
-          },
-          {
-            "in": "query",
-            "name": "status",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Filter by status"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of listings matching search",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Listing"
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Error searching listings"
-          }
-        }
-      }
-    },
-    "/api/listings/{id}": {
-      "get": {
-        "summary": "Get listing by ID",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Listing ID"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Listing found"
-          },
-          "404": {
-            "description": "Listing not found"
-          },
-          "500": {
-            "description": "Error fetching listing"
-          }
-        }
-      },
+    "/api/auth/roles/{id}": {
       "put": {
-        "summary": "Update listing by ID",
+        "summary": "Update a role",
+        "tags": [
+          "Auth"
+        ],
         "parameters": [
           {
             "in": "path",
             "name": "id",
-            "required": true,
             "schema": {
               "type": "integer"
             },
-            "description": "Listing ID"
+            "required": true
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Listing"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Listing updated"
-          },
-          "404": {
-            "description": "Listing not found"
-          },
-          "500": {
-            "description": "Error updating listing"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete listing by ID",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Listing ID"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Listing deleted successfully"
-          },
-          "404": {
-            "description": "Listing not found"
-          },
-          "500": {
-            "description": "Error deleting listing"
-          }
-        }
-      }
-    },
-    "/api/ownership": {
-      "post": {
-        "summary": "Create a new ownership record",
         "requestBody": {
           "required": true,
           "content": {
@@ -949,67 +65,74 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "ownershipType": {
-                    "type": "string",
-                    "enum": [
-                      "Self",
-                      "Company"
-                    ],
-                    "description": "The type of ownership"
-                  },
-                  "contact": {
-                    "type": "object",
-                    "properties": {
-                      "firstName": {
-                        "type": "string"
-                      },
-                      "lastName": {
-                        "type": "string"
-                      },
-                      "address": {
-                        "type": "string"
-                      },
-                      "telephone": {
-                        "type": "string"
-                      },
-                      "email": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "companyDetails": {
-                    "type": "object",
-                    "properties": {
-                      "companyName": {
-                        "type": "string"
-                      },
-                      "companyAddress": {
-                        "type": "string"
-                      },
-                      "companyTelephone": {
-                        "type": "string"
-                      },
-                      "companyEmail": {
-                        "type": "string"
-                      },
-                      "assignedContact": {
-                        "type": "object",
-                        "properties": {
-                          "firstName": {
-                            "type": "string"
-                          },
-                          "lastName": {
-                            "type": "string"
-                          },
-                          "telephone": {
-                            "type": "string"
-                          },
-                          "email": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Role updated"
+          },
+          "404": {
+            "description": "Role not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a role",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Role deleted"
+          },
+          "404": {
+            "description": "Role not found"
+          }
+        }
+      }
+    },
+    "/api/auth/pages": {
+      "get": {
+        "summary": "Get all pages",
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of pages"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new page",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
                   }
                 }
               }
@@ -1018,153 +141,1497 @@
         },
         "responses": {
           "201": {
-            "description": "Ownership record created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "_id": {
-                      "type": "string",
-                      "description": "The ID of the created ownership record"
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Page created"
           },
-          "500": {
-            "description": "Error creating ownership record"
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/api/auth/role-page-access": {
+      "get": {
+        "summary": "Get the role-page access matrix",
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "Access matrix"
           }
         }
       },
-      "get": {
-        "summary": "Get all ownerships/agreements (with optional filters and pagination)",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "status",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Filter by status"
-          },
-          {
-            "in": "query",
-            "name": "agreementType",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Filter by agreement type"
-          },
-          {
-            "in": "query",
-            "name": "page",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Page number for pagination"
-          },
-          {
-            "in": "query",
-            "name": "limit",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Page size for pagination"
-          }
+      "post": {
+        "summary": "Create a new role-page access entry",
+        "tags": [
+          "Auth"
         ],
-        "responses": {
-          "200": {
-            "description": "Paginated list of ownerships/agreements",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ownerships": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Ownership"
-                      }
-                    },
-                    "total": {
-                      "type": "integer"
-                    },
-                    "page": {
-                      "type": "integer"
-                    },
-                    "pageSize": {
-                      "type": "integer"
-                    }
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "role_id": {
+                    "type": "integer"
+                  },
+                  "page_id": {
+                    "type": "integer"
+                  },
+                  "can_view": {
+                    "type": "boolean"
+                  },
+                  "can_edit": {
+                    "type": "boolean"
                   }
                 }
               }
             }
-          },
-          "500": {
-            "description": "Error fetching ownerships/agreements"
           }
-        }
-      }
-    },
-    "/api/ownership/search": {
-      "get": {
-        "summary": "Search/filter ownerships/agreements",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "status",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Filter by status"
-          },
-          {
-            "in": "query",
-            "name": "agreementType",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Filter by agreement type"
-          }
-        ],
+        },
         "responses": {
-          "200": {
-            "description": "List of ownerships/agreements matching search",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Ownership"
-                  }
-                }
-              }
-            }
+          "201": {
+            "description": "Access entry created"
           },
-          "500": {
-            "description": "Error searching ownerships/agreements"
+          "400": {
+            "description": "Validation error"
           }
         }
       }
     },
-    "/api/ownership/{id}": {
-      "get": {
-        "summary": "Get an ownership record by ID",
+    "/api/auth/role-page-access/{id}": {
+      "put": {
+        "summary": "Update a role-page access entry",
+        "tags": [
+          "Auth"
+        ],
         "parameters": [
           {
             "in": "path",
             "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "can_view": {
+                    "type": "boolean"
+                  },
+                  "can_edit": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Access entry updated"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a role-page access entry",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Access entry deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/api/auth/users": {
+      "get": {
+        "summary": "Get all users",
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of users"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new user",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password_hash": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "role_id": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created"
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/api/auth/users/{id}": {
+      "put": {
+        "summary": "Update a user",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a user",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/appconfig": {
+      "get": {
+        "summary": "Get all app config records",
+        "tags": [
+          "AppConfig"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of app config records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppConfigArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create an app config record",
+        "tags": [
+          "AppConfig"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppConfig"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/appconfig/{id}": {
+      "get": {
+        "summary": "Get an app config record by ID",
+        "tags": [
+          "AppConfig"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Ownership record details",
+            "description": "App config record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppConfig"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an app config record",
+        "tags": [
+          "AppConfig"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppConfig"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an app config record",
+        "tags": [
+          "AppConfig"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/catalog": {
+      "get": {
+        "summary": "Get all catalog items",
+        "tags": [
+          "Catalog"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of catalog items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a catalog item",
+        "tags": [
+          "Catalog"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Catalog"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/catalog/{id}": {
+      "get": {
+        "summary": "Get a catalog item by ID",
+        "tags": [
+          "Catalog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Catalog item",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Catalog"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a catalog item",
+        "tags": [
+          "Catalog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Catalog"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a catalog item",
+        "tags": [
+          "Catalog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/communicationlogs": {
+      "get": {
+        "summary": "Get all communication logs",
+        "tags": [
+          "CommunicationLogs"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of communication logs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunicationLogsArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a communication log",
+        "tags": [
+          "CommunicationLogs"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommunicationLogs"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/communicationlogs/{id}": {
+      "get": {
+        "summary": "Get a communication log by ID",
+        "tags": [
+          "CommunicationLogs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Communication log",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunicationLogs"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a communication log",
+        "tags": [
+          "CommunicationLogs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommunicationLogs"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a communication log",
+        "tags": [
+          "CommunicationLogs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/customer": {
+      "get": {
+        "summary": "Get all customers",
+        "tags": [
+          "Customer"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of customers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a customer",
+        "tags": [
+          "Customer"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Customer"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/customer/{id}": {
+      "get": {
+        "summary": "Get a customer by ID",
+        "tags": [
+          "Customer"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Customer"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a customer",
+        "tags": [
+          "Customer"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Customer"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a customer",
+        "tags": [
+          "Customer"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/database_configuration": {
+      "get": {
+        "summary": "Get all database configuration records",
+        "tags": [
+          "DatabaseConfiguration"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of database configuration records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatabaseConfigurationArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a database configuration record",
+        "tags": [
+          "DatabaseConfiguration"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatabaseConfiguration"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/database_configuration/{id}": {
+      "get": {
+        "summary": "Get a database configuration record by ID",
+        "tags": [
+          "DatabaseConfiguration"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Database configuration record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatabaseConfiguration"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a database configuration record",
+        "tags": [
+          "DatabaseConfiguration"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatabaseConfiguration"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a database configuration record",
+        "tags": [
+          "DatabaseConfiguration"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/ebayinfo": {
+      "get": {
+        "summary": "Get all eBay info records",
+        "tags": [
+          "EbayInfo"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of eBay info records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EbayInfoArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create an eBay info record",
+        "tags": [
+          "EbayInfo"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EbayInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/ebayinfo/{id}": {
+      "get": {
+        "summary": "Get an eBay info record by ID",
+        "tags": [
+          "EbayInfo"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "eBay info record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EbayInfo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an eBay info record",
+        "tags": [
+          "EbayInfo"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EbayInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an eBay info record",
+        "tags": [
+          "EbayInfo"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/financialtracking": {
+      "get": {
+        "summary": "Get all financial tracking records",
+        "tags": [
+          "FinancialTracking"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of financial tracking records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FinancialTrackingArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a financial tracking record",
+        "tags": [
+          "FinancialTracking"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinancialTracking"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/financialtracking/{id}": {
+      "get": {
+        "summary": "Get a financial tracking record by ID",
+        "tags": [
+          "FinancialTracking"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Financial tracking record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FinancialTracking"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a financial tracking record",
+        "tags": [
+          "FinancialTracking"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinancialTracking"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a financial tracking record",
+        "tags": [
+          "FinancialTracking"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/listing": {
+      "get": {
+        "summary": "Get all listings",
+        "tags": [
+          "Listing"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of listings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListingArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a listing",
+        "tags": [
+          "Listing"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Listing"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/listing/{id}": {
+      "get": {
+        "summary": "Get a listing by ID",
+        "tags": [
+          "Listing"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Listing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Listing"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a listing",
+        "tags": [
+          "Listing"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Listing"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a listing",
+        "tags": [
+          "Listing"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/orderdetails": {
+      "get": {
+        "summary": "Get all order details records",
+        "tags": [
+          "OrderDetails"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of order details records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDetailsArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create an order details record",
+        "tags": [
+          "OrderDetails"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderDetails"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/orderdetails/{id}": {
+      "get": {
+        "summary": "Get an order details record by ID",
+        "tags": [
+          "OrderDetails"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order details record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an order details record",
+        "tags": [
+          "OrderDetails"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderDetails"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an order details record",
+        "tags": [
+          "OrderDetails"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/ownership": {
+      "get": {
+        "summary": "Get all ownership records",
+        "tags": [
+          "Ownership"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of ownership records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnershipArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create an ownership record",
+        "tags": [
+          "Ownership"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ownership"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/ownership/{id}": {
+      "get": {
+        "summary": "Get an ownership record by ID",
+        "tags": [
+          "Ownership"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ownership record",
             "content": {
               "application/json": {
                 "schema": {
@@ -1174,22 +1641,22 @@
             }
           },
           "404": {
-            "description": "Ownership record not found"
-          },
-          "500": {
-            "description": "Error fetching ownership record"
+            "description": "Not found"
           }
         }
       },
       "put": {
-        "summary": "Update an ownership record by ID",
+        "summary": "Update an ownership record",
+        "tags": [
+          "Ownership"
+        ],
         "parameters": [
           {
-            "in": "path",
             "name": "id",
+            "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer"
             }
           }
         ],
@@ -1198,260 +1665,131 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "ownershipType": {
-                    "type": "string",
-                    "enum": [
-                      "Self",
-                      "Company"
-                    ],
-                    "description": "The type of ownership"
-                  },
-                  "contact": {
-                    "type": "object",
-                    "properties": {
-                      "firstName": {
-                        "type": "string"
-                      },
-                      "lastName": {
-                        "type": "string"
-                      },
-                      "address": {
-                        "type": "string"
-                      },
-                      "telephone": {
-                        "type": "string"
-                      },
-                      "email": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "companyDetails": {
-                    "type": "object",
-                    "properties": {
-                      "companyName": {
-                        "type": "string"
-                      },
-                      "companyAddress": {
-                        "type": "string"
-                      },
-                      "companyTelephone": {
-                        "type": "string"
-                      },
-                      "companyEmail": {
-                        "type": "string"
-                      },
-                      "assignedContact": {
-                        "type": "object",
-                        "properties": {
-                          "firstName": {
-                            "type": "string"
-                          },
-                          "lastName": {
-                            "type": "string"
-                          },
-                          "telephone": {
-                            "type": "string"
-                          },
-                          "email": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
+                "$ref": "#/components/schemas/Ownership"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Ownership record updated successfully"
-          },
-          "400": {
-            "description": "Invalid input data"
+            "description": "Updated"
           },
           "404": {
-            "description": "Ownership record not found"
-          },
-          "500": {
-            "description": "Error updating ownership record"
+            "description": "Not found"
           }
         }
       },
       "delete": {
-        "summary": "Delete an ownership record by ID",
+        "summary": "Delete an ownership record",
+        "tags": [
+          "Ownership"
+        ],
         "parameters": [
           {
-            "in": "path",
             "name": "id",
+            "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer"
             }
           }
         ],
         "responses": {
           "204": {
-            "description": "Ownership record deleted successfully"
+            "description": "Deleted"
           },
           "404": {
-            "description": "Ownership record not found"
-          },
-          "500": {
-            "description": "Error deleting ownership record"
+            "description": "Not found"
           }
         }
       }
     },
-    "/api/sales": {
-      "post": {
-        "summary": "Create a new sale",
+    "/ownershipagreements": {
+      "get": {
+        "summary": "Get all ownership agreements",
         "tags": [
-          "Sales"
+          "OwnershipAgreements"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of ownership agreements",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnershipAgreementsArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create an ownership agreement",
+        "tags": [
+          "OwnershipAgreements"
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "item": {
-                    "type": "string"
-                  },
-                  "price": {
-                    "type": "number"
-                  },
-                  "soldDate": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "owner": {
-                    "type": "string"
-                  },
-                  "negotiatedTerms": {
-                    "type": "string"
-                  }
-                }
+                "$ref": "#/components/schemas/OwnershipAgreements"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Sale created successfully"
-          },
-          "500": {
-            "description": "Error creating sale"
-          }
-        }
-      },
-      "get": {
-        "summary": "Get all sales (with optional filters)",
-        "tags": [
-          "Sales"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "status",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Filter by sale status"
-          },
-          {
-            "in": "query",
-            "name": "itemId",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Filter by item ID"
-          },
-          {
-            "in": "query",
-            "name": "customerId",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Filter by customer ID"
-          },
-          {
-            "in": "query",
-            "name": "startDate",
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "description": "Filter by start date"
-          },
-          {
-            "in": "query",
-            "name": "endDate",
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "description": "Filter by end date"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of sales"
-          },
-          "500": {
-            "description": "Error fetching sales"
+            "description": "Created"
           }
         }
       }
     },
-    "/api/sales/{id}": {
+    "/ownershipagreements/{id}": {
       "get": {
-        "summary": "Get sale by ID",
+        "summary": "Get an ownership agreement by ID",
         "tags": [
-          "Sales"
+          "OwnershipAgreements"
         ],
         "parameters": [
           {
-            "in": "path",
             "name": "id",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "integer"
-            },
-            "description": "Sale ID"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "Sale found"
+            "description": "Ownership agreement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnershipAgreements"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Sale not found"
-          },
-          "500": {
-            "description": "Error fetching sale"
+            "description": "Not found"
           }
         }
       },
       "put": {
-        "summary": "Update sale by ID",
+        "summary": "Update an ownership agreement",
         "tags": [
-          "Sales"
+          "OwnershipAgreements"
         ],
         "parameters": [
           {
-            "in": "path",
             "name": "id",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "integer"
-            },
-            "description": "Sale ID"
+            }
           }
         ],
         "requestBody": {
@@ -1459,215 +1797,1923 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object"
+                "$ref": "#/components/schemas/OwnershipAgreements"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Sale updated"
-          },
-          "400": {
-            "description": "Validation error"
+            "description": "Updated"
           },
           "404": {
-            "description": "Sale not found"
-          },
-          "500": {
-            "description": "Error updating sale"
+            "description": "Not found"
           }
         }
       },
       "delete": {
-        "summary": "Delete sale by ID",
+        "summary": "Delete an ownership agreement",
         "tags": [
-          "Sales"
+          "OwnershipAgreements"
         ],
         "parameters": [
           {
-            "in": "path",
             "name": "id",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "integer"
-            },
-            "description": "Sale ID"
+            }
           }
         ],
         "responses": {
-          "200": {
-            "description": "Sale deleted successfully"
+          "204": {
+            "description": "Deleted"
           },
           "404": {
-            "description": "Sale not found"
-          },
-          "500": {
-            "description": "Error deleting sale"
+            "description": "Not found"
           }
         }
       }
     },
-    "/api/sales/bulk": {
-      "put": {
-        "summary": "Bulk update sales",
-        "tags": [
-          "Sales"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "ids": {
-                    "type": "array",
-                    "items": {
-                      "type": "integer"
-                    }
-                  },
-                  "status": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Number of sales updated"
-          },
-          "400": {
-            "description": "No IDs provided"
-          },
-          "500": {
-            "description": "Error bulk updating sales"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Bulk delete sales",
-        "tags": [
-          "Sales"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "ids": {
-                    "type": "array",
-                    "items": {
-                      "type": "integer"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Number of sales deleted"
-          },
-          "400": {
-            "description": "No IDs provided"
-          },
-          "500": {
-            "description": "Error bulk deleting sales"
-          }
-        }
-      }
-    },
-    "/api/sales/search": {
+    "/page": {
       "get": {
-        "summary": "Search/filter sales",
+        "summary": "Get all pages",
+        "tags": [
+          "Page"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of pages",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a page",
+        "tags": [
+          "Page"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Page"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/page/{id}": {
+      "get": {
+        "summary": "Get a page by ID",
+        "tags": [
+          "Page"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a page",
+        "tags": [
+          "Page"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Page"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a page",
+        "tags": [
+          "Page"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/performancemetrics": {
+      "get": {
+        "summary": "Get all performance metrics records",
+        "tags": [
+          "PerformanceMetrics"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of performance metrics records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PerformanceMetricsArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a performance metrics record",
+        "tags": [
+          "PerformanceMetrics"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PerformanceMetrics"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/performancemetrics/{id}": {
+      "get": {
+        "summary": "Get a performance metrics record by ID",
+        "tags": [
+          "PerformanceMetrics"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Performance metrics record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PerformanceMetrics"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a performance metrics record",
+        "tags": [
+          "PerformanceMetrics"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PerformanceMetrics"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a performance metrics record",
+        "tags": [
+          "PerformanceMetrics"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/returnhistory": {
+      "get": {
+        "summary": "Get all return history records",
+        "tags": [
+          "ReturnHistory"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of return history records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnHistoryArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a return history record",
+        "tags": [
+          "ReturnHistory"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReturnHistory"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/returnhistory/{id}": {
+      "get": {
+        "summary": "Get a return history record by ID",
+        "tags": [
+          "ReturnHistory"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return history record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReturnHistory"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a return history record",
+        "tags": [
+          "ReturnHistory"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReturnHistory"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a return history record",
+        "tags": [
+          "ReturnHistory"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/role": {
+      "get": {
+        "summary": "Get all roles",
+        "tags": [
+          "Role"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of roles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a role",
+        "tags": [
+          "Role"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Role"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/role/{id}": {
+      "get": {
+        "summary": "Get a role by ID",
+        "tags": [
+          "Role"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Role"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a role",
+        "tags": [
+          "Role"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Role"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a role",
+        "tags": [
+          "Role"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/rolePageAccess": {
+      "get": {
+        "summary": "Get all role page access records",
+        "tags": [
+          "RolePageAccess"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of role page access records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolePageAccessArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a role page access record",
+        "tags": [
+          "RolePageAccess"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolePageAccess"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/rolePageAccess/{id}": {
+      "get": {
+        "summary": "Get a role page access record by ID",
+        "tags": [
+          "RolePageAccess"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Role page access record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolePageAccess"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a role page access record",
+        "tags": [
+          "RolePageAccess"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolePageAccess"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a role page access record",
+        "tags": [
+          "RolePageAccess"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/sales": {
+      "get": {
+        "summary": "Get all sales records",
+        "tags": [
+          "Sales"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of sales records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a sales record",
+        "tags": [
+          "Sales"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sales"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/sales/{id}": {
+      "get": {
+        "summary": "Get a sales record by ID",
         "tags": [
           "Sales"
         ],
         "parameters": [
           {
-            "in": "query",
-            "name": "item",
+            "name": "id",
+            "in": "path",
+            "required": true,
             "schema": {
-              "type": "string"
-            },
-            "description": "Search by item name"
-          },
-          {
-            "in": "query",
-            "name": "owner",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Search by owner"
-          },
-          {
-            "in": "query",
-            "name": "minPrice",
-            "schema": {
-              "type": "number"
-            },
-            "description": "Minimum price"
-          },
-          {
-            "in": "query",
-            "name": "maxPrice",
-            "schema": {
-              "type": "number"
-            },
-            "description": "Maximum price"
-          },
-          {
-            "in": "query",
-            "name": "status",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Filter by status"
-          },
-          {
-            "in": "query",
-            "name": "startDate",
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "description": "Filter by start date"
-          },
-          {
-            "in": "query",
-            "name": "endDate",
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "description": "Filter by end date"
+              "type": "integer"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "List of sales matching search"
+            "description": "Sales record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sales"
+                }
+              }
+            }
           },
-          "400": {
-            "description": "Bad request"
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a sales record",
+        "tags": [
+          "Sales"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sales"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
           },
-          "500": {
-            "description": "Error searching sales"
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a sales record",
+        "tags": [
+          "Sales"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/shippinglog": {
+      "get": {
+        "summary": "Get all shipping log records",
+        "tags": [
+          "ShippingLog"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of shipping log records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingLogArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a shipping log record",
+        "tags": [
+          "ShippingLog"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShippingLog"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/shippinglog/{id}": {
+      "get": {
+        "summary": "Get a shipping log record by ID",
+        "tags": [
+          "ShippingLog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Shipping log record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingLog"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a shipping log record",
+        "tags": [
+          "ShippingLog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShippingLog"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a shipping log record",
+        "tags": [
+          "ShippingLog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "summary": "Get all users",
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a user",
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "summary": "Get a user by ID",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a user",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a user",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
           }
         }
       }
     }
   },
-  "components": {},
-  "tags": [
-    {
-      "name": "eBayInfo",
-      "description": "eBay Info & Performance"
+  "components": {
+    "schemas": {
+      "AppConfig": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "config_key": {
+            "type": "string"
+          },
+          "config_value": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "config_key"
+        ]
+      },
+      "AppConfigArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AppConfig"
+        }
+      },
+      "Catalog": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "description": {
+            "type": "string"
+          },
+          "manufacturer": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "serial_number": {
+            "type": "string"
+          },
+          "sku_barcode": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "sku_barcode"
+        ]
+      },
+      "CatalogArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Catalog"
+        }
+      },
+      "CommunicationLogs": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "customer_id": {
+            "type": "integer"
+          },
+          "sales_id": {
+            "type": "integer"
+          },
+          "communication_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "channel": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "response": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "customer_id",
+          "communication_date"
+        ]
+      },
+      "CommunicationLogsArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/CommunicationLogs"
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "CustomerArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Customer"
+        }
+      },
+      "DatabaseConfiguration": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "config_name": {
+            "type": "string"
+          },
+          "config_value": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "config_name"
+        ]
+      },
+      "DatabaseConfigurationArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/DatabaseConfiguration"
+        }
+      },
+      "EbayInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "account_id": {
+            "type": "string"
+          },
+          "store_name": {
+            "type": "string"
+          },
+          "feedback_score": {
+            "type": "integer"
+          },
+          "positive_feedback_percent": {
+            "type": "number",
+            "format": "float"
+          },
+          "seller_level": {
+            "type": "string"
+          },
+          "defect_rate": {
+            "type": "number",
+            "format": "float"
+          },
+          "late_shipment_rate": {
+            "type": "number",
+            "format": "float"
+          },
+          "transaction_defect_rate": {
+            "type": "number",
+            "format": "float"
+          },
+          "policy_compliance_status": {
+            "type": "string"
+          },
+          "selling_limits": {
+            "type": "object"
+          },
+          "api_status": {
+            "type": "string"
+          },
+          "last_sync": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "account_id"
+        ]
+      },
+      "EbayInfoArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/EbayInfo"
+        }
+      },
+      "FinancialTracking": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "sales_id": {
+            "type": "integer"
+          },
+          "payment_received": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "payment_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "payout_status": {
+            "type": "string"
+          },
+          "payout_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fees": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "net_amount": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "sales_id"
+        ]
+      },
+      "FinancialTrackingArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/FinancialTracking"
+        }
+      },
+      "Listing": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "catalog_id": {
+            "type": "integer"
+          },
+          "listing_title": {
+            "type": "string"
+          },
+          "listing_price": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "listing_status": {
+            "type": "string"
+          },
+          "listing_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiration_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "catalog_id",
+          "listing_title",
+          "listing_price"
+        ]
+      },
+      "ListingArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Listing"
+        }
+      },
+      "OrderDetails": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "sales_id": {
+            "type": "integer"
+          },
+          "item_id": {
+            "type": "integer"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "unit_price": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "discount": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "tax": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "total": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "sales_id",
+          "item_id",
+          "quantity",
+          "unit_price"
+        ]
+      },
+      "OrderDetailsArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/OrderDetails"
+        }
+      },
+      "Ownership": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "user_account_id": {
+            "type": "integer"
+          },
+          "catalog_id": {
+            "type": "integer"
+          },
+          "ownership_percentage": {
+            "type": "number",
+            "format": "float"
+          },
+          "ownership_type": {
+            "type": "string"
+          },
+          "agreement_id": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "user_account_id",
+          "catalog_id",
+          "ownership_percentage"
+        ]
+      },
+      "OwnershipArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Ownership"
+        }
+      },
+      "OwnershipAgreements": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "agreement_name": {
+            "type": "string"
+          },
+          "agreement_type": {
+            "type": "string"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "agreement_name",
+          "agreement_type"
+        ]
+      },
+      "OwnershipAgreementsArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/OwnershipAgreements"
+        }
+      },
+      "Page": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "PageArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Page"
+        }
+      },
+      "PerformanceMetrics": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "user_account_id": {
+            "type": "integer"
+          },
+          "metric_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "metric_type": {
+            "type": "string"
+          },
+          "metric_value": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "user_account_id",
+          "metric_date"
+        ]
+      },
+      "PerformanceMetricsArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/PerformanceMetrics"
+        }
+      },
+      "ReturnHistory": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "sales_id": {
+            "type": "integer"
+          },
+          "return_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "refund_amount": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "sales_id",
+          "return_date"
+        ]
+      },
+      "ReturnHistoryArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ReturnHistory"
+        }
+      },
+      "Role": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "RoleArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Role"
+        }
+      },
+      "RolePageAccess": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "role_id": {
+            "type": "integer"
+          },
+          "page_id": {
+            "type": "integer"
+          },
+          "access": {
+            "type": "string",
+            "enum": [
+              "none",
+              "read",
+              "read_write",
+              "read_write_create",
+              "full"
+            ]
+          }
+        },
+        "required": [
+          "role_id",
+          "page_id",
+          "access"
+        ]
+      },
+      "RolePageAccessArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/RolePageAccess"
+        }
+      },
+      "Sales": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "listing_id": {
+            "type": "integer"
+          },
+          "sold_price": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "soldDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sold_shipping_collected": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "taxes": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "owner_id": {
+            "type": "integer"
+          },
+          "negotiated_terms": {
+            "type": "string"
+          },
+          "negotiated_terms_calculation": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "sales_channel": {
+            "type": "string"
+          },
+          "customer_feedback": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "listing_id",
+          "sold_price"
+        ]
+      },
+      "SalesArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Sales"
+        }
+      },
+      "ShippingLog": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "sales_id": {
+            "type": "integer"
+          },
+          "carrier": {
+            "type": "string"
+          },
+          "tracking_number": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "shipped_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "delivered_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "sales_id"
+        ]
+      },
+      "ShippingLogArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ShippingLog"
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "role_id": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "username",
+          "email",
+          "password"
+        ]
+      },
+      "UserArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/User"
+        }
+      }
     }
-  ]
+  }
 }

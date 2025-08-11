@@ -39,6 +39,15 @@ const apiService = {
         }
     },
 
+    // Fetch all listings (with optional filters and pagination)
+    getListings: async (params = {}) => {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/listings`, { params });
+            return response.data;
+        } catch (error) {
+            throw error.response ? error.response.data : error.message;
+        }
+    },
     // Additional API methods can be added here
 };
 

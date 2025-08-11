@@ -5,9 +5,9 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../utils/database');
 
 const CommunicationLogs = sequelize.define('communicationlogs', {
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  customer_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'customer', key: 'id' } },
-  sales_id: { type: DataTypes.INTEGER, references: { model: 'sales', key: 'id' } },
+  communicationlog_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  customer_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'customer', key: 'customer_id' } },
+  sale_id: { type: DataTypes.INTEGER, references: { model: 'sales', key: 'sale_id' } },
   communication_date: { type: DataTypes.DATE, allowNull: false },
   channel: { type: DataTypes.STRING },
   subject: { type: DataTypes.STRING },

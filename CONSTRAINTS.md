@@ -120,3 +120,22 @@ This networking information is critical and must not be removed or altered witho
 ### Important Notes
 - Local execution of Sequelize commands will not work unless the container is properly configured to expose the database.
 - Use `docker-compose` commands to manage the container lifecycle.
+
+## Standard Operating Procedure (SOP): Seeder and Migration File Naming
+
+- All seeder and migration files should use a date-based prefix in their filename (e.g., `20250711-mySeeder.js`).
+- This ensures each file is unique, sortable by creation date, and avoids accidental overwrites.
+- This convention matches best practices for Sequelize and other migration tools, and should be followed for all new seeders/migrations.
+
+## Standard Operating Procedure (SOP): Idempotent Seeding
+All INSERT statements in seed files must use `ON CONFLICT DO NOTHING` with the appropriate unique or primary key(s).
+This ensures seeding is idempotent and robust, preventing duplicate key errors on repeated runs.
+
+**Example:**
+```sql
+INSERT INTO "Catalog" (description, manufacturer, model, serial_number, sku_barcode)
+VALUES (...)
+ON CONFLICT (sku_barcode) DO NOTHING;
+```
+
+This SOP applies to all tables and seed files in this project.

@@ -1,8 +1,9 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../utils/database');
 
+// Match DB schema: primary key is ownership_id, table name is 'ownership'
 const Ownership = sequelize.define('ownership', {
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  ownership_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   ownership_type: { type: DataTypes.STRING },
   first_name: { type: DataTypes.STRING },
   last_name: { type: DataTypes.STRING },
@@ -17,12 +18,15 @@ const Ownership = sequelize.define('ownership', {
   assigned_contact_first_name: { type: DataTypes.STRING },
   assigned_contact_last_name: { type: DataTypes.STRING },
   assigned_contact_telephone: { type: DataTypes.STRING },
-  assigned_contact_email: { type: DataTypes.STRING }
+  assigned_contact_email: { type: DataTypes.STRING },
+  created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+  updated_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
 }, {
   tableName: 'ownership',
-  timestamps: false
+  freezeTableName: true,
+  timestamps: true,
+  createdAt: 'created_at',
+  updatedAt: 'updated_at'
 });
 
-// For backward compatibility, export as both names for now
 module.exports = Ownership;
-module.exports.Ownership = Ownership;

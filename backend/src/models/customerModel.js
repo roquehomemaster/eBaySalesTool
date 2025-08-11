@@ -3,7 +3,7 @@ const { sequelize } = require('../utils/database');
 
 
 const Customer = sequelize.define('customer', {
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  customer_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   first_name: { type: DataTypes.STRING },
   last_name: { type: DataTypes.STRING },
   email: { type: DataTypes.STRING, unique: true },
@@ -14,7 +14,9 @@ const Customer = sequelize.define('customer', {
   updated_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
 }, {
   tableName: 'customer',
-  timestamps: false
+  timestamps: true,
+  createdAt: 'created_at',
+  updatedAt: 'updated_at'
 });
 
 module.exports = Customer;

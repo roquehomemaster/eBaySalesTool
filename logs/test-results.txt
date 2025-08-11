@@ -38,8 +38,8 @@ DEBUG: Raw select from Customer after sync: [
     "phone": "555-1234",
     "address": "123 Main St",
     "status": "active",
-    "createdAt": "2025-06-25T15:09:14.324Z",
-    "updatedAt": "2025-06-25T15:09:14.324Z"
+    "createdAt": "2025-07-10T19:18:51.069Z",
+    "updatedAt": "2025-07-10T19:18:51.069Z"
   },
   {
     "id": 2,
@@ -49,8 +49,8 @@ DEBUG: Raw select from Customer after sync: [
     "phone": "555-5678",
     "address": "456 Elm St",
     "status": "active",
-    "createdAt": "2025-06-25T15:09:14.324Z",
-    "updatedAt": "2025-06-25T15:09:14.324Z"
+    "createdAt": "2025-07-10T19:18:51.069Z",
+    "updatedAt": "2025-07-10T19:18:51.069Z"
   }
 ]
 DEBUG: Raw select from Customer after create: [
@@ -62,8 +62,8 @@ DEBUG: Raw select from Customer after create: [
     "phone": "555-1234",
     "address": "123 Main St",
     "status": "active",
-    "createdAt": "2025-06-25T15:09:14.324Z",
-    "updatedAt": "2025-06-25T15:09:14.324Z"
+    "createdAt": "2025-07-10T19:18:51.069Z",
+    "updatedAt": "2025-07-10T19:18:51.069Z"
   },
   {
     "id": 2,
@@ -73,8 +73,8 @@ DEBUG: Raw select from Customer after create: [
     "phone": "555-5678",
     "address": "456 Elm St",
     "status": "active",
-    "createdAt": "2025-06-25T15:09:14.324Z",
-    "updatedAt": "2025-06-25T15:09:14.324Z"
+    "createdAt": "2025-07-10T19:18:51.069Z",
+    "updatedAt": "2025-07-10T19:18:51.069Z"
   },
   {
     "id": 3,
@@ -84,32 +84,11 @@ DEBUG: Raw select from Customer after create: [
     "phone": null,
     "address": null,
     "status": "active",
-    "createdAt": "2025-06-25T15:09:14.367Z",
-    "updatedAt": "2025-06-25T15:09:14.367Z"
+    "createdAt": "2025-07-10T19:18:51.117Z",
+    "updatedAt": "2025-07-10T19:18:51.118Z"
   }
 ]
 PASS tests/customerApi.test.js
-  ● Console
-
-    console.log
-      Sequelize config: {
-        database: 'ebay_sales_tool',
-        user: 'postgres',
-        password: 'password',
-        host: 'localhost',
-        port: '5432',
-        dialect: 'postgres',
-        NODE_ENV: 'test'
-      }
-
-      at Object.log (src/utils/database.js:9:9)
-
-    console.log
-      Logs directory already exists at /usr/src/app/logs
-
-      at Object.log (src/app.js:28:13)
-
-PASS tests/ownershipApi.test.js
   ● Console
 
     console.log
@@ -159,7 +138,7 @@ PASS tests/itemApi.test.js
 
       at Object.log (src/app.js:28:13)
 
-PASS tests/ebayInfoApi.test.js
+PASS tests/ownershipApi.test.js
   ● Console
 
     console.log
@@ -181,6 +160,27 @@ PASS tests/ebayInfoApi.test.js
       at Object.log (src/app.js:28:13)
 
 PASS tests/listingApi.test.js
+  ● Console
+
+    console.log
+      Sequelize config: {
+        database: 'ebay_sales_tool',
+        user: 'postgres',
+        password: 'password',
+        host: 'localhost',
+        port: '5432',
+        dialect: 'postgres',
+        NODE_ENV: 'test'
+      }
+
+      at Object.log (src/utils/database.js:9:9)
+
+    console.log
+      Logs directory already exists at /usr/src/app/logs
+
+      at Object.log (src/app.js:28:13)
+
+PASS tests/ebayInfoApi.test.js
   ● Console
 
     console.log
@@ -227,5 +227,5 @@ PASS src/tests/customerApi.test.js
 Test Suites: 7 passed, 7 total
 Tests:       49 passed, 49 total
 Snapshots:   0 total
-Time:        6.359 s
+Time:        5.737 s, estimated 19 s
 Ran all test suites matching /tests/i.

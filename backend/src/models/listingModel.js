@@ -15,10 +15,10 @@ const sequelize = require('../utils/database').sequelize;
 
 // Listing model definition (fixed syntax)
 const Listing = sequelize.define('listing', {
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  listing_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   title: { type: DataTypes.STRING, allowNull: false },
   listing_price: { type: DataTypes.DECIMAL },
-  item_id: { type: DataTypes.INTEGER, references: { model: 'catalog', key: 'id' } },
+  item_id: { type: DataTypes.INTEGER, references: { model: 'catalog', key: 'item_id' } },
   status: { type: DataTypes.STRING },
   watchers: { type: DataTypes.INTEGER },
   item_condition_description: {

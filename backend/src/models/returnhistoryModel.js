@@ -5,8 +5,8 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../utils/database');
 
 const ReturnHistory = sequelize.define('returnhistory', {
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  sales_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'sales', key: 'id' } },
+  returnhistory_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  sale_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'sales', key: 'sale_id' } },
   return_date: { type: DataTypes.DATE, allowNull: false },
   reason: { type: DataTypes.STRING },
   status: { type: DataTypes.STRING },

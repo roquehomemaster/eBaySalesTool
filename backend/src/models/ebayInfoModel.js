@@ -6,8 +6,7 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../utils/database');
 
 const EbayInfo = sequelize.define('ebayinfo', {
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  accountId: { type: DataTypes.STRING, allowNull: false, unique: true, field: 'account_id' },
+  account_id: { type: DataTypes.STRING, allowNull: false, unique: true, primaryKey: true },
   store_name: DataTypes.STRING,
   feedback_score: DataTypes.INTEGER,
   positive_feedback_percent: DataTypes.FLOAT,
@@ -18,9 +17,7 @@ const EbayInfo = sequelize.define('ebayinfo', {
   policy_compliance_status: DataTypes.STRING,
   selling_limits: DataTypes.JSONB,
   api_status: DataTypes.STRING,
-  last_sync: DataTypes.DATE,
-  created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-  updated_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
+  last_sync: DataTypes.DATE
 }, {
   tableName: 'ebayinfo',
   timestamps: false

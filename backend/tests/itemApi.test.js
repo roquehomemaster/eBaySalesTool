@@ -7,9 +7,15 @@ describe('Catalog API', () => {
   let createdId;
 
   beforeAll(async () => {
-    // Truncate the Catalog table before running tests
-    await sequelize.query('TRUNCATE "Catalog" RESTART IDENTITY CASCADE;');
-  });
+    jest.setTimeout(60000);
+    // Use API endpoint to seed and reset the database inside the container
+    const res = await request(app).post('/api/populate-database');
+    if (res.statusCode !== 200) {
+      throw new Error(`Database seeding failed: ${res.statusCode} ${JSON.stringify(res.body)}`);
+    }
+    // Truncate the catalog table before running tests
+    await sequelize.query('TRUNCATE catalog RESTART IDENTITY CASCADE;');
+  }, 60000);
 
   it('should create a catalog entry with valid data', async () => {
     const res = await request(app)
@@ -22,8 +28,8 @@ describe('Catalog API', () => {
         sku_barcode: `SKU${Date.now()}A`
       });
     expect(res.statusCode).toBe(201);
-    expect(res.body).toHaveProperty('id');
-    createdId = res.body.id;
+    expect(res.body).toHaveProperty('item_id');
+    createdId = res.body.item_id;
   });
 
   it('should fail to create catalog entry with missing required field', async () => {
@@ -40,14 +46,26 @@ describe('Catalog API', () => {
   });
 
   it('should fail to create catalog entry with duplicate SKU', async () => {
-    const res = await request(app)
+    const duplicateSku = 'SKU-DUPLICATE-TEST';
+    // First create
+    await request(app)
       .post('/api/catalog')
       .send({
         description: 'Test Catalog 2',
         manufacturer: 'TestCo',
         model: 'T1000',
         serial_number: 'SN124',
-        sku_barcode: `SKU${Date.now()}A` // duplicate
+        sku_barcode: duplicateSku
+      });
+    // Second create with same SKU
+    const res = await request(app)
+      .post('/api/catalog')
+      .send({
+        description: 'Test Catalog 3',
+        manufacturer: 'TestCo',
+        model: 'T1000',
+        serial_number: 'SN125',
+        sku_barcode: duplicateSku // true duplicate
       });
     expect(res.statusCode).toBe(409);
     expect(res.body.message).toMatch(/Duplicate SKU/);
@@ -66,7 +84,7 @@ describe('Catalog API', () => {
         extra_field: 'should be ignored'
       });
     expect(res.statusCode).toBe(201);
-    expect(res.body).toHaveProperty('id');
+    expect(res.body).toHaveProperty('item_id');
     expect(res.body).not.toHaveProperty('extra_field');
   });
 
@@ -80,7 +98,7 @@ describe('Catalog API', () => {
   it('should get catalog entry by ID', async () => {
     const res = await request(app).get(`/api/catalog/${createdId}`);
     expect(res.statusCode).toBe(200);
-    expect(res.body).toHaveProperty('id', createdId);
+    expect(res.body).toHaveProperty('item_id', createdId);
   });
 
   it('should return 404 for non-existent catalog entry', async () => {
@@ -97,26 +115,32 @@ describe('Catalog API', () => {
   });
 
   it('should fail to update catalog entry with duplicate SKU', async () => {
-    const uniqueSku = 'SKU-UNIQUE-UPDATE-' + Date.now();
-    // Create a second catalog entry with a unique SKU
+    const duplicateSku = 'SKU-DUPLICATE-UPDATE';
+    // Create two entries
     const res1 = await request(app)
       .post('/api/catalog')
       .send({
-        description: 'Second Catalog',
+        description: 'Test Catalog 4',
         manufacturer: 'TestCo',
-        model: 'T1002',
+        model: 'T1000',
         serial_number: 'SN126',
-        sku_barcode: uniqueSku
+        sku_barcode: duplicateSku
       });
-    expect(res1.statusCode).toBe(201);
-    const secondId = res1.body.id;
-
-    // Try to update second catalog entry to use the first entry's SKU
     const res2 = await request(app)
-      .put(`/api/catalog/${secondId}`)
-      .send({ sku_barcode: `SKU${Date.now()}A` });
-    expect(res2.statusCode).toBe(409);
-    expect(res2.body.message).toMatch(/Duplicate SKU/);
+      .post('/api/catalog')
+      .send({
+        description: 'Test Catalog 5',
+        manufacturer: 'TestCo',
+        model: 'T1000',
+        serial_number: 'SN127',
+        sku_barcode: 'SKU-UNIQUE-UPDATE'
+      });
+    // Try to update second entry to duplicate SKU
+    const updateRes = await request(app)
+      .put(`/api/catalog/${res2.body.item_id}`)
+      .send({ sku_barcode: duplicateSku });
+    expect(updateRes.statusCode).toBe(409);
+    expect(updateRes.body.message).toMatch(/Duplicate SKU/);
   });
 
   it('should delete catalog entry by ID', async () => {

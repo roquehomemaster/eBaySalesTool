@@ -1,4 +1,5 @@
-const Catalog = require('../models/itemModel');
+// Use the canonical catalog model (either file defines same table/shape). Prefer catalogModel.
+const Catalog = require('../models/catalogModel');
 const { Op } = require('sequelize');
 
 // Create a new catalog entry
@@ -19,7 +20,7 @@ exports.createCatalog = async (req, res) => {
         if (error.name === 'SequelizeUniqueConstraintError') {
             return res.status(409).json({ message: 'Duplicate SKU/Barcode' });
         }
-        res.status(500).json({ message: 'Error creating catalog entry' });
+        res.status(500).json({ message: 'Error creating catalog entry', error: error.message, details: error.errors || undefined });
     }
 };
 
@@ -41,25 +42,25 @@ exports.getAllCatalog = async (req, res) => {
             pageSize: limit
         });
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching catalog' });
+        res.status(500).json({ message: 'Error fetching catalog', error: error.message });
     }
 };
 
 // Get catalog entry by ID
 exports.getCatalogById = async (req, res) => {
     try {
-        const catalog = await Catalog.findByPk(req.params.id);
+        const catalog = await Catalog.findByPk(req.params.item_id);
         if (!catalog) { return res.status(404).json({ message: 'Catalog entry not found' }); }
         res.json(catalog);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching catalog entry' });
+        res.status(500).json({ message: 'Error fetching catalog entry', error: error.message });
     }
 };
 
 // Update catalog entry by ID
 exports.updateCatalogById = async (req, res) => {
     try {
-        const catalog = await Catalog.findByPk(req.params.id);
+        const catalog = await Catalog.findByPk(req.params.item_id);
         if (!catalog) { return res.status(404).json({ message: 'Catalog entry not found' }); }
         await catalog.update(req.body);
         res.json(catalog);
@@ -67,33 +68,33 @@ exports.updateCatalogById = async (req, res) => {
         if (error.name === 'SequelizeUniqueConstraintError') {
             return res.status(409).json({ message: 'Duplicate SKU/Barcode' });
         }
-        res.status(500).json({ message: 'Error updating catalog entry' });
+        res.status(500).json({ message: 'Error updating catalog entry', error: error.message, details: error.errors || undefined });
     }
 };
 
 // Delete catalog entry by ID
 exports.deleteCatalogById = async (req, res) => {
     try {
-        const catalog = await Catalog.findByPk(req.params.id);
+        const catalog = await Catalog.findByPk(req.params.item_id);
         if (!catalog) { return res.status(404).json({ message: 'Catalog entry not found' }); }
         await catalog.destroy();
         res.json({ message: 'Catalog entry deleted successfully.' });
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting catalog entry' });
+        res.status(500).json({ message: 'Error deleting catalog entry', error: error.message });
     }
 };
 
 // Bulk update catalog entries (optional)
 exports.bulkUpdateCatalog = async (req, res) => {
     try {
-        const { ids, ...updateFields } = req.body;
-        if (!Array.isArray(ids) || ids.length === 0) {
-            return res.status(400).json({ message: 'No IDs provided for bulk update.' });
+        const { item_ids, ...updateFields } = req.body;
+        if (!Array.isArray(item_ids) || item_ids.length === 0) {
+            return res.status(400).json({ message: 'No item_ids provided for bulk update.' });
         }
-        const [updated] = await Catalog.update(updateFields, { where: { id: ids } });
+        const [updated] = await Catalog.update(updateFields, { where: { item_id: item_ids } });
         res.json({ updated });
     } catch (error) {
-        res.status(500).json({ message: 'Error bulk updating catalog' });
+        res.status(500).json({ message: 'Error bulk updating catalog', error: error.message });
     }
 };
 
@@ -107,7 +108,7 @@ exports.bulkDeleteCatalog = async (req, res) => {
         const deleted = await Catalog.destroy({ where: { id: ids } });
         res.json({ deleted });
     } catch (error) {
-        res.status(500).json({ message: 'Error bulk deleting catalog' });
+        res.status(500).json({ message: 'Error bulk deleting catalog', error: error.message });
     }
 };
 
@@ -125,6 +126,6 @@ exports.searchCatalog = async (req, res) => {
         const catalog = await Catalog.findAll({ where });
         res.json(catalog);
     } catch (error) {
-        res.status(500).json({ message: 'Error searching catalog' });
+        res.status(500).json({ message: 'Error searching catalog', error: error.message });
     }
 };

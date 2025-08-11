@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../utils/database');
 
 const OwnershipAgreements = sequelize.define('ownershipagreements', {
-  id: {
+  ownershipagreement_id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true
@@ -13,7 +13,7 @@ const OwnershipAgreements = sequelize.define('ownershipagreements', {
     allowNull: false,
     references: {
       model: 'ownership',
-      key: 'id'
+      key: 'ownership_id'
     }
   },
   commission_percentage: DataTypes.DECIMAL,

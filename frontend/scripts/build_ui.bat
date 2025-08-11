@@ -18,9 +18,7 @@ if %ERRORLEVEL% neq 0 (
 )
 docker compose -f f:\Dev\eBaySalesTool\docker-compose.yml up -d frontend
 if %ERRORLEVEL% neq 0 (
-    echo "Failed to start frontend container."
+    echo "Frontend container restart failed."
     exit /b 1
 )
-
-echo "Frontend build and restart completed successfully."
-exit /b 0
+echo "Frontend container rebuilt and restarted successfully."

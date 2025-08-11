@@ -42,7 +42,8 @@ exports.createOwnership = async (req, res) => {
         });
         res.status(201).json(newOwnership);
     } catch (error) {
-        res.status(500).json({ message: 'Error creating ownership/agreement', error });
+        console.error('Error in createOwnership:', error);
+        res.status(500).json({ message: 'Error creating ownership/agreement', error: error.message, details: error.errors || undefined });
     }
 };
 
@@ -64,7 +65,8 @@ exports.getAllOwnerships = async (req, res) => {
             pageSize: limit
         });
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching ownerships/agreements' });
+        console.error('Error in getAllOwnerships:', error);
+        res.status(500).json({ message: 'Error fetching ownerships/agreements', error: error.message });
     }
 };
 
@@ -75,7 +77,8 @@ exports.getOwnershipById = async (req, res) => {
         if (!ownership) { return res.status(404).json({ message: 'Ownership/Agreement not found' }); }
         res.json(ownership);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching ownership/agreement' });
+        console.error('Error in getOwnershipById:', error);
+        res.status(500).json({ message: 'Error fetching ownership/agreement', error: error.message });
     }
 };
 
@@ -87,7 +90,8 @@ exports.updateOwnershipById = async (req, res) => {
         await ownership.update(req.body);
         res.json(ownership);
     } catch (error) {
-        res.status(500).json({ message: 'Error updating ownership/agreement' });
+        console.error('Error in updateOwnershipById:', error);
+        res.status(500).json({ message: 'Error updating ownership/agreement', error: error.message, details: error.errors || undefined });
     }
 };
 
@@ -99,7 +103,8 @@ exports.deleteOwnershipById = async (req, res) => {
         await ownership.destroy();
         res.json({ message: 'Ownership/Agreement deleted successfully.' });
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting ownership/agreement' });
+        console.error('Error in deleteOwnershipById:', error);
+        res.status(500).json({ message: 'Error deleting ownership/agreement', error: error.message });
     }
 };
 
@@ -113,7 +118,8 @@ exports.bulkUpdateOwnerships = async (req, res) => {
         const [updated] = await Ownership.update(updateFields, { where: { id: ids } });
         res.json({ updated });
     } catch (error) {
-        res.status(500).json({ message: 'Error bulk updating ownerships/agreements' });
+        console.error('Error in bulkUpdateOwnerships:', error);
+        res.status(500).json({ message: 'Error bulk updating ownerships/agreements', error: error.message });
     }
 };
 
@@ -127,7 +133,8 @@ exports.bulkDeleteOwnerships = async (req, res) => {
         const deleted = await Ownership.destroy({ where: { id: ids } });
         res.json({ deleted });
     } catch (error) {
-        res.status(500).json({ message: 'Error bulk deleting ownerships/agreements' });
+        console.error('Error in bulkDeleteOwnerships:', error);
+        res.status(500).json({ message: 'Error bulk deleting ownerships/agreements', error: error.message });
     }
 };
 
@@ -141,6 +148,7 @@ exports.searchOwnerships = async (req, res) => {
         const ownerships = await Ownership.findAll({ where });
         res.json(ownerships);
     } catch (error) {
-        res.status(500).json({ message: 'Error searching ownerships/agreements' });
+        console.error('Error in searchOwnerships:', error);
+        res.status(500).json({ message: 'Error searching ownerships/agreements', error: error.message });
     }
 };

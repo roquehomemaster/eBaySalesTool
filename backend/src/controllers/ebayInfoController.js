@@ -7,12 +7,12 @@ const { Op } = require('sequelize');
 // Get eBay info from DB
 exports.getEbayInfo = async (req, res) => {
     try {
-        const info = await EbayInfo.findOne();
+    const info = await EbayInfo.findOne({ order: [['last_sync', 'DESC']] });
         if (!info) {
             return res.status(404).json({ message: 'eBay info not found' });
         }
         res.json({
-            accountId: info.accountId,
+            accountId: info.account_id,
             storeName: info.store_name,
             feedbackScore: info.feedback_score,
             positiveFeedbackPercent: info.positive_feedback_percent,
@@ -26,7 +26,7 @@ exports.getEbayInfo = async (req, res) => {
 
 exports.getPerformance = async (req, res) => {
     try {
-        const info = await EbayInfo.findOne();
+    const info = await EbayInfo.findOne({ order: [['last_sync', 'DESC']] });
         if (!info) {
             return res.status(404).json({ message: 'eBay info not found' });
         }
@@ -45,7 +45,7 @@ exports.getPerformance = async (req, res) => {
 
 exports.getApiStatus = async (req, res) => {
     try {
-        const info = await EbayInfo.findOne();
+    const info = await EbayInfo.findOne({ order: [['last_sync', 'DESC']] });
         if (!info) {
             return res.status(404).json({ message: 'eBay info not found' });
         }
@@ -86,7 +86,7 @@ exports.searchEbayInfo = async (req, res) => {
         const infos = await EbayInfo.findAll({ where });
         // Map DB fields to camelCase in response
         const mapped = infos.map(info => ({
-            accountId: info.accountId,
+            accountId: info.account_id,
             storeName: info.store_name,
             feedbackScore: info.feedback_score,
             positiveFeedbackPercent: info.positive_feedback_percent,

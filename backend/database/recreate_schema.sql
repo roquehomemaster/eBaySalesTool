@@ -39,7 +39,7 @@ CREATE TABLE application_account (
 );
 
 CREATE TABLE catalog (
-  id int PRIMARY KEY,
+  item_id SERIAL PRIMARY KEY,
   description varchar,
   manufacturer varchar,
   model varchar,
@@ -50,7 +50,7 @@ CREATE TABLE catalog (
 );
 
 CREATE TABLE customer (
-  id int PRIMARY KEY,
+  customer_id SERIAL PRIMARY KEY,
   first_name varchar,
   last_name varchar,
   email varchar,
@@ -62,19 +62,21 @@ CREATE TABLE customer (
 );
 
 CREATE TABLE ebayinfo (
-  account_id varchar PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
+  account_id varchar NOT NULL,
   store_name varchar,
   feedback_score int,
   positive_feedback_percent float,
+  selling_limits jsonb,
   seller_level varchar,
-  ebay_evaluation_fee float,
   defect_rate float,
   late_shipment_rate float,
   transaction_defect_rate float,
   policy_compliance_status varchar,
-  selling_limits jsonb,
   api_status varchar,
-  last_sync date
+  last_sync timestamp,
+  created_at timestamp,
+  updated_at timestamp
 );
 
 CREATE TABLE appconfig (
@@ -88,8 +90,33 @@ CREATE TABLE database_configuration (
   value jsonb
 );
 
+CREATE TABLE roles (
+  role_id SERIAL PRIMARY KEY,
+  name varchar UNIQUE,
+  description varchar,
+  created_at timestamp,
+  updated_at timestamp
+);
+
+CREATE TABLE pages (
+  page_id SERIAL PRIMARY KEY,
+  name varchar UNIQUE,
+  url varchar,
+  created_at timestamp,
+  updated_at timestamp
+);
+
+CREATE TABLE role_page_access (
+  access_id SERIAL PRIMARY KEY,
+  role_id int REFERENCES roles(role_id),
+  page_id int REFERENCES pages(page_id),
+  access varchar,
+  created_at timestamp,
+  updated_at timestamp
+);
+
 CREATE TABLE ownership (
-  id int PRIMARY KEY,
+  ownership_id SERIAL PRIMARY KEY,
   ownership_type varchar,
   first_name varchar,
   last_name varchar,
@@ -105,11 +132,13 @@ CREATE TABLE ownership (
   assigned_contact_last_name varchar,
   assigned_contact_telephone varchar,
   assigned_contact_email varchar
+  ,created_at timestamp
+  ,updated_at timestamp
 );
 
 CREATE TABLE ownershipagreements (
-  id int PRIMARY KEY,
-  ownership_id int REFERENCES ownership(id),
+  ownershipagreement_id int PRIMARY KEY,
+  ownership_id int REFERENCES ownership(ownership_id),
   commission_percentage decimal,
   minimum_sale_price decimal,
   duration_of_agreement int,
@@ -117,8 +146,8 @@ CREATE TABLE ownershipagreements (
 );
 
 CREATE TABLE customerdetails (
-  id int PRIMARY KEY,
-  customer_id int REFERENCES customer(id),
+  customerdetail_id int PRIMARY KEY,
+  customer_id int REFERENCES customer(customer_id),
   address varchar,
   phone varchar,
   notes text,
@@ -127,10 +156,10 @@ CREATE TABLE customerdetails (
 );
 
 CREATE TABLE listing (
-  id int PRIMARY KEY,
+  listing_id SERIAL PRIMARY KEY,
   title varchar,
   listing_price decimal,
-  item_id int REFERENCES catalog(id),
+  item_id int REFERENCES catalog(item_id),
   status varchar,
   watchers int,
   item_condition_description text,
@@ -141,13 +170,13 @@ CREATE TABLE listing (
 );
 
 CREATE TABLE sales (
-  id int PRIMARY KEY,
-  listing_id int REFERENCES listing(id),
+  sale_id SERIAL PRIMARY KEY,
+  listing_id int REFERENCES listing(listing_id),
   sold_price decimal,
   sold_date timestamp,
   sold_shipping_collected decimal,
   taxes decimal,
-  owner_id int REFERENCES ownership(id),
+  ownership_id int REFERENCES ownership(ownership_id),
   negotiated_terms text,
   negotiated_terms_calculation decimal,
   sales_channel varchar,
@@ -155,8 +184,8 @@ CREATE TABLE sales (
 );
 
 CREATE TABLE saleshistory (
-  id int PRIMARY KEY,
-  sale_id int REFERENCES sales(id),
+  saleshistory_id SERIAL PRIMARY KEY,
+  sale_id int REFERENCES sales(sale_id),
   change_type varchar,
   change_details text,
   changed_by int REFERENCES application_account(user_account_id),
@@ -165,8 +194,8 @@ CREATE TABLE saleshistory (
 
 
 CREATE TABLE shippinglog (
-  id int PRIMARY KEY,
-  listing_id int REFERENCES listing(id),
+  shippinglog_id int PRIMARY KEY,
+  listing_id int REFERENCES listing(listing_id),
   shipping_collected decimal,
   shipping_label_costs decimal,
   additional_shipping_costs_material decimal,
@@ -174,8 +203,8 @@ CREATE TABLE shippinglog (
 );
 
 CREATE TABLE product_research (
-  id int PRIMARY KEY,
-  item int REFERENCES catalog(id),
+  product_research_id int PRIMARY KEY,
+  item_id int REFERENCES catalog(item_id),
   observed_sold_price decimal,
   research_date timestamp
 );
@@ -192,7 +221,7 @@ CREATE TABLE historylogs (
 
 CREATE TABLE returnhistory (
   id int PRIMARY KEY,
-  item_id int REFERENCES listing(id),
+  listing_id int REFERENCES listing(listing_id),
   return_reasoning text,
   return_request_date date,
   return_approved_date date,
@@ -201,25 +230,20 @@ CREATE TABLE returnhistory (
 );
 
 CREATE TABLE order_details (
-  id int,
-  listing_id int,
+  id SERIAL PRIMARY KEY,
+  listing_id int REFERENCES listing(listing_id),
   purchase_date date,
   date_shipped date,
   date_received date,
   date_out_of_warranty date,
-  purchase_method varchar,
-  shipping_preferences text,
-  PRIMARY KEY (id, listing_id),
-  FOREIGN KEY (listing_id) REFERENCES listing(id)
--- removed stray parenthesis
+  purchase_method varchar(50),
+  shipping_preferences varchar(100)
 );
 
-
-
 CREATE TABLE financialtracking (
-  id int PRIMARY KEY,
-  item_id int REFERENCES listing(id),
-  sales_id int REFERENCES sales(id),
+  financialtracking_id SERIAL PRIMARY KEY,
+  listing_id int REFERENCES listing(listing_id),
+  sale_id int REFERENCES sales(sale_id),
   sold_total decimal,
   taxes_collected decimal,
   actual_shipping_costs decimal,
@@ -231,15 +255,15 @@ CREATE TABLE financialtracking (
 );
 
 CREATE TABLE communicationlogs (
-  id int PRIMARY KEY,
-  owner_id int REFERENCES ownership(id),
+  communicationlog_id SERIAL PRIMARY KEY,
+  ownership_id int REFERENCES ownership(ownership_id),
   owner_communication_history text,
   approval_process text
 );
 
 CREATE TABLE performancemetrics (
-  id int PRIMARY KEY,
-  item_id int UNIQUE REFERENCES catalog(id),
+  performancemetric_id int PRIMARY KEY,
+  item_id int UNIQUE REFERENCES catalog(item_id),
   total_sales decimal,
   number_of_items_sold int,
   average_sale_price decimal

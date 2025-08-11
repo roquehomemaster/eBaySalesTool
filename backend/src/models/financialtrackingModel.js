@@ -5,9 +5,9 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../utils/database');
 
 const FinancialTracking = sequelize.define('financialtracking', {
-  id: { type: DataTypes.INTEGER, primaryKey: true },
-  item_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'listing', key: 'id' } },
-  sales_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'sales', key: 'id' } },
+  financialtracking_id: { type: DataTypes.INTEGER, primaryKey: true },
+  listing_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'listing', key: 'listing_id' } },
+  sale_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'sales', key: 'sale_id' } },
   sold_total: { type: DataTypes.DECIMAL },
   taxes_collected: { type: DataTypes.DECIMAL },
   actual_shipping_costs: { type: DataTypes.DECIMAL },
