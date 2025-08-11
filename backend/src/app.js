@@ -24,6 +24,7 @@ const authRoutes = require('./routes/authRoutes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const { sequelize } = require('./utils/database');
+const listingController = require('./controllers/listingController');
 const Catalog = require('./models/itemModel');
 const Ownership = require('./models/ownershipModel');
 const Sales = require('./models/salesModel');
@@ -78,6 +79,9 @@ app.use('/api/appconfig', appconfigRoutes);
 app.use('/api/database_configuration', database_configurationRoutes);
 app.use('/api/shippinglog', shippinglogRoutes);
 app.use('/api/ownershipagreements', ownershipagreementsRoutes);
+
+// Temporary explicit route to ensure details endpoint is available even if router file misses it
+app.get('/api/listings/:id/details', listingController.getListingDetails);
 
 // Swagger configuration (merged)
 const mergedSwagger = require('./swagger/mergedSwagger');

@@ -10,6 +10,7 @@
 
 const { Op } = require('sequelize');
 const Listing = require('../models/listingModel');
+const { pool } = require('../utils/database');
 
 /**
  * Create a new listing
@@ -23,8 +24,8 @@ exports.createListing = async (req, res) => {
             }
         }
         // Check if itemId exists in Catalog table for FK integrity BEFORE creating the listing
-        const Catalog = require('../models/itemModel'); // Use itemModel.js for catalog lookups
-        const item_id = req.body.item_id;
+    const Catalog = require('../models/itemModel'); // Use itemModel.js for catalog lookups
+    const { item_id } = req.body;
         const catalogItem = await Catalog.findByPk(item_id);
         if (!catalogItem) {
             return res.status(400).json({ message: 'Invalid item_id: catalog item does not exist' });
@@ -150,5 +151,59 @@ exports.searchListings = async (req, res) => {
         }));
     } catch (error) {
         res.status(500).json({ message: 'Error searching listings' });
+    }
+};
+
+/**
+ * Get comprehensive listing details, aggregating related data
+ * - listing, catalog item, sales (and ownerships), shippinglog, order_details,
+ *   financialtracking, returnhistory, performancemetrics, ownershipagreements
+ */
+exports.getListingDetails = async (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+        return res.status(400).json({ message: 'Invalid listing id' });
+    }
+    try {
+        const listingRes = await pool.query('SELECT * FROM listing WHERE listing_id = $1', [id]);
+        if (listingRes.rowCount === 0) {
+            return res.status(404).json({ message: 'Listing not found' });
+        }
+        const listing = listingRes.rows[0];
+
+        const [catalogRes, salesRes, shippingRes, orderRes, returnRes, perfRes] = await Promise.all([
+            pool.query('SELECT * FROM catalog WHERE item_id = $1', [listing.item_id]),
+            pool.query('SELECT * FROM sales WHERE listing_id = $1', [id]),
+            pool.query('SELECT * FROM shippinglog WHERE listing_id = $1', [id]),
+            pool.query('SELECT * FROM order_details WHERE listing_id = $1', [id]),
+            pool.query('SELECT * FROM returnhistory WHERE listing_id = $1', [id]),
+            pool.query('SELECT * FROM performancemetrics WHERE item_id = $1', [listing.item_id])
+        ]);
+
+        const sales = salesRes.rows;
+        const saleIds = sales.map(s => s.sale_id).filter(Boolean);
+        const ownershipIds = sales.map(s => s.ownership_id).filter(Boolean);
+
+        const [ownershipRes, agreementsRes, finTrackRes] = await Promise.all([
+            ownershipIds.length ? pool.query(`SELECT * FROM ownership WHERE ownership_id = ANY($1::int[])`, [ownershipIds]) : Promise.resolve({ rows: [] }),
+            ownershipIds.length ? pool.query(`SELECT * FROM ownershipagreements WHERE ownership_id = ANY($1::int[])`, [ownershipIds]) : Promise.resolve({ rows: [] }),
+            saleIds.length ? pool.query(`SELECT * FROM financialtracking WHERE listing_id = $1 OR sale_id = ANY($2::int[])`, [id, saleIds]) : pool.query(`SELECT * FROM financialtracking WHERE listing_id = $1`, [id])
+        ]);
+
+        res.json({
+            listing,
+            catalog: catalogRes.rows[0] || null,
+            sales,
+            ownerships: ownershipRes.rows,
+            ownershipagreements: agreementsRes.rows,
+            shippinglog: shippingRes.rows,
+            order_details: orderRes.rows,
+            financialtracking: finTrackRes.rows,
+            returnhistory: returnRes.rows,
+            performancemetrics: perfRes.rows[0] || null
+        });
+    } catch (error) {
+        console.error('Error fetching listing details:', error);
+        res.status(500).json({ message: 'Error fetching listing details' });
     }
 };

@@ -1,60 +1,52 @@
-import React, { useEffect, useState } from 'react';
-import Page from './Page';
-import SystemMessage from './SystemMessage';
+import React from 'react';
+import ListWithDetails from './ListWithDetails';
 import apiService from '../services/apiService';
 
 const SalesList = () => {
-  const [sales, setSales] = useState([]);
-  const [message, setMessage] = useState(null);
-  const [messageType, setMessageType] = useState('info');
+  const fetchList = async () => {
+    const response = await apiService.getSales();
+    if (Array.isArray(response)) {
+      return response;
+    }
+    if (Array.isArray(response?.sales)) {
+      return response.sales;
+    }
+    return [];
+  };
 
-  useEffect(() => {
-    const fetchSales = async () => {
-      try {
-        const response = await apiService.getSales();
-        setSales(response.sales || response); // handle both {sales:[]} and []
-        setMessage(null);
-      } catch (error) {
-        setMessage('Error fetching sales. Please try again later.');
-        setMessageType('error');
-        setSales([]);
-      }
-    };
-    fetchSales();
-  }, []);
+  const columns = ['Date', 'Item', 'Quantity', 'Price', 'Total', 'Buyer'];
+  const rowRenderer = (sale) => (
+    <>
+      <td>{sale.date || '-'}</td>
+      <td>{sale.itemName || '-'}</td>
+      <td>{sale.quantity || '-'}</td>
+      <td>{sale.price || '-'}</td>
+      <td>{sale.total || '-'}</td>
+      <td>{sale.buyer || '-'}</td>
+    </>
+  );
+
+  const detailsRenderer = (sale) => (
+    <div>
+      <h3>Sale Details</h3>
+      <p><strong>Date:</strong> {sale.date || '-'}</p>
+      <p><strong>Item:</strong> {sale.itemName || '-'}</p>
+      <p><strong>Quantity:</strong> {sale.quantity || '-'}</p>
+      <p><strong>Price:</strong> {sale.price || '-'}</p>
+      <p><strong>Total:</strong> {sale.total || '-'}</p>
+      <p><strong>Buyer:</strong> {sale.buyer || '-'}</p>
+    </div>
+  );
 
   return (
-    <Page title="Sales List">
-      <SystemMessage message={message} type={messageType} onClose={() => setMessage(null)} />
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Item</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Total</th>
-            <th>Buyer</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sales.length === 0 ? (
-            <tr><td colSpan="6" style={{textAlign:'center'}}>No sales found.</td></tr>
-          ) : (
-            sales.map((sale, idx) => (
-              <tr key={sale.id || idx}>
-                <td>{sale.date || '-'}</td>
-                <td>{sale.itemName || '-'}</td>
-                <td>{sale.quantity || '-'}</td>
-                <td>{sale.price || '-'}</td>
-                <td>{sale.total || '-'}</td>
-                <td>{sale.buyer || '-'}</td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </Page>
+    <ListWithDetails
+      title="Sales List"
+      fetchList={fetchList}
+      columns={columns}
+      rowRenderer={rowRenderer}
+      detailsRenderer={detailsRenderer}
+      pageKey="sales"
+    />
   );
 };
 

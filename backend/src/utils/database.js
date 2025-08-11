@@ -55,7 +55,7 @@ const pool = new Pool({
  */
 async function seedDatabaseIfTestFlag() {
     try {
-        const result = await pool.query("SELECT config_value FROM AppConfig WHERE config_key = 'testdata'");
+    const result = await pool.query("SELECT config_value FROM appconfig WHERE config_key = 'testdata'");
         const testDataFlag = result.rows[0]?.config_value === 'true';
 
         if (testDataFlag) {

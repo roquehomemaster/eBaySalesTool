@@ -1,16 +1,13 @@
 // appconfigModel.js
-// Sequelize model for AppConfig table (matches new schema)
+// Sequelize model for appconfig table (config_key PK, value and type only)
 
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../utils/database');
 
 const AppConfig = sequelize.define('appconfig', {
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  config_key: { type: DataTypes.STRING, allowNull: false, unique: true },
-  config_value: { type: DataTypes.STRING },
-  description: { type: DataTypes.STRING },
-  created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-  updated_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
+  config_key: { type: DataTypes.STRING, primaryKey: true },
+  config_value: { type: DataTypes.TEXT, allowNull: false },
+  data_type: { type: DataTypes.STRING, allowNull: false, defaultValue: 'string' }
 }, {
   tableName: 'appconfig',
   timestamps: false
