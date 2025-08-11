@@ -48,6 +48,14 @@ const apiService = {
             throw error.response ? error.response.data : error.message;
         }
     },
+    getListingDetails: async (listingId) => {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/listings/${listingId}/details`);
+            return response.data;
+        } catch (error) {
+            throw error.response ? error.response.data : error.message;
+        }
+    },
     // Fetch app configuration by key (e.g., 'listings.page_size')
     getAppConfigByKey: async (key) => {
         try {

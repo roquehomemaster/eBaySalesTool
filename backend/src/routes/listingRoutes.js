@@ -173,6 +173,7 @@ router.post('/', listingController.createListing);
  *         description: Error deleting listing
  */
 router.get('/:id', listingController.getListingById);
+router.get('/:id/details', listingController.getListingDetails);
 router.put('/:id', listingController.updateListingById);
 router.delete('/:id', listingController.deleteListingById);
 

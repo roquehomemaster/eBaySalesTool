@@ -30,41 +30,87 @@ const ListingTable = () => {
   );
 
   const detailsRenderer = (listing) => {
-    const entries = Object.entries(listing || {});
-    const formatKey = (k) => k.replace(/_/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase());
-    const formatVal = (v) => {
-      if (v === null || v === undefined) {
-        return '-';
-      }
-      if (typeof v === 'string') {
-        // Try to parse timestamps
-        const d = new Date(v);
-        if (!isNaN(d.getTime()) && /\d{4}-\d{2}-\d{2}/.test(v)) {
-          return d.toLocaleString();
-        }
-      }
-      return String(v);
-    };
-    return (
-      <div>
-        <h3>Listing Details</h3>
-        <table className="kv-table">
-          <tbody>
-            {entries.map(([key, val]) => (
-              <tr key={key}>
-                <td className="kv-key">{formatKey(key)}</td>
-                <td className="kv-val">{formatVal(val)}</td>
-              </tr>
+    // Fetch aggregated details on-demand per selected listing
+    // Simple client component below to display grouped data
+    const Details = () => {
+      const [data, setData] = React.useState(null);
+      const [error, setError] = React.useState(null);
+      React.useEffect(() => {
+        let active = true;
+        (async () => {
+          try {
+            const resp = await apiService.getListingDetails(listing.listing_id);
+            if (active) {
+              setData(resp);
+            }
+          } catch (e) {
+            if (active) {
+              setError('Failed to load details');
+            }
+          }
+        })();
+        return () => { active = false; };
+      }, [listing.listing_id]);
+
+      const Section = ({ title, obj, rows }) => (
+        <div style={{ marginTop: 12 }}>
+          <h4 style={{ margin: '6px 0' }}>{title}</h4>
+          <table className="kv-table"><tbody>
+            {(rows || Object.entries(obj || {})).map(([k, v]) => (
+              <tr key={k}><td className="kv-key">{String(k)}</td><td className="kv-val">{typeof v === 'object' ? JSON.stringify(v) : String(v ?? '-')}</td></tr>
             ))}
-          </tbody>
-        </table>
-        <style>{`
-          .kv-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-          .kv-table td { border-bottom: 1px solid #eee; padding: 6px 8px; vertical-align: top; }
-          .kv-key { width: 220px; font-weight: 600; color: #334e68; background: #f9fbfd; }
-        `}</style>
-      </div>
-    );
+          </tbody></table>
+        </div>
+      );
+
+      if (error) {
+        return <div className="system-message error">{error}</div>;
+      }
+      if (!data) {
+        return <div className="system-message info">Loading details…</div>;
+      }
+
+      return (
+        <div>
+          <h3>Listing Details</h3>
+          <Section title="Listing" obj={data.listing} />
+          <Section title="Catalog Item" obj={data.catalog} />
+          <Section title="Shipping Log" rows={(data.shippinglog||[]).flatMap((r, i) => Object.entries(r).map(([k,v]) => [[`${i+1}.${k}`, v]] )).flat()} />
+          <Section title="Order Details" rows={(data.order_details||[]).flatMap((r, i) => Object.entries(r).map(([k,v]) => [[`${i+1}.${k}`, v]] )).flat()} />
+          <Section title="Financial Tracking" rows={(data.financialtracking||[]).flatMap((r, i) => Object.entries(r).map(([k,v]) => [[`${i+1}.${k}`, v]] )).flat()} />
+          <Section title="Returns" rows={(data.returnhistory||[]).flatMap((r, i) => Object.entries(r).map(([k,v]) => [[`${i+1}.${k}`, v]] )).flat()} />
+          <Section title="Performance Metrics" obj={data.performancemetrics} />
+          <div style={{ marginTop: 12 }}>
+            <h4 style={{ margin: '6px 0' }}>Sales and Ownership</h4>
+            {(data.sales || []).map((s, idx) => (
+              <div key={s.sale_id || idx} style={{ marginBottom: 10 }}>
+                <Section title={`Sale #${s.sale_id || idx+1}`} obj={s} />
+                {/* Ownership for this sale if ownership_id present */}
+                {s.ownership_id && (
+                  <Section
+                    title={`Ownership (ID ${s.ownership_id})`}
+                    obj={(data.ownerships || []).find(o => o.ownership_id === s.ownership_id) || {}}
+                  />
+                )}
+                {s.ownership_id && (
+                  <Section
+                    title={`Ownership Agreement(s)`}
+                    rows={(data.ownershipagreements || []).filter(a => a.ownership_id === s.ownership_id)
+                      .flatMap((r, i) => Object.entries(r).map(([k,v]) => [[`${i+1}.${k}`, v]] )).flat()}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+          <style>{`
+            .kv-table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+            .kv-table td { border-bottom: 1px solid #eee; padding: 6px 8px; vertical-align: top; }
+            .kv-key { width: 240px; font-weight: 600; color: #334e68; background: #f9fbfd; }
+          `}</style>
+        </div>
+      );
+    };
+    return <Details/>;
   };
 
   return (
