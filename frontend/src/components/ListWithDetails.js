@@ -7,7 +7,7 @@ import apiService from '../services/apiService';
 // - fetchList: () => Promise<Array>
 // - rowRenderer: (item) => ReactNode (for table row cells)
 // - columns: string[] (column headers)
-// - detailsRenderer: (item) => ReactNode (right pane contents)
+// - detailsRenderer: (item, helpers?) => ReactNode (right pane contents). Helpers: { refreshList(selectPredicate?), selectItem(item) }
 // - pageKey: string (e.g., 'listings', 'catalog', 'sales') used to get X from appconfig `${pageKey}.page_size`
 
 const ListWithDetails = ({ title, fetchList, rowRenderer, columns, detailsRenderer, pageKey }) => {
@@ -33,37 +33,47 @@ const ListWithDetails = ({ title, fetchList, rowRenderer, columns, detailsRender
     return () => { active = false; };
   }, [pageKey]);
 
-  // Load list
+  // Load list (reusable)
+  const loadList = React.useCallback(async (selectPredicate) => {
+    try {
+      const data = await fetchList();
+      const list = Array.isArray(data) ? data : (data?.list || data?.rows || data?.data || data?.items || []);
+      setItems(list);
+      if (typeof selectPredicate === 'function') {
+        const found = list.find(selectPredicate) || null;
+        setSelected(found || list[0] || null);
+      } else {
+        setSelected(list[0] || null);
+      }
+      setMessage(list.length ? null : 'No data found');
+    } catch (_) {
+      setMessage('Error loading data');
+      setMessageType('error');
+    }
+  }, [fetchList]);
+
   useEffect(() => {
     let mounted = true;
     (async () => {
-      try {
-        const data = await fetchList();
-        if (!mounted) {
-          return;
-        }
-        const list = Array.isArray(data) ? data : (data?.list || data?.rows || data?.data || data?.items || []);
-        setItems(list);
-        setSelected(list[0] || null);
-        setMessage(list.length ? null : 'No data found');
-      } catch (err) {
-        if (!mounted) {
-          return;
-        }
-        setMessage('Error loading data');
-        setMessageType('error');
-      }
+      if (!mounted) { return; }
+      await loadList();
     })();
     return () => { mounted = false; };
-  }, [fetchList]);
+  }, [loadList]);
 
-  // Compute row height and container height from CSS variables inlined here
+  // Compute row height and container height; lock to configured pageSize only
   const rowHeight = 36; // px per row (approx)
-  const listHeight = useMemo(() => `${Math.max(1, pageSize) * rowHeight + 40}px`, [pageSize]); // + header
+  const visibleRows = useMemo(() => Math.max(pageSize || 0, 1), [pageSize]);
+  const listHeight = useMemo(() => `${visibleRows * rowHeight + 40}px`, [visibleRows]); // + header
+
+  const helpers = useMemo(() => ({
+    refreshList: (selectPredicate) => loadList(selectPredicate),
+    selectItem: (item) => setSelected(item)
+  }), [loadList]);
 
   return (
     <div className="stack-layout">
-      <div className="stack-top" style={{ maxHeight: listHeight, overflowY: 'auto' }}>
+  <div className="stack-top" style={{ height: listHeight, overflowY: 'auto', marginBottom: 16 }}>
         <h2 style={{ margin: '8px 0' }}>{title}</h2>
         {message && (
           <div className={`system-message ${messageType}`}>{message}</div>
@@ -92,7 +102,7 @@ const ListWithDetails = ({ title, fetchList, rowRenderer, columns, detailsRender
       </div>
       <div className="stack-bottom">
         {selected ? (
-          detailsRenderer(selected)
+          detailsRenderer(selected, helpers)
         ) : (
           <div style={{ padding: 16, color: '#777' }}>Select an item to see details</div>
         )}
@@ -101,8 +111,13 @@ const ListWithDetails = ({ title, fetchList, rowRenderer, columns, detailsRender
         .list-table { width: 100%; border-collapse: collapse; }
         .list-table th, .list-table td { border-bottom: 1px solid #e5e5e5; padding: 8px; text-align: left; }
         .list-table tr.selected { background: #f0f7ff; }
+        
         .system-message.info { background: #eef6ff; color: #035388; padding: 8px; border-radius: 4px; margin-bottom: 8px; }
         .system-message.error { background: #ffefef; color: #8a041a; padding: 8px; border-radius: 4px; margin-bottom: 8px; }
+
+  .stack-layout { display: flex; flex-direction: column; }
+  .stack-top { flex: 0 0 auto; }
+  .stack-bottom { flex: 0 0 auto; }
       `}</style>
     </div>
   );
