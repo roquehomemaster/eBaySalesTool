@@ -326,8 +326,7 @@ const ListingTable = () => {
       columns={columns}
       rowRenderer={rowRenderer}
   detailsRenderer={detailsRenderer}
-  pageKey="listings"
-  minVisibleRows={10}
+      pageKey="listings"
     />
   );
 };

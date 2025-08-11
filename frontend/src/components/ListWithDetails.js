@@ -9,9 +9,8 @@ import apiService from '../services/apiService';
 // - columns: string[] (column headers)
 // - detailsRenderer: (item, helpers?) => ReactNode (right pane contents). Helpers: { refreshList(selectPredicate?), selectItem(item) }
 // - pageKey: string (e.g., 'listings', 'catalog', 'sales') used to get X from appconfig `${pageKey}.page_size`
-// - minVisibleRows?: number (minimum rows visible; pads blanks if fewer)
 
-const ListWithDetails = ({ title, fetchList, rowRenderer, columns, detailsRenderer, pageKey, minVisibleRows }) => {
+const ListWithDetails = ({ title, fetchList, rowRenderer, columns, detailsRenderer, pageKey }) => {
   const [items, setItems] = useState([]);
   const [selected, setSelected] = useState(null);
   const [message, setMessage] = useState(null);
@@ -62,9 +61,9 @@ const ListWithDetails = ({ title, fetchList, rowRenderer, columns, detailsRender
     return () => { mounted = false; };
   }, [loadList]);
 
-  // Compute row height and container height; enforce minVisibleRows if provided
+  // Compute row height and container height; lock to configured pageSize only
   const rowHeight = 36; // px per row (approx)
-  const visibleRows = useMemo(() => Math.max(minVisibleRows || 0, pageSize || 0, 1), [minVisibleRows, pageSize]);
+  const visibleRows = useMemo(() => Math.max(pageSize || 0, 1), [pageSize]);
   const listHeight = useMemo(() => `${visibleRows * rowHeight + 40}px`, [visibleRows]); // + header
 
   const helpers = useMemo(() => ({
@@ -98,11 +97,6 @@ const ListWithDetails = ({ title, fetchList, rowRenderer, columns, detailsRender
                 {rowRenderer(item)}
               </tr>
             ))}
-            {items.length < visibleRows && Array.from({ length: visibleRows - items.length }).map((_, i) => (
-              <tr key={`placeholder-${i}`} className="placeholder">
-                <td colSpan={columns.length}>&nbsp;</td>
-              </tr>
-            ))}
           </tbody>
         </table>
       </div>
@@ -117,7 +111,7 @@ const ListWithDetails = ({ title, fetchList, rowRenderer, columns, detailsRender
         .list-table { width: 100%; border-collapse: collapse; }
         .list-table th, .list-table td { border-bottom: 1px solid #e5e5e5; padding: 8px; text-align: left; }
         .list-table tr.selected { background: #f0f7ff; }
-        .list-table tr.placeholder td { height: ${rowHeight}px; background: #fafafa; }
+        
         .system-message.info { background: #eef6ff; color: #035388; padding: 8px; border-radius: 4px; margin-bottom: 8px; }
         .system-message.error { background: #ffefef; color: #8a041a; padding: 8px; border-radius: 4px; margin-bottom: 8px; }
       `}</style>
