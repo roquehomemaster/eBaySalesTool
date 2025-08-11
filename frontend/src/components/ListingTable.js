@@ -29,16 +29,43 @@ const ListingTable = () => {
     </>
   );
 
-  const detailsRenderer = (listing) => (
-    <div>
-      <h3>{listing.title}</h3>
-      <p><strong>Price:</strong> {listing.listing_price}</p>
-      <p><strong>Status:</strong> {listing.status}</p>
-      <p><strong>Item ID:</strong> {listing.item_id}</p>
-      <p><strong>Created:</strong> {listing.created_at ? new Date(listing.created_at).toLocaleString() : '-'}</p>
-      <p><strong>Updated:</strong> {listing.updated_at ? new Date(listing.updated_at).toLocaleString() : '-'}</p>
-    </div>
-  );
+  const detailsRenderer = (listing) => {
+    const entries = Object.entries(listing || {});
+    const formatKey = (k) => k.replace(/_/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase());
+    const formatVal = (v) => {
+      if (v === null || v === undefined) {
+        return '-';
+      }
+      if (typeof v === 'string') {
+        // Try to parse timestamps
+        const d = new Date(v);
+        if (!isNaN(d.getTime()) && /\d{4}-\d{2}-\d{2}/.test(v)) {
+          return d.toLocaleString();
+        }
+      }
+      return String(v);
+    };
+    return (
+      <div>
+        <h3>Listing Details</h3>
+        <table className="kv-table">
+          <tbody>
+            {entries.map(([key, val]) => (
+              <tr key={key}>
+                <td className="kv-key">{formatKey(key)}</td>
+                <td className="kv-val">{formatVal(val)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <style>{`
+          .kv-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+          .kv-table td { border-bottom: 1px solid #eee; padding: 6px 8px; vertical-align: top; }
+          .kv-key { width: 220px; font-weight: 600; color: #334e68; background: #f9fbfd; }
+        `}</style>
+      </div>
+    );
+  };
 
   return (
     <ListWithDetails

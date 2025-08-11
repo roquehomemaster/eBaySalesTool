@@ -59,8 +59,8 @@ PASS tests/itemApi.test.js
             'T1000',
             'SN125',
             'SKU-DUPLICATE-TEST',
-            '2025-08-11 13:33:51.633 +00:00',
-            '2025-08-11 13:33:51.633 +00:00'
+            '2025-08-11 14:07:56.033 +00:00',
+            '2025-08-11 14:07:56.033 +00:00'
           ]
         },
         original: error: duplicate key value violates unique constraint "catalog_sku_barcode_key"
@@ -97,8 +97,8 @@ PASS tests/itemApi.test.js
             'T1000',
             'SN125',
             'SKU-DUPLICATE-TEST',
-            '2025-08-11 13:33:51.633 +00:00',
-            '2025-08-11 13:33:51.633 +00:00'
+            '2025-08-11 14:07:56.033 +00:00',
+            '2025-08-11 14:07:56.033 +00:00'
           ]
         },
         fields: { sku_barcode: 'SKU-DUPLICATE-TEST' },
@@ -120,10 +120,10 @@ PASS src/tests/authApi.test.js
 
     console.log
       DEBUG: Created role for user test: {
-        created_at: 2025-08-11T17:33:52.726Z,
-        updated_at: 2025-08-11T17:33:52.726Z,
+        created_at: 2025-08-11T18:07:57.156Z,
+        updated_at: 2025-08-11T18:07:57.157Z,
         role_id: 4,
-        name: 'user_role_824373',
+        name: 'user_role_537393',
         description: null
       } role_id: 4
 
@@ -137,7 +137,7 @@ PASS src/tests/customerApi.test.js
 Test Suites: 7 passed, 7 total
 Tests:       49 passed, 49 total
 Snapshots:   0 total
-Time:        6.228 s, estimated 7 s
+Time:        6.353 s, estimated 7 s
 Ran all test suites matching /tests/i.
 
 Jest has detected the following 6 open handles potentially keeping Jest from exiting:

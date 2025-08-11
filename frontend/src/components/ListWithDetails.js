@@ -62,8 +62,8 @@ const ListWithDetails = ({ title, fetchList, rowRenderer, columns, detailsRender
   const listHeight = useMemo(() => `${Math.max(1, pageSize) * rowHeight + 40}px`, [pageSize]); // + header
 
   return (
-    <div className="split-layout">
-      <div className="split-left" style={{ maxHeight: listHeight, overflowY: 'auto' }}>
+    <div className="stack-layout">
+      <div className="stack-top" style={{ maxHeight: listHeight, overflowY: 'auto' }}>
         <h2 style={{ margin: '8px 0' }}>{title}</h2>
         {message && (
           <div className={`system-message ${messageType}`}>{message}</div>
@@ -90,7 +90,7 @@ const ListWithDetails = ({ title, fetchList, rowRenderer, columns, detailsRender
           </tbody>
         </table>
       </div>
-      <div className="split-right">
+      <div className="stack-bottom">
         {selected ? (
           detailsRenderer(selected)
         ) : (
@@ -98,11 +98,9 @@ const ListWithDetails = ({ title, fetchList, rowRenderer, columns, detailsRender
         )}
       </div>
       <style>{`
-        .split-layout { display: grid; grid-template-columns: 1fr 1.2fr; gap: 16px; }
         .list-table { width: 100%; border-collapse: collapse; }
         .list-table th, .list-table td { border-bottom: 1px solid #e5e5e5; padding: 8px; text-align: left; }
         .list-table tr.selected { background: #f0f7ff; }
-        .split-right { border-left: 1px solid #eee; padding-left: 12px; }
         .system-message.info { background: #eef6ff; color: #035388; padding: 8px; border-radius: 4px; margin-bottom: 8px; }
         .system-message.error { background: #ffefef; color: #8a041a; padding: 8px; border-radius: 4px; margin-bottom: 8px; }
       `}</style>

@@ -37,6 +37,10 @@
 .list-table { width: 100%; border-collapse: collapse; }
 .list-table th, .list-table td { border-bottom: 1px solid #e5e5e5; padding: 8px; text-align: left; }
 .list-table tr.selected { background: #f0f7ff; }
+
+/* Vertical stack layout for list + details */
+.stack-layout { display: flex; flex-direction: column; gap: 16px; }
+.stack-bottom { border-top: 1px solid #eee; padding-top: 12px; }
   gap: 32px;
 }
 
