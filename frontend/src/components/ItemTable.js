@@ -1,70 +1,52 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import ListWithDetails from './ListWithDetails';
 import apiService from '../services/apiService';
-import SystemMessage from './SystemMessage';
-import Page from './Page';
 
 const CatalogTable = () => {
-    const [catalog, setCatalog] = useState([]);
-    const [message, setMessage] = useState(null);
-    const [messageType, setMessageType] = useState('info');
+    const fetchList = async () => {
+        const response = await apiService.getCatalog();
+        if (Array.isArray(response)) {
+            return response;
+        }
+        if (response && Array.isArray(response.catalog)) {
+            return response.catalog;
+        }
+        if (response && response.data && Array.isArray(response.data.catalog)) {
+            return response.data.catalog;
+        }
+        return [];
+    };
 
-    useEffect(() => {
-        const fetchCatalog = async () => {
-            try {
-                const response = await apiService.getCatalog();
-                // Accepts: { catalog: [...] }, [...], or { ...paginated, catalog: [...] }
-                let entries = [];
-                if (Array.isArray(response)) {
-                    entries = response;
-                } else if (response && Array.isArray(response.catalog)) {
-                    entries = response.catalog;
-                } else if (response && response.data && Array.isArray(response.data.catalog)) {
-                    entries = response.data.catalog;
-                }
-                setCatalog(entries);
-                if (!entries.length) {
-                    setMessage('No catalog entries available');
-                    setMessageType('info');
-                } else {
-                    setMessage(null);
-                }
-            } catch (error) {
-                setMessage('Error fetching catalog. Please try again later.');
-                setMessageType('error');
-                setCatalog([]);
-            }
-        };
-        fetchCatalog();
-    }, []);
+    const columns = ['Description', 'SKU/Barcode', 'Category', 'Manufacturer', 'Model'];
+    const rowRenderer = (entry) => (
+        <>
+            <td>{entry.description}</td>
+            <td>{entry.sku_barcode}</td>
+            <td>{entry.category || ''}</td>
+            <td>{entry.manufacturer}</td>
+            <td>{entry.model}</td>
+        </>
+    );
+
+    const detailsRenderer = (entry) => (
+        <div>
+            <h3>{entry.description}</h3>
+            <p><strong>Manufacturer:</strong> {entry.manufacturer}</p>
+            <p><strong>Model:</strong> {entry.model}</p>
+            <p><strong>SKU/Barcode:</strong> {entry.sku_barcode}</p>
+            {entry.category && <p><strong>Category:</strong> {entry.category}</p>}
+        </div>
+    );
 
     return (
-        <Page title="Catalog List">
-            <SystemMessage message={message} type={messageType} onClose={() => setMessage(null)} />
-            <table>
-                <thead>
-                    <tr>
-                        <th>Description</th>
-                        <th>SKU/Barcode</th>
-                        <th>Category</th>
-                        <th>Manufacturer</th>
-                        <th>Model</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {catalog.length > 0 ? (
-                        catalog.map(entry => (
-                            <tr key={entry.id || entry._id}>
-                                <td>{entry.description}</td>
-                                <td>{entry.sku_barcode}</td>
-                                <td>{entry.category || ''}</td>
-                                <td>{entry.manufacturer}</td>
-                                <td>{entry.model}</td>
-                            </tr>
-                        ))
-                    ) : null}
-                </tbody>
-            </table>
-        </Page>
+        <ListWithDetails
+            title="Catalog List"
+            fetchList={fetchList}
+            columns={columns}
+            rowRenderer={rowRenderer}
+            detailsRenderer={detailsRenderer}
+            pageKey="catalog"
+        />
     );
 };
 

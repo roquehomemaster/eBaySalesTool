@@ -48,7 +48,15 @@ const apiService = {
             throw error.response ? error.response.data : error.message;
         }
     },
-    // Additional API methods can be added here
+    // Fetch app configuration by key (e.g., 'listings.page_size')
+    getAppConfigByKey: async (key) => {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/appconfig/key/${encodeURIComponent(key)}`);
+            return response.data;
+        } catch (error) {
+            throw error.response ? error.response.data : error.message;
+        }
+    }
 };
 
 export default apiService;

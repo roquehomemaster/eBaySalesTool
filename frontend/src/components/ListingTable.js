@@ -1,71 +1,54 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import ListWithDetails from './ListWithDetails';
 import apiService from '../services/apiService';
-import SystemMessage from './SystemMessage';
-import Page from './Page';
 
 const ListingTable = () => {
-  const [listings, setListings] = useState([]);
-  const [message, setMessage] = useState(null);
-  const [messageType, setMessageType] = useState('info');
+  const fetchList = async () => {
+    const response = await apiService.getListings();
+    if (Array.isArray(response)) {
+      return response;
+    }
+    if (response?.listings) {
+      return response.listings;
+    }
+    if (response?.data?.listings) {
+      return response.data.listings;
+    }
+    return [];
+  };
 
-  useEffect(() => {
-    const fetchListings = async () => {
-      try {
-        const response = await apiService.getListings();
-        let entries = [];
-        if (Array.isArray(response)) {
-          entries = response;
-        } else if (response && Array.isArray(response.listings)) {
-          entries = response.listings;
-        } else if (response && response.data && Array.isArray(response.data.listings)) {
-          entries = response.data.listings;
-        }
-        setListings(entries);
-        if (!entries.length) {
-          setMessage('No listings available');
-          setMessageType('info');
-        } else {
-          setMessage(null);
-        }
-      } catch (error) {
-        setMessage('Error fetching listings. Please try again later.');
-        setMessageType('error');
-        setListings([]);
-      }
-    };
-    fetchListings();
-  }, []);
+  const columns = ['Title', 'Listing Price', 'Status', 'Item ID', 'Created At', 'Updated At'];
+  const rowRenderer = (listing) => (
+    <>
+      <td>{listing.title}</td>
+      <td>{listing.listing_price}</td>
+      <td>{listing.status}</td>
+      <td>{listing.item_id}</td>
+      <td>{listing.created_at ? new Date(listing.created_at).toLocaleString() : ''}</td>
+      <td>{listing.updated_at ? new Date(listing.updated_at).toLocaleString() : ''}</td>
+    </>
+  );
+
+  const detailsRenderer = (listing) => (
+    <div>
+      <h3>{listing.title}</h3>
+      <p><strong>Price:</strong> {listing.listing_price}</p>
+      <p><strong>Status:</strong> {listing.status}</p>
+      <p><strong>Item ID:</strong> {listing.item_id}</p>
+      <p><strong>Created:</strong> {listing.created_at ? new Date(listing.created_at).toLocaleString() : '-'}</p>
+      <p><strong>Updated:</strong> {listing.updated_at ? new Date(listing.updated_at).toLocaleString() : '-'}</p>
+    </div>
+  );
 
   return (
-    <Page title="eBay Listings">
-      <SystemMessage message={message} type={messageType} onClose={() => setMessage(null)} />
-      <table>
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Listing Price</th>
-            <th>Status</th>
-            <th>Item ID</th>
-            <th>Created At</th>
-            <th>Updated At</th>
-          </tr>
-        </thead>
-        <tbody>
-          {listings.length > 0 ? (
-            listings.map(listing => (
-              <tr key={listing.listing_id}>
-                <td>{listing.title}</td>
-                <td>{listing.listing_price}</td>
-                <td>{listing.status}</td>
-                <td>{listing.item_id}</td>
-                <td>{listing.created_at ? new Date(listing.created_at).toLocaleString() : ''}</td>
-                <td>{listing.updated_at ? new Date(listing.updated_at).toLocaleString() : ''}</td>
-              </tr>
-            ))
-          ) : null}
-        </tbody>
-      </table>
-    </Page>
+    <ListWithDetails
+      title="eBay Listings"
+      fetchList={fetchList}
+      columns={columns}
+      rowRenderer={rowRenderer}
+      detailsRenderer={detailsRenderer}
+      pageKey="listings"
+    />
   );
 };
 

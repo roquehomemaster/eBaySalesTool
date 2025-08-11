@@ -25,6 +25,18 @@
   margin: 0;
   display: flex;
   justify-content: center;
+
+/* Split layout enhancements */
+.split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 16px;
+}
+.split-left { overflow-y: auto; }
+.split-right { overflow-y: auto; }
+.list-table { width: 100%; border-collapse: collapse; }
+.list-table th, .list-table td { border-bottom: 1px solid #e5e5e5; padding: 8px; text-align: left; }
+.list-table tr.selected { background: #f0f7ff; }
   gap: 32px;
 }
 

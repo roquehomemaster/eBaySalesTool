@@ -118,7 +118,9 @@ INSERT INTO ebayinfo (account_id, store_name, feedback_score, positive_feedback_
 -- Insert appconfig records (config_key, config_value, data_type)
 INSERT INTO appconfig (config_key, config_value, data_type) VALUES
   ('site_name', 'eBay Sales Tool', 'string'),
-  ('max_items', '100', 'integer');
+  ('listings.page_size', '12', 'integer'),
+  ('catalog.page_size', '15', 'integer'),
+  ('sales.page_size', '10', 'integer');
 
 -- Insert database_configuration records (key, value)
 INSERT INTO database_configuration (key, value) VALUES

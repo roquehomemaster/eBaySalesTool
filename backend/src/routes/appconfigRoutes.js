@@ -4,6 +4,7 @@ const controller = require('../controllers/appconfigController');
 
 router.post('/', controller.createAppConfig);
 router.get('/', controller.getAllAppConfig);
+router.get('/key/:config_key', controller.getAppConfigByKey);
 router.get('/:id', controller.getAppConfigById);
 router.put('/:id', controller.updateAppConfigById);
 router.delete('/:id', controller.deleteAppConfigById);

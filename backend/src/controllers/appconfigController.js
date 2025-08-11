@@ -19,6 +19,23 @@ exports.createAppConfig = async (req, res) => {
     }
 };
 
+// Get app config by key
+exports.getAppConfigByKey = async (req, res) => {
+    try {
+        const key = req.params.config_key;
+        if (!key) {
+            return res.status(400).json({ message: 'Missing config_key' });
+        }
+        const record = await AppConfig.findOne({ where: { config_key: key } });
+        if (!record) {
+            return res.status(404).json({ message: 'Config not found' });
+        }
+        res.json(record);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching app config by key' });
+    }
+};
+
 // Get all app config records
 exports.getAllAppConfig = async (req, res) => {
     try {
