@@ -29,10 +29,14 @@ const ListingTable = () => {
     </>
   );
 
-  const detailsRenderer = (listing) => {
+  const detailsRenderer = (listing, helpers) => {
     const Details = () => {
       const [data, setData] = React.useState(null);
       const [error, setError] = React.useState(null);
+      const [createMode, setCreateMode] = React.useState(false);
+      const [form, setForm] = React.useState({ title: '', listing_price: '', item_id: '' });
+      const [saving, setSaving] = React.useState(false);
+      const [catalog, setCatalog] = React.useState([]);
 
       // Helpers
       const prettify = (k) => (k || '').replace(/_/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase());
@@ -71,19 +75,73 @@ const ListingTable = () => {
       React.useEffect(() => {
         let active = true;
         (async () => {
-          try {
-            const resp = await apiService.getListingDetails(listing.listing_id);
-            if (active) {
-              setData(resp);
-            }
-          } catch (e) {
-            if (active) {
-              setError('Failed to load details');
+          // Load default read-only details for selected listing
+          if (!createMode && listing?.listing_id) {
+            try {
+              const resp = await apiService.getListingDetails(listing.listing_id);
+              if (active) {
+                setData(resp);
+              }
+            } catch (e) {
+              if (active) {
+                setError('Failed to load details');
+              }
             }
           }
         })();
         return () => { active = false; };
-      }, [listing.listing_id]);
+      }, [listing.listing_id, createMode]);
+
+      // Preload catalog for item selection in create mode
+      React.useEffect(() => {
+        let mounted = true;
+        (async () => {
+          try {
+            const res = await apiService.getCatalog();
+            const list = Array.isArray(res) ? res : (res?.catalog || res?.data?.catalog || []);
+            if (mounted) { setCatalog(list); }
+          } catch (_) { /* ignore */ }
+        })();
+        return () => { mounted = false; };
+      }, []);
+
+      const startCreate = () => {
+        setCreateMode(true);
+        setError(null);
+        setForm({ title: '', listing_price: '', item_id: '' });
+      };
+      const cancelCreate = () => {
+        setCreateMode(false);
+        setError(null);
+      };
+      const onChange = (e) => {
+        const { name, value } = e.target;
+        setForm((f) => ({ ...f, [name]: value }));
+      };
+      const canSave = () => {
+        return Boolean(form.title && form.item_id && form.listing_price && !saving);
+      };
+      const save = async () => {
+        if (!canSave()) { return; }
+        setSaving(true);
+        try {
+          const payload = {
+            title: form.title,
+            listing_price: Number(form.listing_price),
+            item_id: Number(form.item_id),
+            status: 'draft'
+          };
+          const created = await apiService.createListing(payload);
+          // Refresh list and select the newly created listing
+          await helpers?.refreshList?.((it) => (it.listing_id && created?.listing_id) ? it.listing_id === created.listing_id : (it.title === payload.title && it.item_id === payload.item_id));
+          setCreateMode(false);
+          setSaving(false);
+        } catch (e) {
+          setSaving(false);
+          const msg = (e && (e.message || e.error || e.msg || e.message)) || 'Failed to create listing';
+          setError(typeof e === 'string' ? e : msg);
+        }
+      };
 
       const Section = ({ title, obj, rows }) => (
         <div style={{ marginTop: 12 }}>
@@ -99,13 +157,70 @@ const ListingTable = () => {
       if (error) {
         return <div className="system-message error">{error}</div>;
       }
+      // Header with Add button
+      const Header = () => (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h3 style={{ margin: 0 }}>Listing Details</h3>
+          {!createMode && (
+            <button onClick={startCreate} style={{ padding: '6px 10px' }}>Add</button>
+          )}
+        </div>
+      );
+
+      if (createMode) {
+        return (
+          <div>
+            <Header />
+            <div className="details-grid">
+              <div className="group">
+                <h4 style={{ margin: '6px 0' }}>eBay Listing</h4>
+                <div className="form-row"><label>* Title</label><input name="title" value={form.title} onChange={onChange} /></div>
+                <div className="form-row"><label>* Listing Price</label><input name="listing_price" type="number" step="0.01" value={form.listing_price} onChange={onChange} /></div>
+                <div className="form-row"><label>Payment Method</label><input name="payment_method" disabled placeholder="Optional (later)" /></div>
+                <div className="form-row"><label>Shipping Method</label><input name="shipping_method" disabled placeholder="Optional (later)" /></div>
+              </div>
+              <div className="group">
+                <h4 style={{ margin: '6px 0' }}>Product Details</h4>
+                <div className="form-row">
+                  <label>* Catalog Item</label>
+                  <select name="item_id" value={form.item_id} onChange={onChange}>
+                    <option value="">Select item…</option>
+                    {catalog.map((c) => (
+                      <option key={c.item_id} value={c.item_id}>{c.description} ({c.manufacturer} {c.model})</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-row"><label>Condition</label><input name="item_condition_description" disabled placeholder="Optional (later)" /></div>
+              </div>
+            </div>
+            {error && <div className="system-message error" style={{ marginTop: 12 }}>{error}</div>}
+            <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
+              <button onClick={save} disabled={!canSave()}>{saving ? 'Saving…' : 'Save'}</button>
+              <button onClick={cancelCreate} disabled={saving}>Cancel</button>
+            </div>
+            <style>{`
+              .details-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+              .details-grid .group { grid-column: span 2; }
+              .form-row { display: flex; flex-direction: column; margin-bottom: 8px; }
+              .form-row label { font-weight: 600; margin-bottom: 4px; }
+              .form-row input, .form-row select { padding: 6px 8px; }
+            `}</style>
+          </div>
+        );
+      }
+
       if (!data) {
-        return <div className="system-message info">Loading details…</div>;
+        return (
+          <div>
+            <Header />
+            <div className="system-message info" style={{ marginTop: 8 }}>Loading details…</div>
+          </div>
+        );
       }
 
       return (
         <div>
-          <h3>Listing Details</h3>
+          <Header />
           <div className="details-grid">
             <div className="group">
               <Section
@@ -210,8 +325,9 @@ const ListingTable = () => {
       fetchList={fetchList}
       columns={columns}
       rowRenderer={rowRenderer}
-      detailsRenderer={detailsRenderer}
-      pageKey="listings"
+  detailsRenderer={detailsRenderer}
+  pageKey="listings"
+  minVisibleRows={10}
     />
   );
 };

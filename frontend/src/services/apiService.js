@@ -3,6 +3,14 @@ import axios from 'axios';
 const API_BASE_URL = 'http://localhost:5000/api'; // Adjust the base URL as needed
 
 const apiService = {
+    createListing: async (listingData) => {
+        try {
+            const response = await axios.post(`${API_BASE_URL}/listings`, listingData);
+            return response.data;
+        } catch (error) {
+            throw (error && error.response) ? error.response.data : (error ? error.message : 'Request failed');
+        }
+    },
     createSale: async (saleData) => {
         try {
             const response = await axios.post(`${API_BASE_URL}/sales`, saleData);
