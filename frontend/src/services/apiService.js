@@ -72,6 +72,14 @@ const apiService = {
             throw error.response ? error.response.data : error.message;
         }
     },
+    updateListing: async (listingId, data) => {
+        try {
+            const response = await axios.put(`${API_BASE_URL}/listings/${listingId}`, data);
+            return response.data;
+        } catch (error) {
+            throw error.response ? error.response.data : error.message;
+        }
+    },
     // Fetch app configuration by key (e.g., 'listings.page_size')
     getAppConfigByKey: async (key) => {
         try {

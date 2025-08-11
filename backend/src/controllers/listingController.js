@@ -132,7 +132,36 @@ exports.updateListingById = async (req, res) => {
     try {
         const listing = await Listing.findByPk(req.params.id);
         if (!listing) { return res.status(404).json({ message: 'Listing not found' }); }
+        // Extract ownership_id if provided (not a column on listing)
+        let ownershipId = req.body.ownership_id;
+        if (ownershipId !== undefined && ownershipId !== null) {
+            ownershipId = parseInt(ownershipId, 10);
+            if (Number.isNaN(ownershipId)) {
+                return res.status(400).json({ message: 'Invalid ownership_id' });
+            }
+            const owner = await Ownership.findByPk(ownershipId);
+            if (!owner) {
+                return res.status(400).json({ message: 'Invalid ownership_id: ownership record does not exist' });
+            }
+        }
+
+        // Update listing fields (unknown fields like ownership_id are ignored by Sequelize)
         await listing.update(req.body);
+
+        // If ownership provided, upsert/link via Sales record
+        if (ownershipId) {
+            try {
+                const existing = await Sales.findOne({ where: { listing_id: listing.listing_id } });
+                if (existing) {
+                    await existing.update({ ownership_id: ownershipId });
+                } else {
+                    await Sales.create({ listing_id: listing.listing_id, ownership_id: ownershipId });
+                }
+            } catch (err) {
+                console.error('Failed to upsert sales ownership link on update:', err?.message || err);
+                // Do not fail the listing update if link fails; include a warning
+            }
+        }
         const obj = listing.toJSON ? listing.toJSON() : listing;
         delete obj.id;
         res.json(obj);

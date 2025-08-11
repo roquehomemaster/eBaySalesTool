@@ -33,7 +33,8 @@ const ListingTable = () => {
     const Details = () => {
       const [data, setData] = React.useState(null);
       const [error, setError] = React.useState(null);
-      const [createMode, setCreateMode] = React.useState(false);
+  const [createMode, setCreateMode] = React.useState(false);
+  const [editMode, setEditMode] = React.useState(false);
   const [form, setForm] = React.useState({ title: '', listing_price: '', item_id: '', ownership_id: '' });
       const [saving, setSaving] = React.useState(false);
       const [catalog, setCatalog] = React.useState([]);
@@ -116,8 +117,25 @@ const ListingTable = () => {
         setError(null);
   setForm({ title: '', listing_price: '', item_id: '', ownership_id: '' });
       };
+      const startEdit = () => {
+        if (!data?.listing) { return; }
+        setEditMode(true);
+        setError(null);
+        // Pull ownership from first sales entry if present
+        const initialOwnership = (data.sales && data.sales[0] && data.sales[0].ownership_id) ? String(data.sales[0].ownership_id) : '';
+        setForm({
+          title: data.listing.title || '',
+          listing_price: data.listing.listing_price != null ? String(data.listing.listing_price) : '',
+          item_id: data.listing.item_id != null ? String(data.listing.item_id) : '',
+          ownership_id: initialOwnership
+        });
+      };
       const cancelCreate = () => {
         setCreateMode(false);
+        setError(null);
+      };
+      const cancelEdit = () => {
+        setEditMode(false);
         setError(null);
       };
       const onChange = (e) => {
@@ -138,10 +156,15 @@ const ListingTable = () => {
             ownership_id: Number(form.ownership_id),
             status: 'draft'
           };
-          const created = await apiService.createListing(payload);
-          // Refresh list and select the newly created listing
-          await helpers?.refreshList?.((it) => (it.listing_id && created?.listing_id) ? it.listing_id === created.listing_id : (it.title === payload.title && it.item_id === payload.item_id));
-          setCreateMode(false);
+          if (createMode) {
+            const created = await apiService.createListing(payload);
+            await helpers?.refreshList?.((it) => (it.listing_id && created?.listing_id) ? it.listing_id === created.listing_id : (it.title === payload.title && it.item_id === payload.item_id));
+            setCreateMode(false);
+          } else if (editMode && listing?.listing_id) {
+            await apiService.updateListing(listing.listing_id, payload);
+            await helpers?.refreshList?.((it) => it.listing_id === listing.listing_id);
+            setEditMode(false);
+          }
           setSaving(false);
         } catch (e) {
           setSaving(false);
@@ -164,17 +187,20 @@ const ListingTable = () => {
       if (error) {
         return <div className="system-message error">{error}</div>;
       }
-      // Header with Add button
+      // Header with Add/Edit buttons
       const Header = () => (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h3 style={{ margin: 0 }}>Listing Details</h3>
-          {!createMode && (
-            <button onClick={startCreate} style={{ padding: '6px 10px' }}>Add</button>
+          {!(createMode || editMode) && (
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={startCreate} style={{ padding: '6px 10px' }}>Add</button>
+              <button onClick={startEdit} style={{ padding: '6px 10px' }} disabled={!data?.listing}>Edit</button>
+            </div>
           )}
         </div>
       );
 
-      if (createMode) {
+      if (createMode || editMode) {
         return (
           <div>
             <Header />
@@ -215,7 +241,11 @@ const ListingTable = () => {
             {error && <div className="system-message error" style={{ marginTop: 12 }}>{error}</div>}
             <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
               <button onClick={save} disabled={!canSave()}>{saving ? 'Saving…' : 'Save'}</button>
-              <button onClick={cancelCreate} disabled={saving}>Cancel</button>
+              {createMode ? (
+                <button onClick={cancelCreate} disabled={saving}>Cancel</button>
+              ) : (
+                <button onClick={cancelEdit} disabled={saving}>Cancel</button>
+              )}
             </div>
             <style>{`
               .details-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
