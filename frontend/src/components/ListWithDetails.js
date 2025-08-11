@@ -73,7 +73,7 @@ const ListWithDetails = ({ title, fetchList, rowRenderer, columns, detailsRender
 
   return (
     <div className="stack-layout">
-      <div className="stack-top" style={{ maxHeight: listHeight, overflowY: 'auto', marginBottom: 16 }}>
+  <div className="stack-top" style={{ height: listHeight, overflowY: 'auto', marginBottom: 16 }}>
         <h2 style={{ margin: '8px 0' }}>{title}</h2>
         {message && (
           <div className={`system-message ${messageType}`}>{message}</div>
@@ -114,6 +114,10 @@ const ListWithDetails = ({ title, fetchList, rowRenderer, columns, detailsRender
         
         .system-message.info { background: #eef6ff; color: #035388; padding: 8px; border-radius: 4px; margin-bottom: 8px; }
         .system-message.error { background: #ffefef; color: #8a041a; padding: 8px; border-radius: 4px; margin-bottom: 8px; }
+
+  .stack-layout { display: flex; flex-direction: column; }
+  .stack-top { flex: 0 0 auto; }
+  .stack-bottom { flex: 0 0 auto; }
       `}</style>
     </div>
   );
