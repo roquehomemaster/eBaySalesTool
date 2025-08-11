@@ -10,6 +10,8 @@
 
 const { Op } = require('sequelize');
 const Listing = require('../models/listingModel');
+const Sales = require('../models/salesModel');
+const Ownership = require('../models/ownershipModel');
 const { pool } = require('../utils/database');
 
 /**
@@ -30,6 +32,19 @@ exports.createListing = async (req, res) => {
         if (!catalogItem) {
             return res.status(400).json({ message: 'Invalid item_id: catalog item does not exist' });
         }
+        // Optional: validate ownership if provided
+        let ownershipId = req.body.ownership_id;
+        if (ownershipId !== undefined && ownershipId !== null) {
+            ownershipId = parseInt(ownershipId, 10);
+            if (Number.isNaN(ownershipId)) {
+                return res.status(400).json({ message: 'Invalid ownership_id' });
+            }
+            const owner = await Ownership.findByPk(ownershipId);
+            if (!owner) {
+                return res.status(400).json({ message: 'Invalid ownership_id: ownership record does not exist' });
+            }
+        }
+
         // Prepare listing data only after validation
         const listingData = {
             title: req.body.title,
@@ -37,9 +52,19 @@ exports.createListing = async (req, res) => {
             item_id: item_id
         };
         const newListing = await Listing.create(listingData);
+
+        // If ownership provided, create a placeholder sales record linking ownership to this listing
+        if (ownershipId) {
+            try {
+                await Sales.create({ listing_id: newListing.listing_id, ownership_id: ownershipId });
+            } catch (err) {
+                console.error('Failed to create placeholder sales record for ownership link:', err?.message || err);
+                // Do not fail the listing creation; surface a warning in the response if needed
+            }
+        }
         // Map DB fields to snake_case in response
         const response = newListing.toJSON ? newListing.toJSON() : newListing;
-        res.status(201).json({
+    res.status(201).json({
             listing_id: response.listing_id,
             title: response.title,
             listing_price: response.listing_price,

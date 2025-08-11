@@ -46,6 +46,14 @@ const apiService = {
             throw error.response ? error.response.data : error.message;
         }
     },
+    getOwnerships: async (params = {}) => {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/ownership`, { params });
+            return response.data;
+        } catch (error) {
+            throw error.response ? error.response.data : error.message;
+        }
+    },
 
     // Fetch all listings (with optional filters and pagination)
     getListings: async (params = {}) => {

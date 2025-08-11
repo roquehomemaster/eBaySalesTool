@@ -34,9 +34,10 @@ const ListingTable = () => {
       const [data, setData] = React.useState(null);
       const [error, setError] = React.useState(null);
       const [createMode, setCreateMode] = React.useState(false);
-      const [form, setForm] = React.useState({ title: '', listing_price: '', item_id: '' });
+  const [form, setForm] = React.useState({ title: '', listing_price: '', item_id: '', ownership_id: '' });
       const [saving, setSaving] = React.useState(false);
       const [catalog, setCatalog] = React.useState([]);
+  const [ownerships, setOwnerships] = React.useState([]);
 
       // Helpers
       const prettify = (k) => (k || '').replace(/_/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase());
@@ -92,7 +93,7 @@ const ListingTable = () => {
         return () => { active = false; };
       }, [listing.listing_id, createMode]);
 
-      // Preload catalog for item selection in create mode
+      // Preload catalog and ownerships for selection in create mode
       React.useEffect(() => {
         let mounted = true;
         (async () => {
@@ -101,6 +102,11 @@ const ListingTable = () => {
             const list = Array.isArray(res) ? res : (res?.catalog || res?.data?.catalog || []);
             if (mounted) { setCatalog(list); }
           } catch (_) { /* ignore */ }
+          try {
+            const own = await apiService.getOwnerships();
+            const list = Array.isArray(own?.ownerships) ? own.ownerships : (Array.isArray(own) ? own : (own?.data?.ownerships || []));
+            if (mounted) { setOwnerships(list); }
+          } catch (_) { /* ignore */ }
         })();
         return () => { mounted = false; };
       }, []);
@@ -108,7 +114,7 @@ const ListingTable = () => {
       const startCreate = () => {
         setCreateMode(true);
         setError(null);
-        setForm({ title: '', listing_price: '', item_id: '' });
+  setForm({ title: '', listing_price: '', item_id: '', ownership_id: '' });
       };
       const cancelCreate = () => {
         setCreateMode(false);
@@ -119,7 +125,7 @@ const ListingTable = () => {
         setForm((f) => ({ ...f, [name]: value }));
       };
       const canSave = () => {
-        return Boolean(form.title && form.item_id && form.listing_price && !saving);
+  return Boolean(form.title && form.item_id && form.listing_price && form.ownership_id && !saving);
       };
       const save = async () => {
         if (!canSave()) { return; }
@@ -129,6 +135,7 @@ const ListingTable = () => {
             title: form.title,
             listing_price: Number(form.listing_price),
             item_id: Number(form.item_id),
+            ownership_id: Number(form.ownership_id),
             status: 'draft'
           };
           const created = await apiService.createListing(payload);
@@ -191,6 +198,18 @@ const ListingTable = () => {
                   </select>
                 </div>
                 <div className="form-row"><label>Condition</label><input name="item_condition_description" disabled placeholder="Optional (later)" /></div>
+              </div>
+              <div className="group">
+                <h4 style={{ margin: '6px 0' }}>Ownership</h4>
+                <div className="form-row">
+                  <label>* Owner</label>
+                  <select name="ownership_id" value={form.ownership_id} onChange={onChange}>
+                    <option value="">Select owner…</option>
+                    {ownerships.map((o) => (
+                      <option key={o.ownership_id} value={o.ownership_id}>{`${o.first_name || ''} ${o.last_name || ''}`.trim() || o.email || `Owner ${o.ownership_id}`}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
             {error && <div className="system-message error" style={{ marginTop: 12 }}>{error}</div>}
