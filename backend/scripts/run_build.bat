@@ -62,14 +62,7 @@ echo PostgreSQL container failed to become healthy after %HEALTH_CHECK_RETRIES% 
 exit /b 1
 
 :run_migrations
-REM Run migration SQL scripts to ensure schema exists before seeding
-REM (Assumes psql is available in the backend container)
-docker exec -i postgres_db psql -U postgres -d ebay_sales_tool < f:/Dev/eBaySalesTool/database/migrations/01_init.sql
-if %ERRORLEVEL% neq 0 (
-    echo Error: Failed to run database migrations.
-    exit /b 1
-)
-
+REM Single canonical schema apply (01_init executed only on brand-new container by docker-entrypoint-initdb.d)
 docker exec -i postgres_db psql -U postgres -d ebay_sales_tool < f:/Dev/eBaySalesTool/backend/database/recreate_schema.sql
 if %ERRORLEVEL% neq 0 (
     echo Error: Failed to run recreate_schema.sql.
