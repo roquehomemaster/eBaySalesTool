@@ -160,6 +160,7 @@ CREATE TABLE listing (
   title varchar,
   listing_price decimal,
   item_id int REFERENCES catalog(item_id),
+  ownership_id int REFERENCES ownership(ownership_id),
   status varchar,
   watchers int,
   item_condition_description text,
@@ -168,6 +169,19 @@ CREATE TABLE listing (
   created_at timestamp,
   updated_at timestamp
 );
+
+-- Track ownership history for listings
+CREATE TABLE listing_ownership_history (
+  listing_ownership_history_id SERIAL PRIMARY KEY,
+  listing_id int NOT NULL REFERENCES listing(listing_id),
+  ownership_id int NOT NULL REFERENCES ownership(ownership_id),
+  started_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  ended_at timestamp NULL,
+  change_reason text,
+  changed_by int NULL REFERENCES application_account(user_account_id)
+);
+CREATE INDEX idx_listing_ownership_history_listing ON listing_ownership_history(listing_id);
+CREATE INDEX idx_listing_ownership_history_active ON listing_ownership_history(listing_id, ended_at);
 
 CREATE TABLE sales (
   sale_id SERIAL PRIMARY KEY,
