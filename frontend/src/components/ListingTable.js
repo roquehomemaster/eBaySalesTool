@@ -122,7 +122,7 @@ const ListingTable = () => {
         setEditMode(true);
         setError(null);
         // Pull ownership from first sales entry if present
-        const initialOwnership = (data.sales && data.sales[0] && data.sales[0].ownership_id) ? String(data.sales[0].ownership_id) : '';
+        const initialOwnership = (data.sales && data.sales.find(s => s.ownership_id)?.ownership_id) ? String(data.sales.find(s => s.ownership_id).ownership_id) : '';
         setForm({
           title: data.listing.title || '',
           listing_price: data.listing.listing_price != null ? String(data.listing.listing_price) : '',
@@ -206,7 +206,7 @@ const ListingTable = () => {
         </div>
       );
 
-      if (createMode || editMode) {
+  if (createMode || editMode) {
         return (
           <div>
             <Header />
@@ -235,7 +235,7 @@ const ListingTable = () => {
                 <h4 style={{ margin: '6px 0' }}>Ownership</h4>
                 <div className="form-row">
                   <label>* Owner</label>
-                  <select name="ownership_id" value={form.ownership_id} onChange={onChange}>
+                   <select name="ownership_id" value={form.ownership_id} onChange={onChange}>
                     <option value="">Select owner…</option>
                     {ownerships.map((o) => (
                       <option key={o.ownership_id} value={o.ownership_id}>{`${o.first_name || ''} ${o.last_name || ''}`.trim() || o.email || `Owner ${o.ownership_id}`}</option>

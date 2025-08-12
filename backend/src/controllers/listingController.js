@@ -235,8 +235,18 @@ exports.getListingDetails = async (req, res) => {
         ]);
 
         const sales = salesRes.rows;
+        // Determine current ownership: prefer a placeholder sale (unsold) else first sale
+        let currentOwnershipId = null;
+        if (sales.length) {
+            const placeholder = sales.find(s => s.sold_price == null && s.sold_date == null && s.ownership_id);
+            if (placeholder) { currentOwnershipId = placeholder.ownership_id; }
+            else {
+                const firstWithOwner = sales.find(s => s.ownership_id);
+                if (firstWithOwner) { currentOwnershipId = firstWithOwner.ownership_id; }
+            }
+        }
         const saleIds = sales.map(s => s.sale_id).filter(Boolean);
-        const ownershipIds = sales.map(s => s.ownership_id).filter(Boolean);
+        const ownershipIds = currentOwnershipId ? [currentOwnershipId] : [];
 
         const [ownershipRes, agreementsRes, finTrackRes] = await Promise.all([
             ownershipIds.length ? pool.query(`SELECT * FROM ownership WHERE ownership_id = ANY($1::int[])`, [ownershipIds]) : Promise.resolve({ rows: [] }),
@@ -248,7 +258,7 @@ exports.getListingDetails = async (req, res) => {
             listing,
             catalog: catalogRes.rows[0] || null,
             sales,
-            ownerships: ownershipRes.rows,
+            ownerships: ownershipRes.rows, // now at most one based on currentOwnershipId
             ownershipagreements: agreementsRes.rows,
             shippinglog: shippingRes.rows,
             order_details: orderRes.rows,
