@@ -162,7 +162,13 @@ const ListingTable = () => {
             setCreateMode(false);
           } else if (editMode && listing?.listing_id) {
             await apiService.updateListing(listing.listing_id, payload);
+            // Refresh list to ensure updated values in list view
             await helpers?.refreshList?.((it) => it.listing_id === listing.listing_id);
+            // Fetch updated details (ownership + sales linkage) explicitly since listing_id is unchanged
+            try {
+              const updatedDetails = await apiService.getListingDetails(listing.listing_id);
+              setData(updatedDetails);
+            } catch (_) { /* ignore details refresh error */ }
             setEditMode(false);
           }
           setSaving(false);
