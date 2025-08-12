@@ -17,6 +17,18 @@ if %ERRORLEVEL% neq 0 (
     exit /b 1
 )
 
+REM Ensure required external PostgreSQL volume exists (introduced in commit 94d4f7f for persistence)
+docker volume inspect ebaysalestool-db >nul 2>&1
+if %ERRORLEVEL% neq 0 (
+    echo External volume ebaysalestool-db not found. Creating it now...
+    docker volume create ebaysalestool-db >nul 2>&1
+    if %ERRORLEVEL% neq 0 (
+        echo Error: Failed to create required external volume ebaysalestool-db.
+        exit /b 1
+    )
+    echo External volume ebaysalestool-db created.
+)
+
 REM Check if Docker containers are already running
 for /f "tokens=1,2,3,4,5*" %%a in ('docker ps -a --format "{{.Names}} {{.Status}}"') do (
     if "%%a"=="postgres_db" (
