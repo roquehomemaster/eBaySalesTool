@@ -144,19 +144,6 @@ CREATE TABLE listing (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Track ownership history for listings (Option #2 implementation)
-CREATE TABLE listing_ownership_history (
-    listing_ownership_history_id SERIAL PRIMARY KEY,
-    listing_id INT NOT NULL REFERENCES listing(listing_id),
-    ownership_id INT NOT NULL REFERENCES ownership(ownership_id),
-    started_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    ended_at TIMESTAMP NULL,
-    change_reason TEXT,
-    changed_by INT NULL REFERENCES application_account(user_account_id)
-);
-CREATE INDEX idx_listing_ownership_history_listing ON listing_ownership_history(listing_id);
-CREATE INDEX idx_listing_ownership_history_active ON listing_ownership_history(listing_id, ended_at);
-
 CREATE TABLE sales (
     sale_id SERIAL PRIMARY KEY,
     listing_id INT REFERENCES listing(listing_id),

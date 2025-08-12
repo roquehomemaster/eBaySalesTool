@@ -92,7 +92,7 @@ const ListingTable = () => {
           }
         })();
         return () => { active = false; };
-      }, [listing.listing_id, createMode]);
+  }, [listing.listing_id, createMode]); // listing.listing_id stable identity; lint warning acceptable
 
       // Preload catalog and ownerships for selection in create mode
       React.useEffect(() => {

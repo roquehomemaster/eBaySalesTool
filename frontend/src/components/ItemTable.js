@@ -64,7 +64,7 @@ const CatalogTable = () => {
                     }
                 })();
                 return () => { active = false; };
-            }, [entry.item_id]);
+            }, [entry.item_id]); // dependency intentional; entry.item_id stable per selection
 
             const Section = ({ title, rows }) => (
                 <div style={{ marginTop: 12 }}>

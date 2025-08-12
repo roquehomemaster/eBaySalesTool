@@ -5,7 +5,7 @@ import SystemMessage from './SystemMessage';
 
 const Layout = ({ children }) => {
   const [message, setMessage] = useState(null);
-  const [type, setType] = useState('info');
+  const [type] = useState('info'); // type currently static; remove unused setter
 
   // Example: setMessage('Welcome!') to show a message
   return (
