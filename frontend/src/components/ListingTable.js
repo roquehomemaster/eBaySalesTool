@@ -121,8 +121,8 @@ const ListingTable = () => {
         if (!data?.listing) { return; }
         setEditMode(true);
         setError(null);
-        // Pull ownership from first sales entry if present
-        const initialOwnership = (data.sales && data.sales.find(s => s.ownership_id)?.ownership_id) ? String(data.sales.find(s => s.ownership_id).ownership_id) : '';
+  // Pull ownership from listing direct column
+  const initialOwnership = data.listing.ownership_id ? String(data.listing.ownership_id) : '';
         setForm({
           title: data.listing.title || '',
           listing_price: data.listing.listing_price != null ? String(data.listing.listing_price) : '',
@@ -313,6 +313,21 @@ const ListingTable = () => {
                     rows={entriesFromObj(a, ['commission_percentage','minimum_sale_price','duration_of_agreement','renewal_terms'])}
                   />
                 ))}
+              </div>
+            )}
+
+            {(data.ownership_history || []).length > 0 && (
+              <div className="group">
+                <h4 style={{ margin: '6px 0' }}>Ownership History</h4>
+                <table className="kv-table"><tbody>
+                  <tr><td className="kv-key">Count</td><td className="kv-val">{data.ownership_history.length}</td></tr>
+                  {data.ownership_history.map((h, idx) => (
+                    <tr key={h.listing_ownership_history_id || idx}>
+                      <td className="kv-key">#{idx+1}</td>
+                      <td className="kv-val">Owner {h.ownership_id} from {new Date(h.started_at).toLocaleString()} {h.ended_at ? `→ ${new Date(h.ended_at).toLocaleString()}` : '(current)'}{h.change_reason ? ` – ${h.change_reason}` : ''}</td>
+                    </tr>
+                  ))}
+                </tbody></table>
               </div>
             )}
 

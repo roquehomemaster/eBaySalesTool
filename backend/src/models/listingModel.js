@@ -19,6 +19,7 @@ const Listing = sequelize.define('listing', {
   title: { type: DataTypes.STRING, allowNull: false },
   listing_price: { type: DataTypes.DECIMAL },
   item_id: { type: DataTypes.INTEGER, references: { model: 'catalog', key: 'item_id' } },
+  ownership_id: { type: DataTypes.INTEGER, allowNull: true, references: { model: 'ownership', key: 'ownership_id' } },
   status: { type: DataTypes.STRING },
   watchers: { type: DataTypes.INTEGER },
   item_condition_description: {

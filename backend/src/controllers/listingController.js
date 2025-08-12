@@ -10,8 +10,9 @@
 
 const { Op } = require('sequelize');
 const Listing = require('../models/listingModel');
-const Sales = require('../models/salesModel');
+const Sales = require('../models/salesModel'); // retained for actual sales data
 const Ownership = require('../models/ownershipModel');
+const ListingOwnershipHistory = require('../models/listingOwnershipHistoryModel');
 const { pool } = require('../utils/database');
 
 /**
@@ -53,13 +54,13 @@ exports.createListing = async (req, res) => {
         };
         const newListing = await Listing.create(listingData);
 
-        // If ownership provided, create a placeholder sales record linking ownership to this listing
+        // If ownership provided, persist on listing and create history
         if (ownershipId) {
             try {
-                await Sales.create({ listing_id: newListing.listing_id, ownership_id: ownershipId });
+                await newListing.update({ ownership_id: ownershipId });
+                await ListingOwnershipHistory.create({ listing_id: newListing.listing_id, ownership_id: ownershipId, change_reason: 'initial assignment' });
             } catch (err) {
-                console.error('Failed to create placeholder sales record for ownership link:', err?.message || err);
-                // Do not fail the listing creation; surface a warning in the response if needed
+                console.error('Failed to set ownership/history on create:', err?.message || err);
             }
         }
         // Map DB fields to snake_case in response
@@ -132,7 +133,7 @@ exports.updateListingById = async (req, res) => {
     try {
         const listing = await Listing.findByPk(req.params.id);
         if (!listing) { return res.status(404).json({ message: 'Listing not found' }); }
-        // Extract ownership_id if provided (not a column on listing)
+    // Extract ownership_id if provided (now a column on listing)
         let ownershipId = req.body.ownership_id;
         if (ownershipId !== undefined && ownershipId !== null) {
             ownershipId = parseInt(ownershipId, 10);
@@ -148,18 +149,23 @@ exports.updateListingById = async (req, res) => {
         // Update listing fields (unknown fields like ownership_id are ignored by Sequelize)
         await listing.update(req.body);
 
-        // If ownership provided, upsert/link via Sales record
+        // If ownership provided and changed, update listing & close previous history row
         if (ownershipId) {
             try {
-                const existing = await Sales.findOne({ where: { listing_id: listing.listing_id } });
-                if (existing) {
-                    await existing.update({ ownership_id: ownershipId });
-                } else {
-                    await Sales.create({ listing_id: listing.listing_id, ownership_id: ownershipId });
+                if (listing.ownership_id !== ownershipId) {
+                    const prev = listing.ownership_id;
+                    await listing.update({ ownership_id: ownershipId });
+                    if (prev) {
+                        // Close previous active history row
+                        await ListingOwnershipHistory.update(
+                            { ended_at: new Date() },
+                            { where: { listing_id: listing.listing_id, ownership_id: prev, ended_at: null } }
+                        );
+                    }
+                    await ListingOwnershipHistory.create({ listing_id: listing.listing_id, ownership_id: ownershipId, change_reason: 'ownership change' });
                 }
             } catch (err) {
-                console.error('Failed to upsert sales ownership link on update:', err?.message || err);
-                // Do not fail the listing update if link fails; include a warning
+                console.error('Failed to update ownership/history:', err?.message || err);
             }
         }
         const obj = listing.toJSON ? listing.toJSON() : listing;
@@ -225,40 +231,27 @@ exports.getListingDetails = async (req, res) => {
         }
         const listing = listingRes.rows[0];
 
-        const [catalogRes, salesRes, shippingRes, orderRes, returnRes, perfRes] = await Promise.all([
+        const [catalogRes, salesRes, shippingRes, orderRes, returnRes, perfRes, ownershipCurrentRes, ownershipHistoryRes, agreementsRes, finTrackRes] = await Promise.all([
             pool.query('SELECT * FROM catalog WHERE item_id = $1', [listing.item_id]),
             pool.query('SELECT * FROM sales WHERE listing_id = $1', [id]),
             pool.query('SELECT * FROM shippinglog WHERE listing_id = $1', [id]),
             pool.query('SELECT * FROM order_details WHERE listing_id = $1', [id]),
             pool.query('SELECT * FROM returnhistory WHERE listing_id = $1', [id]),
-            pool.query('SELECT * FROM performancemetrics WHERE item_id = $1', [listing.item_id])
+            pool.query('SELECT * FROM performancemetrics WHERE item_id = $1', [listing.item_id]),
+            listing.ownership_id ? pool.query('SELECT * FROM ownership WHERE ownership_id = $1', [listing.ownership_id]) : Promise.resolve({ rows: [] }),
+            pool.query('SELECT * FROM listing_ownership_history WHERE listing_id = $1 ORDER BY started_at ASC', [id]),
+            listing.ownership_id ? pool.query('SELECT * FROM ownershipagreements WHERE ownership_id = $1', [listing.ownership_id]) : Promise.resolve({ rows: [] }),
+            pool.query('SELECT * FROM financialtracking WHERE listing_id = $1', [id])
         ]);
 
-        const sales = salesRes.rows;
-        // Determine current ownership: prefer a placeholder sale (unsold) else first sale
-        let currentOwnershipId = null;
-        if (sales.length) {
-            const placeholder = sales.find(s => s.sold_price == null && s.sold_date == null && s.ownership_id);
-            if (placeholder) { currentOwnershipId = placeholder.ownership_id; }
-            else {
-                const firstWithOwner = sales.find(s => s.ownership_id);
-                if (firstWithOwner) { currentOwnershipId = firstWithOwner.ownership_id; }
-            }
-        }
-        const saleIds = sales.map(s => s.sale_id).filter(Boolean);
-        const ownershipIds = currentOwnershipId ? [currentOwnershipId] : [];
-
-        const [ownershipRes, agreementsRes, finTrackRes] = await Promise.all([
-            ownershipIds.length ? pool.query(`SELECT * FROM ownership WHERE ownership_id = ANY($1::int[])`, [ownershipIds]) : Promise.resolve({ rows: [] }),
-            ownershipIds.length ? pool.query(`SELECT * FROM ownershipagreements WHERE ownership_id = ANY($1::int[])`, [ownershipIds]) : Promise.resolve({ rows: [] }),
-            saleIds.length ? pool.query(`SELECT * FROM financialtracking WHERE listing_id = $1 OR sale_id = ANY($2::int[])`, [id, saleIds]) : pool.query(`SELECT * FROM financialtracking WHERE listing_id = $1`, [id])
-        ]);
+        const sales = salesRes.rows; // now pure sales only
 
         res.json({
             listing,
             catalog: catalogRes.rows[0] || null,
             sales,
-            ownerships: ownershipRes.rows, // now at most one based on currentOwnershipId
+            ownerships: ownershipCurrentRes.rows, // at most one current
+            ownership_history: ownershipHistoryRes.rows,
             ownershipagreements: agreementsRes.rows,
             shippinglog: shippingRes.rows,
             order_details: orderRes.rows,
