@@ -1,0 +1,3 @@
+-- Deprecated migration: listing_status_graph seeding is now handled in 01_init.sql.
+-- Intentionally left as a no-op to avoid duplicate writes during rebuilds.
+-- (Original content removed on 2025-08-13 cleanup.)

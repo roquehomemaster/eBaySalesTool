@@ -64,9 +64,9 @@ const apiService = {
             throw error.response ? error.response.data : error.message;
         }
     },
-    getListingDetails: async (listingId) => {
+    getListingDetails: async (listingId, params = {}) => {
         try {
-            const response = await axios.get(`${API_BASE_URL}/listings/${listingId}/details`);
+            const response = await axios.get(`${API_BASE_URL}/listings/${listingId}/details`, { params });
             return response.data;
         } catch (error) {
             throw error.response ? error.response.data : error.message;

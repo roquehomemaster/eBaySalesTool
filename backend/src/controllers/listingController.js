@@ -14,6 +14,8 @@ const Sales = require('../models/salesModel'); // retained for actual sales data
 const Ownership = require('../models/ownershipModel');
 const ListingOwnershipHistory = require('../models/listingOwnershipHistoryModel');
 const { pool } = require('../utils/database');
+const audit = require('../utils/auditLogger');
+const statusWorkflow = require('../utils/statusWorkflow');
 
 /**
  * Create a new listing
@@ -47,12 +49,18 @@ exports.createListing = async (req, res) => {
         }
 
         // Prepare listing data only after validation
+        // Ensure status is initialized at creation (default 'draft' if not provided or blank)
+        let initialStatus = req.body.status;
+        if (initialStatus === undefined || initialStatus === null || (typeof initialStatus === 'string' && initialStatus.trim() === '')) {
+            initialStatus = 'draft';
+        }
         const listingData = {
             title: req.body.title,
             listing_price: req.body.listing_price,
-            item_id: item_id
+            item_id: item_id,
+            status: initialStatus
         };
-        const newListing = await Listing.create(listingData);
+    const newListing = await Listing.create(listingData);
 
         // If ownership provided, persist on listing and create history
         if (ownershipId) {
@@ -62,6 +70,13 @@ exports.createListing = async (req, res) => {
             } catch (err) {
                 console.error('Failed to set ownership/history on create:', err?.message || err);
             }
+        }
+        // Audit: creation (fire and forget)
+        try {
+            const afterObj = newListing.toJSON ? newListing.toJSON() : newListing;
+            await audit.logCreate('listing', afterObj.listing_id, afterObj, req.user_account_id);
+        } catch (e) {
+            console.error('Audit log (create listing) failed:', e?.message || e);
         }
         // Map DB fields to snake_case in response
         const response = newListing.toJSON ? newListing.toJSON() : newListing;
@@ -116,7 +131,7 @@ exports.getAllListings = async (req, res) => {
  */
 exports.getListingById = async (req, res) => {
     try {
-        const listing = await Listing.findByPk(req.params.id);
+    const listing = await Listing.findByPk(req.params.id);
         if (!listing) { return res.status(404).json({ message: 'Listing not found' }); }
         const obj = listing.toJSON ? listing.toJSON() : listing;
         delete obj.id;
@@ -133,7 +148,8 @@ exports.updateListingById = async (req, res) => {
     try {
         const listing = await Listing.findByPk(req.params.id);
         if (!listing) { return res.status(404).json({ message: 'Listing not found' }); }
-    // Extract ownership_id if provided (now a column on listing)
+    const beforeObj = listing.toJSON ? listing.toJSON() : { ...listing };
+        const previousOwnershipId = listing.ownership_id;
         let ownershipId = req.body.ownership_id;
         if (ownershipId !== undefined && ownershipId !== null) {
             ownershipId = parseInt(ownershipId, 10);
@@ -145,30 +161,64 @@ exports.updateListingById = async (req, res) => {
                 return res.status(400).json({ message: 'Invalid ownership_id: ownership record does not exist' });
             }
         }
-
-        // Update listing fields (unknown fields like ownership_id are ignored by Sequelize)
-        await listing.update(req.body);
-
-        // If ownership provided and changed, update listing & close previous history row
-        if (ownershipId) {
+    // Whitelist allowed mutable fields to avoid unintended changes (e.g., immutable item_id)
+    const ALLOWED_UPDATE_FIELDS = ['title', 'listing_price', 'status', 'ownership_id'];
+    const updateData = {};
+    for (const key of ALLOWED_UPDATE_FIELDS) {
+        if (Object.prototype.hasOwnProperty.call(req.body, key)) {
+            updateData[key] = req.body[key];
+        }
+    }
+    // Coerce numeric-like strings for DECIMAL fields
+    if (updateData.listing_price !== undefined && updateData.listing_price !== null) {
+        if (typeof updateData.listing_price === 'string' && /^[-+]?\d+(?:\.\d+)?$/.test(updateData.listing_price.trim())) {
+            const num = Number(updateData.listing_price);
+            if (!Number.isNaN(num)) {
+                updateData.listing_price = num; // ensure numeric for Sequelize/PG
+            }
+        }
+    }
+    // Validate status transition if status present
+    if (Object.prototype.hasOwnProperty.call(updateData, 'status')) {
+        const { ok, error, normalizedNext, allowed } = await statusWorkflow.validateTransition(listing.status, updateData.status);
+        if (!ok) {
+            return res.status(400).json({ message: 'Invalid status transition', detail: error, allowed_next: allowed });
+        }
+        updateData.status = normalizedNext; // normalized (e.g., active->listed)
+    }
+    // If no whitelisted fields provided, return current state (no-op update)
+    if (Object.keys(updateData).length === 0) {
+        const current = listing.toJSON ? listing.toJSON() : listing;
+        delete current.id;
+        return res.json(current);
+    }
+    try {
+        await listing.update(updateData);
+    } catch (updateErr) {
+        console.error('Error applying listing update:', updateErr?.message || updateErr);
+        return res.status(400).json({ message: 'Invalid listing update', error: updateErr?.message || String(updateErr) });
+    }
+        if (ownershipId !== undefined && ownershipId !== null && ownershipId !== previousOwnershipId) {
             try {
-                if (listing.ownership_id !== ownershipId) {
-                    const prev = listing.ownership_id;
-                    await listing.update({ ownership_id: ownershipId });
-                    if (prev) {
-                        // Close previous active history row
-                        await ListingOwnershipHistory.update(
-                            { ended_at: new Date() },
-                            { where: { listing_id: listing.listing_id, ownership_id: prev, ended_at: null } }
-                        );
-                    }
-                    await ListingOwnershipHistory.create({ listing_id: listing.listing_id, ownership_id: ownershipId, change_reason: 'ownership change' });
+                if (previousOwnershipId) {
+                    await ListingOwnershipHistory.update(
+                        { ended_at: new Date() },
+                        { where: { listing_id: listing.listing_id, ownership_id: previousOwnershipId, ended_at: null } }
+                    );
                 }
+                await ListingOwnershipHistory.create({ listing_id: listing.listing_id, ownership_id: ownershipId, change_reason: 'ownership change' });
             } catch (err) {
                 console.error('Failed to update ownership/history:', err?.message || err);
             }
         }
         const obj = listing.toJSON ? listing.toJSON() : listing;
+        // Audit update
+        try {
+            const afterObj = obj;
+            await audit.logUpdate('listing', listing.listing_id, beforeObj, afterObj, req.user_account_id);
+        } catch (e) {
+            console.error('Audit log (update listing) failed:', e?.message || e);
+        }
         delete obj.id;
         res.json(obj);
     } catch (error) {
@@ -183,7 +233,13 @@ exports.deleteListingById = async (req, res) => {
     try {
         const listing = await Listing.findByPk(req.params.id);
         if (!listing) { return res.status(404).json({ message: 'Listing not found' }); }
+        const beforeObj = listing.toJSON ? listing.toJSON() : { ...listing };
         await listing.destroy();
+        try {
+            await audit.logDelete('listing', beforeObj.listing_id, beforeObj, req.user_account_id);
+        } catch (e) {
+            console.error('Audit log (delete listing) failed:', e?.message || e);
+        }
         res.json({ message: 'Listing deleted successfully.' });
     } catch (error) {
         res.status(500).json({ message: 'Error deleting listing' });
@@ -230,8 +286,10 @@ exports.getListingDetails = async (req, res) => {
             return res.status(404).json({ message: 'Listing not found' });
         }
         const listing = listingRes.rows[0];
-
-        const [catalogRes, salesRes, shippingRes, orderRes, returnRes, perfRes, ownershipCurrentRes, ownershipHistoryRes, agreementsRes, finTrackRes] = await Promise.all([
+        // Fetch audit change history (historylogs) instead of listing_ownership_history for UI display
+        // Fetch display limit from appconfig (default 7 if missing or invalid)
+        const limitResPromise = pool.query("SELECT COALESCE(NULLIF(trim(config_value),''),'7')::int AS lim FROM appconfig WHERE config_key='history_display_limit'");
+        const [catalogRes, salesRes, shippingRes, orderRes, returnRes, perfRes, ownershipCurrentRes, changeHistoryRes, agreementsRes, finTrackRes, limitRes] = await Promise.all([
             pool.query('SELECT * FROM catalog WHERE item_id = $1', [listing.item_id]),
             pool.query('SELECT * FROM sales WHERE listing_id = $1', [id]),
             pool.query('SELECT * FROM shippinglog WHERE listing_id = $1', [id]),
@@ -239,19 +297,46 @@ exports.getListingDetails = async (req, res) => {
             pool.query('SELECT * FROM returnhistory WHERE listing_id = $1', [id]),
             pool.query('SELECT * FROM performancemetrics WHERE item_id = $1', [listing.item_id]),
             listing.ownership_id ? pool.query('SELECT * FROM ownership WHERE ownership_id = $1', [listing.ownership_id]) : Promise.resolve({ rows: [] }),
-            pool.query('SELECT * FROM listing_ownership_history WHERE listing_id = $1 ORDER BY started_at ASC', [id]),
+            pool.query("SELECT * FROM historylogs WHERE entity = 'listing' AND entity_id = $1 ORDER BY created_at ASC", [id]),
             listing.ownership_id ? pool.query('SELECT * FROM ownershipagreements WHERE ownership_id = $1', [listing.ownership_id]) : Promise.resolve({ rows: [] }),
-            pool.query('SELECT * FROM financialtracking WHERE listing_id = $1', [id])
+            pool.query('SELECT * FROM financialtracking WHERE listing_id = $1', [id]),
+            limitResPromise
         ]);
-
-        const sales = salesRes.rows; // now pure sales only
-
+        const historyConfigLimit = (limitRes.rows?.[0]?.lim) || 7; // app-level maximum
+        // Optional pagination query params
+        const requestedLimitRaw = req.query.history_limit;
+        let requestedLimit = parseInt(requestedLimitRaw, 10);
+        if (isNaN(requestedLimit) || requestedLimit <= 0) {
+            requestedLimit = undefined; // will fall back to config limit
+        }
+        const effectiveLimit = Math.min(requestedLimit || historyConfigLimit, historyConfigLimit);
+        let offset = parseInt(req.query.history_offset, 10);
+        if (isNaN(offset) || offset < 0) { offset = 0; }
+        const totalHistory = changeHistoryRes.rowCount;
+        const sliced = changeHistoryRes.rows.slice(offset, offset + effectiveLimit);
+        const sales = salesRes.rows;
         res.json({
             listing,
             catalog: catalogRes.rows[0] || null,
             sales,
-            ownerships: ownershipCurrentRes.rows, // at most one current
-            ownership_history: ownershipHistoryRes.rows,
+            ownerships: ownershipCurrentRes.rows,
+            change_history: sliced.map(r => ({
+                id: r.id,
+                action: r.action,
+                changed_fields: r.changed_fields || [],
+                created_at: r.created_at,
+                user_account_id: r.user_account_id,
+                entity: r.entity,
+                entity_id: r.entity_id,
+                change_details: r.change_details,
+                before_data: r.before_data,
+                after_data: r.after_data
+            })),
+            change_history_total: totalHistory,
+            change_history_limit: historyConfigLimit, // maintain existing semantic (config limit)
+            change_history_requested_limit: requestedLimit || null,
+            change_history_offset: offset,
+            change_history_effective_limit: effectiveLimit,
             ownershipagreements: agreementsRes.rows,
             shippinglog: shippingRes.rows,
             order_details: orderRes.rows,

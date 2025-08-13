@@ -1,6 +1,8 @@
 // Use the canonical catalog model (either file defines same table/shape). Prefer catalogModel.
 const Catalog = require('../models/catalogModel');
 const { Op } = require('sequelize');
+const audit = require('../utils/auditLogger');
+const { ENTITY } = require('../constants/entities');
 
 // Create a new catalog entry
 exports.createCatalog = async (req, res) => {
@@ -13,6 +15,12 @@ exports.createCatalog = async (req, res) => {
             }
         }
         const newCatalog = await Catalog.create(req.body);
+        try {
+            const afterObj = newCatalog.toJSON ? newCatalog.toJSON() : newCatalog;
+            await audit.logCreate(ENTITY.CATALOG, afterObj.item_id, afterObj, req.user_account_id);
+        } catch (e) {
+            console.error('Audit (create catalog) failed:', e?.message || e);
+        }
         res.status(201).json(newCatalog);
     } catch (error) {
         // Hide raw error details from client and log server-side
@@ -62,7 +70,14 @@ exports.updateCatalogById = async (req, res) => {
     try {
         const catalog = await Catalog.findByPk(req.params.item_id);
         if (!catalog) { return res.status(404).json({ message: 'Catalog entry not found' }); }
+        const beforeObj = catalog.toJSON ? catalog.toJSON() : { ...catalog };
         await catalog.update(req.body);
+        try {
+            const afterObj = catalog.toJSON ? catalog.toJSON() : catalog;
+            await audit.logUpdate(ENTITY.CATALOG, catalog.item_id, beforeObj, afterObj, req.user_account_id);
+        } catch (e) {
+            console.error('Audit (update catalog) failed:', e?.message || e);
+        }
         res.json(catalog);
     } catch (error) {
         if (error.name === 'SequelizeUniqueConstraintError') {
@@ -77,7 +92,13 @@ exports.deleteCatalogById = async (req, res) => {
     try {
         const catalog = await Catalog.findByPk(req.params.item_id);
         if (!catalog) { return res.status(404).json({ message: 'Catalog entry not found' }); }
+        const beforeObj = catalog.toJSON ? catalog.toJSON() : { ...catalog };
         await catalog.destroy();
+        try {
+            await audit.logDelete(ENTITY.CATALOG, beforeObj.item_id, beforeObj, req.user_account_id);
+        } catch (e) {
+            console.error('Audit (delete catalog) failed:', e?.message || e);
+        }
         res.json({ message: 'Catalog entry deleted successfully.' });
     } catch (error) {
         res.status(500).json({ message: 'Error deleting catalog entry', error: error.message });

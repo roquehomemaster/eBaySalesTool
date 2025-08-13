@@ -8,12 +8,7 @@ describe('Catalog API', () => {
 
   beforeAll(async () => {
     jest.setTimeout(60000);
-    // Use API endpoint to seed and reset the database inside the container
-    const res = await request(app).post('/api/populate-database');
-    if (res.statusCode !== 200) {
-      throw new Error(`Database seeding failed: ${res.statusCode} ${JSON.stringify(res.body)}`);
-    }
-    // Truncate the catalog table before running tests
+    // Global seed done; ensure clean catalog table for deterministic tests
     await sequelize.query('TRUNCATE catalog RESTART IDENTITY CASCADE;');
   }, 60000);
 
@@ -179,8 +174,5 @@ describe('Catalog API', () => {
     expect(res.body.total).toBeGreaterThanOrEqual(15);
   });
 
-  afterAll(async () => {
-    await sequelize.close();
-    await pool.end(); // Close pg Pool to prevent open handles
-  });
+  // Connection cleanup handled by globalTeardown
 });

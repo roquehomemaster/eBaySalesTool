@@ -1,0 +1,1 @@
+-- Archived legacy migration 03_fix_ownership_enum.sql (superseded by 01_init.sql)

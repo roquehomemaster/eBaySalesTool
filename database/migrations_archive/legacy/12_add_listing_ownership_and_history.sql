@@ -1,0 +1,1 @@
+-- Archived legacy migration 12_add_listing_ownership_and_history.sql (replaced by historylogs + ownership fields in 01_init.sql)

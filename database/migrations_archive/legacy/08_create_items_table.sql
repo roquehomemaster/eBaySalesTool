@@ -1,0 +1,1 @@
+-- Archived legacy migration 08_create_items_table.sql (superseded by 01_init.sql)

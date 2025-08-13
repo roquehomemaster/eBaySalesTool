@@ -46,11 +46,12 @@ const CatalogTable = () => {
                 return entries.map(([k, v]) => [prettify(k), v == null ? '-' : String(v)]);
             };
 
+            const itemId = entry.item_id; // derive to satisfy exhaustive-deps without warning
             React.useEffect(() => {
                 let active = true;
                 (async () => {
                     try {
-                        const resp = await apiService.getListings({ item_id: entry.item_id, page: 1, limit: 50 });
+                        const resp = await apiService.getListings({ item_id: itemId, page: 1, limit: 50 });
                         const listings = Array.isArray(resp)
                             ? resp
                             : (resp?.listings || resp?.data?.listings || []);
@@ -64,7 +65,7 @@ const CatalogTable = () => {
                     }
                 })();
                 return () => { active = false; };
-            }, [entry.item_id]); // dependency intentional; entry.item_id stable per selection
+            }, [itemId]); // itemId is stable primitive
 
             const Section = ({ title, rows }) => (
                 <div style={{ marginTop: 12 }}>

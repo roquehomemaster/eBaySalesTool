@@ -1,0 +1,1 @@
+-- Archived legacy migration 10_add_address_to_owners.sql (superseded by unified schema)

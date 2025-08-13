@@ -1,0 +1,1 @@
+-- Archived legacy migration 04_appconfig_pagesize.sql (superseded by 01_init.sql)

@@ -1,0 +1,1 @@
+-- Archived / neutralized: functionality consolidated into 01_init.sql & runtime logic (no-op)

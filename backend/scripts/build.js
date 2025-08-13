@@ -487,7 +487,10 @@ async function main() {
                 PG_DATABASE: 'ebay_sales_tool',
                 PG_PORT: '5432'
             };
-            const testCommand = `npx jest --runInBand --detectOpenHandles --forceExit --testPathPattern=tests > "${testResultsPath}" 2>&1`;
+            // Removed --forceExit now that open handles are resolved; rely on proper teardown to exit cleanly.
+            // Explicitly set NODE_ENV=test to guard any environment-specific logic.
+            testEnv.NODE_ENV = 'test';
+            const testCommand = `npx jest --runInBand --detectOpenHandles --testPathPattern=tests > "${testResultsPath}" 2>&1`;
             log(`Running: ${testCommand}`);
             execSync(testCommand, { cwd: path.resolve(__dirname, '../'), stdio: 'inherit', shell: true, env: testEnv });
             log('API tests executed and results written to logs/API-Test-Results.txt');

@@ -6,27 +6,7 @@ const EbayInfo = require('../src/models/ebayInfoModel'); // Use correct model im
 describe('eBay Info API', () => {
   beforeAll(async () => {
     jest.setTimeout(60000);
-    // Use API endpoint to seed and reset the database inside the container
-    const res = await request(app).post('/api/populate-database');
-    if (res.statusCode !== 200) {
-      throw new Error(`Database seeding failed: ${res.statusCode} ${JSON.stringify(res.body)}`);
-    }
-    if (process.env.VERBOSE_TESTS === '1') {
-      console.log('Registered models:', Object.keys(sequelize.models));
-    }
-  // Log all tables in public schema (robust via pg_tables)
-  const [pgTables] = await sequelize.query("SELECT tablename FROM pg_tables WHERE schemaname = 'public'");
-  const tableNames = pgTables.map(r => r.tablename);
-  if (process.env.VERBOSE_TESTS === '1') {
-    console.log('Tables in public schema (pg_tables):', tableNames);
-  }
-    // Check for required tables
-    const requiredTables = ['ownership', 'listing', 'ebayinfo', 'application_account', 'roles', 'customer', 'catalog'];
-    requiredTables.forEach(tbl => {
-      if (!tableNames.includes(tbl)) {
-        throw new Error(`Missing required table: ${tbl}`);
-      }
-    });
+    // Global seed done; create single EbayInfo baseline row
     await EbayInfo.create({
       account_id: 'acc123',
       store_name: 'Test Store',
@@ -41,7 +21,6 @@ describe('eBay Info API', () => {
       policy_compliance_status: 'Compliant',
       api_status: 'Healthy'
     });
-    await new Promise(resolve => setTimeout(resolve, 100)); // Wait for DB commit
   }, 60000);
 
   it('should get eBay account info', async () => {

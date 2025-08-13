@@ -1,5 +1,7 @@
 const { Op } = require('sequelize');
 const Ownership = require('../models/ownershipModel');
+const audit = require('../utils/auditLogger');
+const { ENTITY } = require('../constants/entities');
 
 // Create a new ownership/agreement
 exports.createOwnership = async (req, res) => {
@@ -40,6 +42,12 @@ exports.createOwnership = async (req, res) => {
             assigned_contact_telephone,
             assigned_contact_email
         });
+        try {
+            const afterObj = newOwnership.toJSON ? newOwnership.toJSON() : newOwnership;
+            await audit.logCreate(ENTITY.OWNERSHIP, afterObj.ownership_id, afterObj, req.user_account_id);
+        } catch (e) {
+            console.error('Audit (create ownership) failed:', e?.message || e);
+        }
         res.status(201).json(newOwnership);
     } catch (error) {
         console.error('Error in createOwnership:', error);
@@ -87,7 +95,14 @@ exports.updateOwnershipById = async (req, res) => {
     try {
         const ownership = await Ownership.findByPk(req.params.id);
         if (!ownership) { return res.status(404).json({ message: 'Ownership/Agreement not found' }); }
+        const beforeObj = ownership.toJSON ? ownership.toJSON() : { ...ownership };
         await ownership.update(req.body);
+        try {
+            const afterObj = ownership.toJSON ? ownership.toJSON() : ownership;
+            await audit.logUpdate(ENTITY.OWNERSHIP, ownership.ownership_id, beforeObj, afterObj, req.user_account_id);
+        } catch (e) {
+            console.error('Audit (update ownership) failed:', e?.message || e);
+        }
         res.json(ownership);
     } catch (error) {
         console.error('Error in updateOwnershipById:', error);
@@ -100,7 +115,13 @@ exports.deleteOwnershipById = async (req, res) => {
     try {
         const ownership = await Ownership.findByPk(req.params.id);
         if (!ownership) { return res.status(404).json({ message: 'Ownership/Agreement not found' }); }
+        const beforeObj = ownership.toJSON ? ownership.toJSON() : { ...ownership };
         await ownership.destroy();
+        try {
+            await audit.logDelete(ENTITY.OWNERSHIP, beforeObj.ownership_id, beforeObj, req.user_account_id);
+        } catch (e) {
+            console.error('Audit (delete ownership) failed:', e?.message || e);
+        }
         res.json({ message: 'Ownership/Agreement deleted successfully.' });
     } catch (error) {
         console.error('Error in deleteOwnershipById:', error);

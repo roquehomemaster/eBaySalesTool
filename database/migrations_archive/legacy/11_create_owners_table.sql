@@ -1,0 +1,1 @@
+-- Archived legacy migration 11_create_owners_table.sql (superseded by 01_init.sql)

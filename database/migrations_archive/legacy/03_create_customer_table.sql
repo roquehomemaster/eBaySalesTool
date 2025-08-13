@@ -1,0 +1,1 @@
+-- Archived legacy migration 03_create_customer_table.sql (superseded by 01_init.sql)

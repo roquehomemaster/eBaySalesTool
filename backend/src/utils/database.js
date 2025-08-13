@@ -40,21 +40,28 @@ const sequelize = new Sequelize(
     }
 );
 
-// pg Pool instance for raw queries
-const pool = new Pool({
-    host: process.env.PG_HOST || 'localhost',
-    max: 10,
-    user: process.env.PG_USER || 'postgres',
-    password: process.env.PG_PASSWORD || 'password',
-    database: process.env.PG_DATABASE || 'ebay_sales_tool',
-    port: process.env.PG_PORT || 5432
-});
+// Lazy pg Pool instance for raw queries (initialized on first access)
+let poolInstance;
+function getPool() {
+    if (!poolInstance) {
+        poolInstance = new Pool({
+            host: process.env.PG_HOST || 'localhost',
+            max: 10,
+            user: process.env.PG_USER || 'postgres',
+            password: process.env.PG_PASSWORD || 'password',
+            database: process.env.PG_DATABASE || 'ebay_sales_tool',
+            port: process.env.PG_PORT || 5432
+        });
+    }
+    return poolInstance;
+}
 
 /**
  * Seed the database with test data if the test flag is set in AppConfig.
  */
 async function seedDatabaseIfTestFlag() {
     try {
+    const pool = getPool();
     const result = await pool.query("SELECT config_value FROM appconfig WHERE config_key = 'testdata'");
         const testDataFlag = result.rows[0]?.config_value === 'true';
 
@@ -73,6 +80,8 @@ async function seedDatabaseIfTestFlag() {
 
 module.exports = {
     sequelize,
-    pool,
+    // For existing imports expecting 'pool', provide getter property
+    get pool() { return getPool(); },
+    getPool,
     seedDatabaseIfTestFlag
 };

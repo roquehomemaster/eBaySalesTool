@@ -939,6 +939,55 @@
         }
       }
     },
+    "/api/listings/{id}/details": {
+      "get": {
+        "summary": "Get comprehensive listing details including change history",
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "integer" }, "description": "Listing ID" },
+          { "in": "query", "name": "history_limit", "schema": { "type": "integer" }, "description": "Optional requested number of history rows (capped by config history_display_limit)" },
+          { "in": "query", "name": "history_offset", "schema": { "type": "integer" }, "description": "Optional offset for history pagination (default 0)" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Listing details payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "listing": { "$ref": "#/components/schemas/Listing" },
+                    "catalog": { "$ref": "#/components/schemas/Catalog" },
+                    "sales": { "type": "array", "items": { "$ref": "#/components/schemas/Sale" } },
+                    "ownerships": { "type": "array", "items": { "$ref": "#/components/schemas/Ownership" } },
+                    "change_history": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "integer" },
+                          "action": { "type": "string", "enum": ["create","update","delete"] },
+                          "changed_fields": { "type": "array", "items": { "type": "string" } },
+                          "created_at": { "type": "string", "format": "date-time" },
+                          "before_data": { "type": "object" },
+                          "after_data": { "type": "object" }
+                        }
+                      }
+                    },
+                    "change_history_total": { "type": "integer" },
+                    "change_history_limit": { "type": "integer", "description": "Configured max history_display_limit" },
+                    "change_history_requested_limit": { "type": "integer", "nullable": true },
+                    "change_history_effective_limit": { "type": "integer" },
+                    "change_history_offset": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Listing not found" },
+          "500": { "description": "Error fetching listing details" }
+        }
+      }
+    },
     "/api/ownership": {
       "post": {
         "summary": "Create a new ownership record",

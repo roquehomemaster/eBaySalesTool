@@ -55,7 +55,7 @@
 - **Customer Feedback/Ratings**: Feedback received from customers.
 
 ## eBay-Specific Information
-- **Listing Status**: Active, ended, or removed.
+- **Listing Status**: draft, ready_to_list, active, sold, shipped, in_warranty, ready_for_payment, complete.
 - **Watchers**: Number of users watching the item.
 - **Item Condition Description**: Detailed description complying with eBay's requirements.
 - **Payment Method**: Accepted payment methods through eBay.

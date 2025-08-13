@@ -1,5 +1,7 @@
 const { Op } = require('sequelize');
 const Sales = require('../models/salesModel');
+const audit = require('../utils/auditLogger');
+const { ENTITY } = require('../constants/entities');
 
 // Create a new sale
 exports.createSale = async (req, res) => {
@@ -12,6 +14,12 @@ exports.createSale = async (req, res) => {
             }
         }
         const newSale = await Sales.create(req.body);
+        try {
+            const afterObj = newSale.toJSON ? newSale.toJSON() : newSale;
+            await audit.logCreate(ENTITY.SALES, afterObj.sale_id, afterObj, req.user_account_id);
+        } catch (e) {
+            console.error('Audit (create sale) failed:', e?.message || e);
+        }
         res.status(201).json(newSale);
     } catch (error) {
         res.status(500).json({ message: 'Error creating sale' });
@@ -53,7 +61,14 @@ exports.updateSaleById = async (req, res) => {
     try {
         const sale = await Sales.findByPk(req.params.id);
         if (!sale) { return res.status(404).json({ message: 'Sale not found' }); }
+        const beforeObj = sale.toJSON ? sale.toJSON() : { ...sale };
         await sale.update(req.body);
+        try {
+            const afterObj = sale.toJSON ? sale.toJSON() : sale;
+            await audit.logUpdate(ENTITY.SALES, sale.sale_id, beforeObj, afterObj, req.user_account_id);
+        } catch (e) {
+            console.error('Audit (update sale) failed:', e?.message || e);
+        }
         res.json(sale);
     } catch (error) {
         res.status(500).json({ message: 'Error updating sale' });
@@ -65,7 +80,13 @@ exports.deleteSaleById = async (req, res) => {
     try {
         const sale = await Sales.findByPk(req.params.id);
         if (!sale) { return res.status(404).json({ message: 'Sale not found' }); }
+        const beforeObj = sale.toJSON ? sale.toJSON() : { ...sale };
         await sale.destroy();
+        try {
+            await audit.logDelete(ENTITY.SALES, beforeObj.sale_id, beforeObj, req.user_account_id);
+        } catch (e) {
+            console.error('Audit (delete sale) failed:', e?.message || e);
+        }
         res.json({ message: 'Sale deleted successfully.' });
     } catch (error) {
         res.status(500).json({ message: 'Error deleting sale' });

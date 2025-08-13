@@ -2,6 +2,8 @@
 // Controller for FinancialTracking endpoints
 
 const FinancialTracking = require('../models/financialtrackingModel');
+const audit = require('../utils/auditLogger');
+const { ENTITY } = require('../constants/entities');
 
 // Create a new financial tracking record
 exports.createFinancialTracking = async (req, res) => {
@@ -13,6 +15,10 @@ exports.createFinancialTracking = async (req, res) => {
             }
         }
         const newRecord = await FinancialTracking.create(req.body);
+        try {
+            const afterObj = newRecord.toJSON ? newRecord.toJSON() : newRecord;
+            await audit.logCreate(ENTITY.FINANCIAL_TRACKING, afterObj.financialtracking_id, afterObj, req.user_account_id);
+        } catch (e) { console.error('Audit (create financialtracking) failed:', e?.message || e); }
         res.status(201).json(newRecord);
     } catch (error) {
         res.status(500).json({ message: 'Error creating financial tracking record' });
@@ -45,7 +51,12 @@ exports.updateFinancialTrackingById = async (req, res) => {
     try {
         const record = await FinancialTracking.findByPk(req.params.id);
         if (!record) { return res.status(404).json({ message: 'Financial tracking record not found' }); }
+        const beforeObj = record.toJSON ? record.toJSON() : { ...record };
         await record.update(req.body);
+        try {
+            const afterObj = record.toJSON ? record.toJSON() : record;
+            await audit.logUpdate(ENTITY.FINANCIAL_TRACKING, record.financialtracking_id, beforeObj, afterObj, req.user_account_id);
+        } catch (e) { console.error('Audit (update financialtracking) failed:', e?.message || e); }
         res.json(record);
     } catch (error) {
         res.status(500).json({ message: 'Error updating financial tracking record' });
@@ -55,10 +66,12 @@ exports.updateFinancialTrackingById = async (req, res) => {
 // Delete financial tracking by ID
 exports.deleteFinancialTrackingById = async (req, res) => {
     try {
-        const record = await FinancialTracking.findByPk(req.params.id);
-        if (!record) { return res.status(404).json({ message: 'Financial tracking record not found' }); }
-        await record.destroy();
-        res.status(204).send();
+    const record = await FinancialTracking.findByPk(req.params.id);
+    if (!record) { return res.status(404).json({ message: 'Financial tracking record not found' }); }
+    const beforeObj = record.toJSON ? record.toJSON() : { ...record };
+    await record.destroy();
+    try { await audit.logDelete(ENTITY.FINANCIAL_TRACKING, beforeObj.financialtracking_id, beforeObj, req.user_account_id); } catch (e) { console.error('Audit (delete financialtracking) failed:', e?.message || e); }
+    res.status(204).send();
     } catch (error) {
         res.status(500).json({ message: 'Error deleting financial tracking record' });
     }

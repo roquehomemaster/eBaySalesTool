@@ -31,7 +31,9 @@ const ListingTable = () => {
 
   const detailsRenderer = (listing, helpers) => {
     const Details = () => {
-      const [data, setData] = React.useState(null);
+  const [data, setData] = React.useState(null);
+  const [historyOffset, setHistoryOffset] = React.useState(0);
+  const [historyLoading, setHistoryLoading] = React.useState(false);
       const [error, setError] = React.useState(null);
   const [createMode, setCreateMode] = React.useState(false);
   const [editMode, setEditMode] = React.useState(false);
@@ -64,6 +66,35 @@ const ListingTable = () => {
         }
         return String(v);
       };
+      // Helpers for change history rendering (defined at component scope for JSX use)
+      function pickFields(obj, fields) {
+        if (!obj) {
+          return {};
+        }
+        if (!Array.isArray(fields) || fields.length === 0) {
+          return obj;
+        }
+        const out = {};
+        fields.forEach(f => {
+          if (Object.prototype.hasOwnProperty.call(obj, f)) {
+            out[f] = obj[f];
+          }
+        });
+        return out;
+      }
+      function diffChanges(before, after, fields) {
+        if (!before || !after) {
+          return {};
+        }
+        const keys = Array.isArray(fields) && fields.length ? fields : Object.keys(after);
+        const diff = {};
+        keys.forEach(k => {
+          if (before[k] !== after[k]) {
+            diff[k] = { before: before[k], after: after[k] };
+          }
+        });
+        return diff;
+      }
       const entriesFromObj = (obj, keysOrder) => {
         if (!obj) {
           return [];
@@ -74,15 +105,16 @@ const ListingTable = () => {
         return entries.map(([k, v]) => [prettify(k), fmtVal(k, v)]);
       };
 
+      const listingId = listing?.listing_id; // stabilize for effect deps
       React.useEffect(() => {
         let active = true;
         (async () => {
-          // Load default read-only details for selected listing
-          if (!createMode && listing?.listing_id) {
+          if (!createMode && listingId) {
             try {
-              const resp = await apiService.getListingDetails(listing.listing_id);
+              const resp = await apiService.getListingDetails(listingId, { history_offset: 0 });
               if (active) {
                 setData(resp);
+                setHistoryOffset(0);
               }
             } catch (e) {
               if (active) {
@@ -92,7 +124,7 @@ const ListingTable = () => {
           }
         })();
         return () => { active = false; };
-  }, [listing.listing_id, createMode]); // listing.listing_id stable identity; lint warning acceptable
+  }, [listingId, createMode]);
 
       // Preload catalog and ownerships for selection in create mode
       React.useEffect(() => {
@@ -166,8 +198,9 @@ const ListingTable = () => {
             await helpers?.refreshList?.((it) => it.listing_id === listing.listing_id);
             // Fetch updated details (ownership + sales linkage) explicitly since listing_id is unchanged
             try {
-              const updatedDetails = await apiService.getListingDetails(listing.listing_id);
+              const updatedDetails = await apiService.getListingDetails(listing.listing_id, { history_offset: 0 });
               setData(updatedDetails);
+              setHistoryOffset(0);
             } catch (_) { /* ignore details refresh error */ }
             setEditMode(false);
           }
@@ -316,18 +349,65 @@ const ListingTable = () => {
               </div>
             )}
 
-            {(data.ownership_history || []).length > 0 && (
+            {(data.change_history || []).length > 0 && (
               <div className="group">
-                <h4 style={{ margin: '6px 0' }}>Ownership History</h4>
-                <table className="kv-table"><tbody>
-                  <tr><td className="kv-key">Count</td><td className="kv-val">{data.ownership_history.length}</td></tr>
-                  {data.ownership_history.map((h, idx) => (
-                    <tr key={h.listing_ownership_history_id || idx}>
-                      <td className="kv-key">#{idx+1}</td>
-                      <td className="kv-val">Owner {h.ownership_id} from {new Date(h.started_at).toLocaleString()} {h.ended_at ? `→ ${new Date(h.ended_at).toLocaleString()}` : '(current)'}{h.change_reason ? ` – ${h.change_reason}` : ''}</td>
-                    </tr>
-                  ))}
-                </tbody></table>
+                <h4 style={{ margin: '6px 0' }}>Change History <span style={{ fontWeight: 400, fontSize: 12 }}>(showing {data.change_history.length} of {data.change_history_total}{data.change_history_total > data.change_history.length ? `, limit ${data.change_history_limit}` : ''})</span></h4>
+                <div style={{ maxHeight: 300, overflowY: 'auto', border: '1px solid #e1e8ed', borderRadius: 4 }}>
+                  <table className="kv-table" style={{ margin: 0 }}><tbody>
+                    {data.change_history.map((h, idx) => (
+                      <tr key={h.id || idx}>
+                        <td className="kv-key" style={{ width: 80 }}>#{idx+1}</td>
+                        <td className="kv-val">
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', fontSize: 12 }}>
+                            <span><strong>Page:</strong> Listing</span>
+                            <span><strong>Function:</strong> {h.action}</span>
+                            <span><strong>At:</strong> {h.created_at ? new Date(h.created_at).toLocaleString() : 'n/a'}</span>
+                            {Array.isArray(h.changed_fields) && h.changed_fields.length > 0 && (
+                              <span><strong>Fields:</strong> {h.changed_fields.join(', ')}</span>
+                            )}
+                          </div>
+                          {(h.action === 'update' && h.before_data && h.after_data) && (
+                            <details style={{ marginTop: 4 }}>
+                              <summary style={{ cursor: 'pointer' }}>Value Changes</summary>
+                              <pre style={{ fontSize: 11, background: '#f6f8fa', padding: 6, maxHeight: 240, overflow: 'auto' }}>{JSON.stringify(diffChanges(h.before_data, h.after_data, h.changed_fields), null, 2)}</pre>
+                            </details>
+                          )}
+                          {(h.action === 'create' && h.after_data) && (
+                            <details style={{ marginTop: 4 }}>
+                              <summary style={{ cursor: 'pointer' }}>Created Values</summary>
+                              <pre style={{ fontSize: 11, background: '#f6f8fa', padding: 6, maxHeight: 240, overflow: 'auto' }}>{JSON.stringify(pickFields(h.after_data, h.changed_fields), null, 2)}</pre>
+                            </details>
+                          )}
+                          {(h.action === 'delete' && h.before_data) && (
+                            <details style={{ marginTop: 4 }}>
+                              <summary style={{ cursor: 'pointer' }}>Deleted Values</summary>
+                              <pre style={{ fontSize: 11, background: '#f6f8fa', padding: 6, maxHeight: 240, overflow: 'auto' }}>{JSON.stringify(pickFields(h.before_data, h.changed_fields), null, 2)}</pre>
+                            </details>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody></table>
+                </div>
+                {data.change_history_total > (historyOffset + data.change_history.length) && (
+                  <div style={{ marginTop: 8 }}>
+                    <button disabled={historyLoading} onClick={async () => {
+                      if (!listing?.listing_id) { return; }
+                      setHistoryLoading(true);
+                      try {
+                        const nextOffset = historyOffset + data.change_history.length;
+                        const resp = await apiService.getListingDetails(listing.listing_id, { history_offset: nextOffset, history_limit: data.change_history_effective_limit || data.change_history_limit });
+                        // Append new slice (avoid duplicates by id)
+                        const existingIds = new Set((data.change_history || []).map(r => r.id));
+                        const merged = [...data.change_history];
+                        (resp.change_history || []).forEach(r => { if (!existingIds.has(r.id)) { merged.push(r); } });
+                        setData({ ...data, change_history: merged });
+                        setHistoryOffset(nextOffset);
+                      } catch (_) { /* ignore */ }
+                      setHistoryLoading(false);
+                    }}>{historyLoading ? 'Loading…' : 'Load More'}</button>
+                  </div>
+                )}
               </div>
             )}
 

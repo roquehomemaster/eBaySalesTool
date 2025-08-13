@@ -18,8 +18,8 @@ COPY package*.json ./
 COPY src ./src
 COPY database/seeds ./database/seeds
 
-# Copy swagger.json from project root into the backend image
-COPY ../swagger.json ./swagger.json
+# Generate swagger.json inside the image (merge fragments)
+RUN node scripts/generate_swagger.js || echo '{"paths":{}}' > swagger.json
 
 # Expose the application port
 EXPOSE 3000

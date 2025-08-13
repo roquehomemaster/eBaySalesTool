@@ -1,0 +1,1 @@
+-- Archived legacy migration 99_drop_catalogs_table.sql (drops handled in 01_init.sql)

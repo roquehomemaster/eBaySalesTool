@@ -1,0 +1,1 @@
+-- Archived legacy migration 03_create_eBayInfo.sql (superseded by 01_init.sql)

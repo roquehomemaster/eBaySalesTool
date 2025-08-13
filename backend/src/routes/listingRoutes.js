@@ -210,4 +210,44 @@ router.post('/generate-listing', (req, res) => {
     // ...existing code...
 });
 
+// Listing status workflow descriptor
+router.get('/status/workflow', async (req, res) => {
+    try {
+        const controller = require('../utils/statusWorkflow');
+        const data = await controller.getWorkflowDescriptor();
+        res.json(data);
+    } catch (e) {
+        res.status(500).json({ message: 'Error loading status workflow' });
+    }
+});
+
+// Update status workflow graph (admin). Expects JSON body { graph: { state: [next,...], ... } }
+router.post('/status/workflow', async (req, res) => {
+    try {
+        const graph = req.body.graph;
+        if (!graph || typeof graph !== 'object' || Array.isArray(graph)) {
+            return res.status(400).json({ message: 'Invalid graph: must be an object mapping status -> array of next statuses' });
+        }
+        // Basic validation: ensure all values are arrays of strings, and referenced nodes exist (closure)
+        const nodes = Object.keys(graph);
+        for (const [k, v] of Object.entries(graph)) {
+            if (!Array.isArray(v) || v.some(n => typeof n !== 'string')) {
+                return res.status(400).json({ message: `Invalid transitions for '${k}'` });
+            }
+        }
+        // Insert implicit nodes referenced only as targets
+        const referenced = new Set();
+        for (const arr of Object.values(graph)) arr.forEach(n => referenced.add(n));
+        referenced.forEach(r => { if (!graph[r]) graph[r] = []; });
+        const { pool } = require('../utils/database');
+        await pool.query("INSERT INTO appconfig (config_key, config_value, data_type) VALUES ('listing_status_graph', $1, 'json') ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value, data_type='json'", [JSON.stringify(graph)]);
+        const controller = require('../utils/statusWorkflow');
+        const data = await controller.getWorkflowDescriptor();
+        res.status(200).json({ message: 'Workflow graph updated', ...data });
+    } catch (e) {
+        console.error('Failed to update status workflow graph:', e?.message || e);
+        res.status(500).json({ message: 'Error updating status workflow' });
+    }
+});
+
 module.exports = router;

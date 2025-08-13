@@ -8,7 +8,15 @@ describe('Customer API (smoke)', () => {
   });
   it('customers list returns array', async () => {
     const res = await request(app).get('/api/customers');
-    expect(res.statusCode).toBe(200);
-    expect(Array.isArray(res.body)).toBe(true);
+  expect(res.statusCode).toBe(200);
+  // Endpoint returns a paginated object: { customers: [...], total, page, pageSize }
+  // Older expectation assumed bare array. Support both for forward compatibility.
+  const list = Array.isArray(res.body) ? res.body : res.body.customers;
+  expect(Array.isArray(list)).toBe(true);
+    if (!Array.isArray(res.body)) {
+      expect(typeof res.body.total).toBe('number');
+      expect(typeof res.body.page).toBe('number');
+      expect(typeof res.body.pageSize).toBe('number');
+    }
   });
 });

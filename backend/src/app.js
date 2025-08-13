@@ -13,7 +13,7 @@
 
 const express = require('express');
 const cors = require('cors');
-const { Pool } = require('pg');
+// Use shared Pool instance from utils/database to avoid duplicate open handles in tests
 const listingRoutes = require('./routes/listingRoutes');
 const catalogRoutes = require('./routes/itemRoutes');
 const ownershipRoutes = require('./routes/ownershipRoutes');
@@ -23,7 +23,7 @@ const ebayInfoRoutes = require('./routes/ebayInfoRoutes');
 const authRoutes = require('./routes/authRoutes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
-const { sequelize } = require('./utils/database');
+const { sequelize, pool } = require('./utils/database');
 const listingController = require('./controllers/listingController');
 const Catalog = require('./models/itemModel');
 const Ownership = require('./models/ownershipModel');
@@ -42,6 +42,7 @@ const appconfigRoutes = require('./routes/appconfigRoutes');
 const database_configurationRoutes = require('./routes/database_configurationRoutes');
 const shippinglogRoutes = require('./routes/shippinglogRoutes');
 const ownershipagreementsRoutes = require('./routes/ownershipagreementsRoutes');
+const historyRoutes = require('./routes/historyRoutes');
 
 // Ensure the logs directory exists BEFORE logger is created
 const logDir = '/usr/src/app/logs';
@@ -79,6 +80,7 @@ app.use('/api/appconfig', appconfigRoutes);
 app.use('/api/database_configuration', database_configurationRoutes);
 app.use('/api/shippinglog', shippinglogRoutes);
 app.use('/api/ownershipagreements', ownershipagreementsRoutes);
+app.use('/api/history', historyRoutes);
 
 // Temporary explicit route to ensure details endpoint is available even if router file misses it
 app.get('/api/listings/:id/details', listingController.getListingDetails);
@@ -92,23 +94,18 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/templates/index.html');
 });
 
-// Use unified logic for Postgres host
-// Use only environment variables or rely on Sequelize config loading
-const pool = new Pool({
-    user: process.env.PG_USER || 'postgres',
-    host: process.env.PG_HOST || 'localhost',
-    database: process.env.PG_DATABASE || 'ebay_sales_tool',
-    password: process.env.PG_PASSWORD || 'password',
-    port: process.env.PG_PORT || 5432,
-});
+// Expose shared pool for test teardown (globalTeardown) to close connections
+if (process.env.NODE_ENV === 'test') {
+    app.locals.pgPool = pool;
+}
 
 // Keep console intact; rely on logger for structured logs
 
 // Only connect to DB (no sync in test). Log registered models for debugging.
 if (process.env.NODE_ENV !== 'test') {
     pool.connect()
-    .then(() => logger.info('PostgreSQL connected'))
-    .catch(err => logger.error('PostgreSQL connection error:', err));
+        .then(() => logger.info('PostgreSQL connected'))
+        .catch(err => logger.error('PostgreSQL connection error:', err));
 
     // Removed sequelize.sync({ alter: true }) to prevent Sequelize from auto-creating or altering tables. Use migrations only.
 }

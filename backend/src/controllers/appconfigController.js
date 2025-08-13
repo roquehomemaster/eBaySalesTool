@@ -2,6 +2,8 @@
 // Controller for AppConfig endpoints
 
 const AppConfig = require('../models/appconfigModel');
+const audit = require('../utils/auditLogger');
+const { ENTITY } = require('../constants/entities');
 
 // Create a new app config record
 exports.createAppConfig = async (req, res) => {
@@ -13,6 +15,12 @@ exports.createAppConfig = async (req, res) => {
             }
         }
         const newRecord = await AppConfig.create(req.body);
+        try {
+            const afterObj = newRecord.toJSON ? newRecord.toJSON() : newRecord;
+            await audit.logCreate(ENTITY.APPCONFIG, afterObj.config_key, afterObj, req.user_account_id);
+        } catch (e) {
+            console.error('Audit (create appconfig) failed:', e?.message || e);
+        }
         res.status(201).json(newRecord);
     } catch (error) {
         res.status(500).json({ message: 'Error creating app config record' });
@@ -62,7 +70,14 @@ exports.updateAppConfigById = async (req, res) => {
     try {
         const record = await AppConfig.findByPk(req.params.id);
         if (!record) { return res.status(404).json({ message: 'App config record not found' }); }
+        const beforeObj = record.toJSON ? record.toJSON() : { ...record };
         await record.update(req.body);
+        try {
+            const afterObj = record.toJSON ? record.toJSON() : record;
+            await audit.logUpdate(ENTITY.APPCONFIG, afterObj.config_key, beforeObj, afterObj, req.user_account_id);
+        } catch (e) {
+            console.error('Audit (update appconfig) failed:', e?.message || e);
+        }
         res.json(record);
     } catch (error) {
         res.status(500).json({ message: 'Error updating app config record' });
@@ -74,7 +89,13 @@ exports.deleteAppConfigById = async (req, res) => {
     try {
         const record = await AppConfig.findByPk(req.params.id);
         if (!record) { return res.status(404).json({ message: 'App config record not found' }); }
+        const beforeObj = record.toJSON ? record.toJSON() : { ...record };
         await record.destroy();
+        try {
+            await audit.logDelete(ENTITY.APPCONFIG, beforeObj.config_key, beforeObj, req.user_account_id);
+        } catch (e) {
+            console.error('Audit (delete appconfig) failed:', e?.message || e);
+        }
         res.status(204).send();
     } catch (error) {
         res.status(500).json({ message: 'Error deleting app config record' });

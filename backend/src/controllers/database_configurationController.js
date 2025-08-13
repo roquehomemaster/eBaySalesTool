@@ -2,6 +2,8 @@
 // Controller for Database_Configuration endpoints
 
 const DatabaseConfiguration = require('../models/database_configurationModel');
+const audit = require('../utils/auditLogger');
+const { ENTITY } = require('../constants/entities');
 
 // Create a new database configuration record
 exports.createDatabaseConfiguration = async (req, res) => {
@@ -12,8 +14,9 @@ exports.createDatabaseConfiguration = async (req, res) => {
                 return res.status(400).json({ message: `Missing required field: ${field}` });
             }
         }
-        const newRecord = await DatabaseConfiguration.create(req.body);
-        res.status(201).json(newRecord);
+    const newRecord = await DatabaseConfiguration.create(req.body);
+    try { const afterObj = newRecord.toJSON ? newRecord.toJSON() : newRecord; await audit.logCreate(ENTITY.DATABASE_CONFIGURATION, afterObj.id, afterObj, req.user_account_id); } catch (e) { console.error('Audit (create database_configuration) failed:', e?.message || e); }
+    res.status(201).json(newRecord);
     } catch (error) {
         res.status(500).json({ message: 'Error creating database configuration record' });
     }
@@ -43,10 +46,12 @@ exports.getDatabaseConfigurationById = async (req, res) => {
 // Update database configuration by ID
 exports.updateDatabaseConfigurationById = async (req, res) => {
     try {
-        const record = await DatabaseConfiguration.findByPk(req.params.id);
-        if (!record) { return res.status(404).json({ message: 'Database configuration record not found' }); }
-        await record.update(req.body);
-        res.json(record);
+    const record = await DatabaseConfiguration.findByPk(req.params.id);
+    if (!record) { return res.status(404).json({ message: 'Database configuration record not found' }); }
+    const beforeObj = record.toJSON ? record.toJSON() : { ...record };
+    await record.update(req.body);
+    try { const afterObj = record.toJSON ? record.toJSON() : record; await audit.logUpdate(ENTITY.DATABASE_CONFIGURATION, record.id, beforeObj, afterObj, req.user_account_id); } catch (e) { console.error('Audit (update database_configuration) failed:', e?.message || e); }
+    res.json(record);
     } catch (error) {
         res.status(500).json({ message: 'Error updating database configuration record' });
     }
@@ -55,10 +60,12 @@ exports.updateDatabaseConfigurationById = async (req, res) => {
 // Delete database configuration by ID
 exports.deleteDatabaseConfigurationById = async (req, res) => {
     try {
-        const record = await DatabaseConfiguration.findByPk(req.params.id);
-        if (!record) { return res.status(404).json({ message: 'Database configuration record not found' }); }
-        await record.destroy();
-        res.status(204).send();
+    const record = await DatabaseConfiguration.findByPk(req.params.id);
+    if (!record) { return res.status(404).json({ message: 'Database configuration record not found' }); }
+    const beforeObj = record.toJSON ? record.toJSON() : { ...record };
+    await record.destroy();
+    try { await audit.logDelete(ENTITY.DATABASE_CONFIGURATION, beforeObj.id, beforeObj, req.user_account_id); } catch (e) { console.error('Audit (delete database_configuration) failed:', e?.message || e); }
+    res.status(204).send();
     } catch (error) {
         res.status(500).json({ message: 'Error deleting database configuration record' });
     }

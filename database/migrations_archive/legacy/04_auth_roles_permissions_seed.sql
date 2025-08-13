@@ -1,0 +1,1 @@
+-- Archived legacy migration 04_auth_roles_permissions_seed.sql (superseded / consolidated)

@@ -1,2 +1,1 @@
--- Migration to ensure legacy Catalogs table is dropped if it exists
-DROP TABLE IF EXISTS "public"."Catalogs" CASCADE;
+-- Archived / neutralized: drop handled in 01_init.sql (no-op)

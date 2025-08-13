@@ -233,9 +233,15 @@ CREATE TABLE historylogs (
   entity_id int,
   action varchar,
   change_details text,
+  changed_fields text[], -- list of field names that changed (for updates) or were set (for create)
+  before_data jsonb,      -- snapshot before change (null for create)
+  after_data jsonb,       -- snapshot after change (null for delete)
   user_account_id int REFERENCES application_account(user_account_id),
-  created_at timestamp
+  created_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
+CREATE INDEX idx_historylogs_entity_entity_id ON historylogs(entity, entity_id);
+CREATE INDEX idx_historylogs_created_at ON historylogs(created_at);
+CREATE INDEX idx_historylogs_entity_action ON historylogs(entity, action);
 
 CREATE TABLE returnhistory (
   id int PRIMARY KEY,
@@ -286,3 +292,7 @@ CREATE TABLE performancemetrics (
   number_of_items_sold int,
   average_sale_price decimal
 );
+
+-- Default application configuration values
+INSERT INTO appconfig (config_key, config_value, data_type) VALUES ('history_display_limit','7','int') ON CONFLICT (config_key) DO NOTHING;
+INSERT INTO appconfig (config_key, config_value, data_type) VALUES ('listing_status_workflow','["draft","ready_to_list","active","sold","shipped","in_warranty","ready_for_payment","complete"]','json') ON CONFLICT (config_key) DO NOTHING;

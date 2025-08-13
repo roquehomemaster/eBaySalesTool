@@ -1,0 +1,1 @@
+-- Archived legacy migration 07_create_ownerships_table.sql (superseded by 01_init.sql)

@@ -1,5 +1,56 @@
 {
   "paths": {
+    "/api/listings/status/workflow": {
+      "get": {
+        "summary": "Get status workflow graph",
+        "tags": [
+          "Listing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Workflow graph"
+          }
+        }
+      },
+      "post": {
+        "summary": "Update status workflow graph",
+        "tags": [
+          "Listing"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "graph": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "graph"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Invalid graph"
+          }
+        }
+      }
+    },
     "/api/auth/roles": {
       "get": {
         "summary": "Get all roles",
@@ -2891,6 +2942,319 @@
           }
         }
       }
+    },
+    "/application_account": {
+      "get": {
+        "summary": "Get all application accounts",
+        "tags": [
+          "ApplicationAccount"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of application accounts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationAccountArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create an application account",
+        "tags": [
+          "ApplicationAccount"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationAccount"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/application_account/{user_account_id}": {
+      "get": {
+        "summary": "Get an application account by ID",
+        "tags": [
+          "ApplicationAccount"
+        ],
+        "parameters": [
+          {
+            "name": "user_account_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ApplicationAccount",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationAccount"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an application account",
+        "tags": [
+          "ApplicationAccount"
+        ],
+        "parameters": [
+          {
+            "name": "user_account_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationAccount"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an application account",
+        "tags": [
+          "ApplicationAccount"
+        ],
+        "parameters": [
+          {
+            "name": "user_account_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/api/listings": {
+      "get": {
+        "summary": "List listings",
+        "tags": [
+          "Listing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Listing collection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "listings": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Listing"
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "page": {
+                      "type": "integer"
+                    },
+                    "pageSize": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create listing",
+        "tags": [
+          "Listing"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListingCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/api/listings/{id}": {
+      "get": {
+        "summary": "Get listing",
+        "tags": [
+          "Listing"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Listing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Listing"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update listing",
+        "tags": [
+          "Listing"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ListingUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete listing",
+        "tags": [
+          "Listing"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/api/listings/{id}/details": {
+      "get": {
+        "summary": "Get listing aggregated details",
+        "tags": [
+          "Listing"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Listing details payload"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3220,29 +3584,38 @@
       "Listing": {
         "type": "object",
         "properties": {
-          "id": {
+          "listing_id": {
             "type": "integer"
           },
-          "catalog_id": {
-            "type": "integer"
-          },
-          "listing_title": {
+          "title": {
             "type": "string"
           },
           "listing_price": {
             "type": "number",
-            "format": "decimal"
+            "format": "float"
           },
-          "listing_status": {
+          "item_id": {
+            "type": "integer"
+          },
+          "ownership_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "description": "Dynamic; see /api/listings/status/workflow"
+          },
+          "watchers": {
+            "type": "integer"
+          },
+          "item_condition_description": {
             "type": "string"
           },
-          "listing_date": {
-            "type": "string",
-            "format": "date-time"
+          "payment_method": {
+            "type": "string"
           },
-          "expiration_date": {
-            "type": "string",
-            "format": "date-time"
+          "shipping_method": {
+            "type": "string"
           },
           "created_at": {
             "type": "string",
@@ -3252,12 +3625,7 @@
             "type": "string",
             "format": "date-time"
           }
-        },
-        "required": [
-          "catalog_id",
-          "listing_title",
-          "listing_price"
-        ]
+        }
       },
       "ListingArray": {
         "type": "array",
@@ -3712,6 +4080,91 @@
         "type": "array",
         "items": {
           "$ref": "#/components/schemas/User"
+        }
+      },
+      "ApplicationAccount": {
+        "type": "object",
+        "properties": {
+          "user_account_id": {
+            "type": "integer"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password_hash": {
+            "type": "string"
+          },
+          "role_id": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "username",
+          "email",
+          "password_hash"
+        ]
+      },
+      "ApplicationAccountArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ApplicationAccount"
+        }
+      },
+      "ListingCreate": {
+        "type": "object",
+        "required": [
+          "title",
+          "listing_price",
+          "item_id"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "listing_price": {
+            "type": "number"
+          },
+          "item_id": {
+            "type": "integer"
+          },
+          "ownership_id": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "description": "Optional initial status (defaults to draft)"
+          }
+        }
+      },
+      "ListingUpdate": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "listing_price": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          },
+          "ownership_id": {
+            "type": "integer"
+          }
         }
       }
     }

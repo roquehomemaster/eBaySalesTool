@@ -1,5 +1,7 @@
 const { Op, Sequelize } = require('sequelize');
 const Customer = require('../models/customerModel');
+const audit = require('../utils/auditLogger');
+const { ENTITY } = require('../constants/entities');
 
 // Create a new customer
 exports.createCustomer = async (req, res) => {
@@ -13,6 +15,11 @@ exports.createCustomer = async (req, res) => {
         }
     const newCustomer = await Customer.create(req.body);
     const created = newCustomer.get({ plain: true });
+    try {
+    await audit.logCreate(ENTITY.CUSTOMER, created.customer_id, created, req.user_account_id);
+    } catch (e) {
+        console.error('Audit (create customer) failed:', e?.message || e);
+    }
     // Include an `id` alias for tests expecting `id`
     res.status(201).json({ ...created, id: created.customer_id });
     } catch (error) {
@@ -62,8 +69,14 @@ exports.updateCustomerById = async (req, res) => {
     try {
     const customer = await Customer.findByPk(req.params.id);
         if (!customer) { return res.status(404).json({ message: 'Customer not found' }); }
+    const beforeObj = customer.get({ plain: true });
     await customer.update(req.body);
     const plain = customer.get({ plain: true });
+    try {
+    await audit.logUpdate(ENTITY.CUSTOMER, plain.customer_id, beforeObj, plain, req.user_account_id);
+    } catch (e) {
+        console.error('Audit (update customer) failed:', e?.message || e);
+    }
     res.json({ ...plain, id: plain.customer_id });
     } catch (error) {
         res.status(500).json({ message: 'Error updating customer' });
@@ -75,7 +88,13 @@ exports.deleteCustomerById = async (req, res) => {
     try {
         const customer = await Customer.findByPk(req.params.id);
         if (!customer) { return res.status(404).json({ message: 'Customer not found' }); }
+        const beforeObj = customer.get({ plain: true });
         await customer.destroy();
+        try {
+            await audit.logDelete(ENTITY.CUSTOMER, beforeObj.customer_id, beforeObj, req.user_account_id);
+        } catch (e) {
+            console.error('Audit (delete customer) failed:', e?.message || e);
+        }
         res.json({ message: 'Customer deleted successfully.' });
     } catch (error) {
         res.status(500).json({ message: 'Error deleting customer' });

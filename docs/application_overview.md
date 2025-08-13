@@ -94,6 +94,49 @@ A **Listing Item** is the top-level entity representing an item being listed for
 2. **Item State Workflow**:
    - **New** → **Pending** → **Listed** → **Sold** → **Ready for Payout** → **Paid** → **Complete**.
 
+### **Branching Listing Status Workflow (Current)**
+A single `listing.status` field now follows a configurable branching state machine stored in `appconfig` under `listing_status_graph` (authoritative) or linear fallback `listing_status_workflow`.
+
+Core default graph (keys = status, values = allowed next statuses):
+
+```
+draft -> ready_to_list
+ready_to_list -> listed
+listed -> sold | listing_ended | listing_removed
+listing_ended -> relist | listing_removed
+relist -> ready_to_list
+sold -> shipped
+shipped -> in_warranty | ready_for_payment
+in_warranty -> ready_for_payment
+ready_for_payment -> complete
+listing_removed -> (terminal)
+complete -> (terminal)
+```
+
+Status meanings (selected):
+- draft: Created, data gathering.
+- ready_to_list: Fully specified and ready to publish.
+- listed: Live on marketplace (legacy alias: active -> normalizes to listed).
+- listing_ended: Manually or time-ended; can relist or remove.
+- listing_removed: Removed/withdrawn; terminal unless administratively reactivated by editing workflow.
+- relist: Transitional node to re-enter readiness (returns to ready_to_list).
+- sold: Buyer committed / sale recorded.
+- shipped: Item shipped; warranty/return timer may begin.
+- in_warranty: Within warranty/return/hold window.
+- ready_for_payment: Warranty complete; payout eligible.
+- complete: Payout processed and lifecycle closed.
+
+Transition validation: updates to `status` are only accepted if the target is in the allowed next array for the current status (after normalizing legacy 'active' to 'listed'). Same-to-same transitions are no-ops and allowed.
+
+Configuration precedence:
+1. `listing_status_graph` (JSON object) – authoritative branching model.
+2. `listing_status_workflow` (JSON array) – linear fallback converted to a chain.
+3. Built-in default graph (above) – if neither config key set.
+
+Admin updates: POST `/api/listings/status/workflow` with `{ graph: { state:[next,...] } }` to atomically replace the graph. GET `/api/listings/status/workflow` returns the active graph (materialized, including implicitly referenced nodes).
+
+Legacy data handling: a migration backfills any pre-existing `active` statuses to `listed`. Incoming API updates specifying `active` are normalized to `listed`.
+
 ---
 
 ## **Template Usage and History Tracking**

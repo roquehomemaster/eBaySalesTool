@@ -189,9 +189,18 @@ CREATE TABLE historylogs (
     entity_id INT,
     action VARCHAR,
     change_details TEXT,
+    changed_fields TEXT[] NULL,
+    before_data JSONB NULL,
+    after_data JSONB NULL,
     user_account_id INT REFERENCES application_account(user_account_id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Indexes to support efficient audit queries
+CREATE INDEX IF NOT EXISTS historylogs_entity_entity_id_created_at_idx
+    ON historylogs (entity, entity_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS historylogs_changed_fields_gin_idx
+    ON historylogs USING GIN (changed_fields);
 
 CREATE TABLE returnhistory (
     id INT PRIMARY KEY,
@@ -253,6 +262,29 @@ CREATE TABLE appconfig (
 INSERT INTO appconfig (config_key, config_value, data_type)
 VALUES ('testdata', 'true', 'string')
 ON CONFLICT (config_key) DO UPDATE SET config_value = 'true', data_type = 'string';
+
+-- Seed history display limit (used for change history pagination)
+INSERT INTO appconfig (config_key, config_value, data_type)
+VALUES ('history_display_limit','7','int')
+ON CONFLICT (config_key) DO NOTHING;
+
+-- Listing status workflow (ordered JSON array of allowed statuses)
+-- Linear fallback workflow (kept for backward compatibility) now uses 'listed' instead of legacy 'active'
+INSERT INTO appconfig (config_key, config_value, data_type)
+VALUES ('listing_status_workflow', '["draft","ready_to_list","listed","sold","shipped","in_warranty","ready_for_payment","complete"]', 'json')
+ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value, data_type='json';
+
+-- Branching status graph (authoritative when present). Keys=states, values=array of allowed next states.
+INSERT INTO appconfig (config_key, config_value, data_type)
+VALUES (
+    'listing_status_graph',
+    '{"draft":["ready_to_list"],"ready_to_list":["listed"],"listed":["sold","listing_ended","listing_removed"],"listing_ended":["relist","listing_removed"],"relist":["ready_to_list"],"sold":["shipped"],"shipped":["in_warranty","ready_for_payment"],"in_warranty":["ready_for_payment"],"ready_for_payment":["complete"],"listing_removed":[],"complete":[]}',
+    'json'
+)
+ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value, data_type='json';
+
+-- Optional backfill: map legacy 'active' -> 'listed' if old data exists (harmless if none)
+UPDATE listing SET status='listed' WHERE status='active';
 
 CREATE TABLE database_configuration (
     key TEXT PRIMARY KEY,
