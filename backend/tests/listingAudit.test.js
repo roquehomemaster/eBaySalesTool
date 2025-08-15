@@ -13,7 +13,7 @@ describe('Listing Audit Logging', () => {
   beforeAll(async () => {
     // Create a catalog item
     const uniqueSku = 'SKU-AUDIT-' + Date.now();
-    const cat = await Catalog.create({ description: 'Audit Item', manufacturer: 'AuditCo', model: 'A100', serial_number: 'AUD123', sku_barcode: uniqueSku });
+  const cat = await Catalog.create({ description: 'Audit Item', manufacturer: 'AuditCo', model: 'A100', serial_number: 'AUD123', sku: uniqueSku, barcode: uniqueSku + 'B' });
     itemId = cat.item_id;
   });
 

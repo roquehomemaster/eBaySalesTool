@@ -47,8 +47,8 @@ CREATE TABLE catalog (
   description varchar,
   manufacturer varchar,
   model varchar,
-  serial_number varchar,
-  sku_barcode varchar UNIQUE,
+  sku varchar UNIQUE,
+  barcode varchar UNIQUE,
   created_at timestamp,
   updated_at timestamp
 );
@@ -170,6 +170,8 @@ CREATE TABLE listing (
   item_condition_description text,
   payment_method varchar,
   shipping_method text,
+  serial_number varchar,
+  manufacture_date date,
   created_at timestamp,
   updated_at timestamp
 );
@@ -296,3 +298,5 @@ CREATE TABLE performancemetrics (
 -- Default application configuration values
 INSERT INTO appconfig (config_key, config_value, data_type) VALUES ('history_display_limit','7','int') ON CONFLICT (config_key) DO NOTHING;
 INSERT INTO appconfig (config_key, config_value, data_type) VALUES ('listing_status_workflow','["draft","ready_to_list","active","sold","shipped","in_warranty","ready_for_payment","complete"]','json') ON CONFLICT (config_key) DO NOTHING;
+-- Default listing status filter (UI default). Configurable; frontend reads key 'listing_default_status'
+INSERT INTO appconfig (config_key, config_value, data_type) VALUES ('listing_default_status','draft','text') ON CONFLICT (config_key) DO NOTHING;

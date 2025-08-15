@@ -1,0 +1,10 @@
+.admin-appconfig { padding: 1rem; }
+.admin-appconfig h2 { margin-top:0; }
+.admin-appconfig .toolbar { margin-bottom: .75rem; }
+.appconfig-table { width:100%; border-collapse: collapse; font-size: 0.9rem; }
+.appconfig-table th, .appconfig-table td { border:1px solid #ccc; padding:4px 6px; }
+.appconfig-table tr.dirty { background: #fffbe6; }
+.appconfig-table input { font-size:0.9rem; }
+.appconfig-table select { font-size:0.9rem; }
+.admin-appconfig .error { color:#b00; margin-bottom: .5rem; }
+.admin-appconfig button { margin-right:4px; }

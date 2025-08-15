@@ -88,6 +88,32 @@ const apiService = {
         } catch (error) {
             throw error.response ? error.response.data : error.message;
         }
+    },
+    getListingStatusWorkflow: async () => {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/listings/status/workflow`);
+            return response.data; // { graph, nodes, default_status }
+        } catch (error) {
+            throw error.response ? error.response.data : error.message;
+        }
+    },
+    // Fetch all app configuration entries
+    getAllAppConfig: async () => {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/appconfig`);
+            return response.data; // [{config_key, config_value, data_type}, ...]
+        } catch (error) {
+            throw error.response ? error.response.data : error.message;
+        }
+    },
+    // Update an appconfig value (config_key is PK, sent as :id in route)
+    updateAppConfig: async (config_key, payload) => {
+        try {
+            const response = await axios.put(`${API_BASE_URL}/appconfig/${encodeURIComponent(config_key)}`, payload);
+            return response.data;
+        } catch (error) {
+            throw error.response ? error.response.data : error.message;
+        }
     }
 };
 

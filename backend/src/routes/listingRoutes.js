@@ -215,7 +215,16 @@ router.get('/status/workflow', async (req, res) => {
     try {
         const controller = require('../utils/statusWorkflow');
         const data = await controller.getWorkflowDescriptor();
-        res.json(data);
+        // also include default status (configurable) for UI consumption
+        const { pool } = require('../utils/database');
+        let defaultStatus = 'draft';
+        try {
+            const r = await pool.query("SELECT config_value FROM appconfig WHERE config_key = 'listing_default_status'");
+            if (r.rowCount > 0 && r.rows[0].config_value && r.rows[0].config_value.trim() !== '') {
+                defaultStatus = r.rows[0].config_value.trim();
+            }
+        } catch (_) { /* ignore, fall back */ }
+        res.json({ ...data, default_status: defaultStatus });
     } catch (e) {
         res.status(500).json({ message: 'Error loading status workflow' });
     }
@@ -224,7 +233,7 @@ router.get('/status/workflow', async (req, res) => {
 // Update status workflow graph (admin). Expects JSON body { graph: { state: [next,...], ... } }
 router.post('/status/workflow', async (req, res) => {
     try {
-        const graph = req.body.graph;
+    const { graph } = req.body;
         if (!graph || typeof graph !== 'object' || Array.isArray(graph)) {
             return res.status(400).json({ message: 'Invalid graph: must be an object mapping status -> array of next statuses' });
         }
@@ -238,7 +247,7 @@ router.post('/status/workflow', async (req, res) => {
         // Insert implicit nodes referenced only as targets
         const referenced = new Set();
         for (const arr of Object.values(graph)) arr.forEach(n => referenced.add(n));
-        referenced.forEach(r => { if (!graph[r]) graph[r] = []; });
+    referenced.forEach(r => { if (!graph[r]) { graph[r] = []; } });
         const { pool } = require('../utils/database');
         await pool.query("INSERT INTO appconfig (config_key, config_value, data_type) VALUES ('listing_status_graph', $1, 'json') ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value, data_type='json'", [JSON.stringify(graph)]);
         const controller = require('../utils/statusWorkflow');

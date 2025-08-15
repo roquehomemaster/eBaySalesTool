@@ -159,6 +159,26 @@ async function seedDatabase() {
         }
 
         const seedSQL = fs.readFileSync(seedFilePath, 'utf-8');
+        // Debug: log presence of expected new seed markers (camera/vase, camera listing)
+        try {
+            const markers = {
+                hasCameraCatalog: /Vintage Camera/i.test(seedSQL),
+                hasVaseCatalog: /Antique Vase/i.test(seedSQL),
+                hasCameraListing: /Camera Listing/i.test(seedSQL),
+                hasVaseListing: /Vase Listing/i.test(seedSQL)
+            };
+            log(`Seed file debug markers: ${JSON.stringify(markers)}`);
+            log(`Seed file length: ${seedSQL.length}`);
+            // Additional debug: log any lines containing the word 'Listing' to verify contents
+            try {
+                const listingLines = seedSQL.split(/\r?\n/).filter(l => /Listing/i.test(l));
+                log(`Seed file lines with 'Listing': ${listingLines.length > 0 ? listingLines.join(' || ') : 'NONE'}`);
+            } catch (inner) {
+                log(`Failed to extract listing lines: ${inner.message}`);
+            }
+        } catch (e) {
+            log(`Seed debug logging failed: ${e.message}`);
+        }
         await pool.query(seedSQL);
 
         log('Database seeding completed successfully.');

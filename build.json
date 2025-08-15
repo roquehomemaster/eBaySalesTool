@@ -14,8 +14,7 @@
     "compose_file": "docker-compose.yml"
   },
   "logging": {
-    "enabled": true,
-    "log_file": "build_and_deploy.log"
+    "enabled": true
   },
   "paths": {
     "backend": "backend/",

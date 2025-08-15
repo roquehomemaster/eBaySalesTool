@@ -10,7 +10,7 @@ describe('Listing item_id immutability', () => {
   let listingId; let originalItemId;
   beforeAll(async () => {
     // Create a catalog item to reference (avoid assuming item_id=1 exists)
-    const catalogRes = await request(app).post('/api/catalog').send({ description: 'Immutable Cat', manufacturer: 'IMM', model: 'IMM1', serial_number: `SNIMM-${Date.now()}`, sku_barcode: `SKU-IMM-${Date.now()}` });
+  const catalogRes = await request(app).post('/api/catalog').send({ description: 'Immutable Cat', manufacturer: 'IMM', model: 'IMM1', serial_number: `SNIMM-${Date.now()}`, sku: `SKU-IMM-${Date.now()}`, barcode: `BC-IMM-${Date.now()}` });
     const itemId = catalogRes.body.item_id;
     const createRes = await request(app)
       .post('/api/listings')

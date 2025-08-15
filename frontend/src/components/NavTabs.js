@@ -8,6 +8,7 @@ const tabs = [
   { label: 'Catalog', path: '/catalog' },
   { label: 'Sales', path: '/sales' },
   { label: 'Reports', path: '/reports' },
+  { label: 'Admin', path: '/admin' },
 ];
 
 const NavTabs = () => (

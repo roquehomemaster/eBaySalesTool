@@ -20,7 +20,8 @@ describe('Catalog API', () => {
         manufacturer: 'TestCo',
         model: 'T1000',
         serial_number: 'SN123',
-        sku_barcode: `SKU${Date.now()}A`
+  sku: `SKU${Date.now()}A`,
+  barcode: `BC${Date.now()}A`
       });
     expect(res.statusCode).toBe(201);
     expect(res.body).toHaveProperty('item_id');
@@ -34,7 +35,8 @@ describe('Catalog API', () => {
         manufacturer: 'TestCo',
         model: 'T1000',
         serial_number: 'SN123',
-        sku_barcode: 'SKU12346'
+  sku: 'SKU12346',
+  barcode: 'BC12346'
       });
     expect(res.statusCode).toBe(400);
     expect(res.body.message).toMatch(/Missing required field/);
@@ -50,7 +52,8 @@ describe('Catalog API', () => {
         manufacturer: 'TestCo',
         model: 'T1000',
         serial_number: 'SN124',
-        sku_barcode: duplicateSku
+  sku: duplicateSku,
+  barcode: duplicateSku + 'B'
       });
     // Second create with same SKU
     const res = await request(app)
@@ -60,7 +63,8 @@ describe('Catalog API', () => {
         manufacturer: 'TestCo',
         model: 'T1000',
         serial_number: 'SN125',
-        sku_barcode: duplicateSku // true duplicate
+  sku: duplicateSku, // true duplicate sku
+  barcode: duplicateSku + 'B'
       });
     expect(res.statusCode).toBe(409);
     expect(res.body.message).toMatch(/Duplicate SKU/);
@@ -75,7 +79,8 @@ describe('Catalog API', () => {
         manufacturer: 'TestCo',
         model: 'T1001',
         serial_number: 'SN125',
-        sku_barcode: uniqueSku,
+  sku: uniqueSku,
+  barcode: uniqueSku + 'B',
         extra_field: 'should be ignored'
       });
     expect(res.statusCode).toBe(201);
@@ -119,7 +124,8 @@ describe('Catalog API', () => {
         manufacturer: 'TestCo',
         model: 'T1000',
         serial_number: 'SN126',
-        sku_barcode: duplicateSku
+  sku: duplicateSku,
+  barcode: duplicateSku + 'B'
       });
     const res2 = await request(app)
       .post('/api/catalog')
@@ -128,12 +134,13 @@ describe('Catalog API', () => {
         manufacturer: 'TestCo',
         model: 'T1000',
         serial_number: 'SN127',
-        sku_barcode: 'SKU-UNIQUE-UPDATE'
+  sku: 'SKU-UNIQUE-UPDATE',
+  barcode: 'BC-UNIQUE-UPDATE'
       });
     // Try to update second entry to duplicate SKU
     const updateRes = await request(app)
       .put(`/api/catalog/${res2.body.item_id}`)
-      .send({ sku_barcode: duplicateSku });
+  .send({ sku: duplicateSku });
     expect(updateRes.statusCode).toBe(409);
     expect(updateRes.body.message).toMatch(/Duplicate SKU/);
   });
@@ -159,7 +166,8 @@ describe('Catalog API', () => {
           manufacturer: 'PaginateCo',
           model: `P${i}`,
           serial_number: `SN-P${i}`,
-          sku_barcode: `SKU-PAGINATE-${i}`
+          sku: `SKU-PAGINATE-${i}`,
+          barcode: `BC-PAGINATE-${i}`
         });
     }
     // Request page 2 with limit 5

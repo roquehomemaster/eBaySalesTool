@@ -8,6 +8,9 @@ import Dashboard from './components/Dashboard';
 import SalesList from './components/SalesList';
 import Reports from './components/Reports';
 import ListingTable from './components/ListingTable';
+import AdminAppConfig from './components/AdminAppConfig';
+import AdminUrls from './components/AdminUrls';
+import AdminLayout from './components/AdminLayout';
 
 function App() {
   return (
@@ -20,6 +23,11 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/sales" element={<SalesList />} />
           <Route path="/reports" element={<Reports />} />
+          <Route path="/admin" element={<AdminLayout />}> 
+            <Route path="appconfig" element={<AdminAppConfig />} />
+            <Route path="urls" element={<AdminUrls />} />
+            <Route index element={<AdminAppConfig />} />
+          </Route>
           <Route path="/add-sale" element={<SalesForm />} />
           <Route path="/product-research" element={<ProductResearch />} />
         </Routes>

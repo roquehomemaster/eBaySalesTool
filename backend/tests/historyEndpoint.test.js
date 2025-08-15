@@ -12,7 +12,7 @@ describe('History Endpoint', () => {
     const uniqueSku = 'SKU-HIST-ENDPT-' + Date.now();
     const catRes = await request(app)
       .post('/api/catalog')
-      .send({ description: 'Hist Endpoint Item', manufacturer: 'HEI', model: 'HEND', serial_number: 'HSN' + Date.now(), sku_barcode: uniqueSku });
+  .send({ description: 'Hist Endpoint Item', manufacturer: 'HEI', model: 'HEND', serial_number: 'HSN' + Date.now(), sku: uniqueSku, barcode: uniqueSku + 'B' });
     expect(catRes.status).toBe(201);
     const itemId = catRes.body.item_id;
     const createRes = await request(app)

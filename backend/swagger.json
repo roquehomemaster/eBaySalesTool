@@ -616,9 +616,11 @@
                     "type": "string",
                     "description": "The category of the item"
                   },
-                  "sku_barcode": {
-                    "type": "string",
-                    "description": "The SKU or barcode of the item"
+                  "sku": {
+                    "type": "string"
+                  },
+                  "barcode": {
+                    "type": "string"
                   },
                   "images": {
                     "type": "array",

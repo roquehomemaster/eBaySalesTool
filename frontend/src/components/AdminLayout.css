@@ -1,0 +1,5 @@
+.admin-subtabs { display:flex; gap:8px; margin-bottom:1rem; }
+.admin-subtab { padding:6px 12px; border:1px solid #ccc; border-radius:4px; text-decoration:none; color:#222; font-size:14px; background:#f7f7f7; }
+.admin-subtab.active { background:#1976d2; color:#fff; border-color:#1976d2; }
+.admin-subtab:hover { background:#e4e4e4; }
+.admin-content { background:#fff; padding:1rem; border:1px solid #ddd; border-radius:4px; }

@@ -38,26 +38,7 @@ This document outlines the required Standard Operating Procedures (SOP) for deve
 ## 4. Table Reference and Auditing
 All tables below are required, must use all-lowercase, snake_case, and be unquoted everywhere:
 
-- `application_account`: User accounts, authentication, and roles.
-- `catalog`: Item master, product details, and SKU barcode.
-- `customer`: Customer records and contact info.
-- `ebayinfo`: eBay account/store details and sync status.
-- `appconfig`: Application-wide configuration (key-value).
-- `database_configuration`: Database config and environment overrides.
-- `ownership`: Item ownership, user/company, and contact info.
-- `ownershipagreements`: Ownership agreement terms and commission.
-- `customerdetails`: Customer address, phone, and notes.
-- `listing`: Item listings, price, status, and conditions.
-- `sales`: Sales records, price, channel, and feedback.
-- `saleshistory`: Sales change history and audit trail.
-- `shippinglog`: Shipping costs, label, and totals.
-- `product_research`: Market research and observed prices.
-- `historylogs`: General change/audit log for all entities.
-- `returnhistory`: Item returns, dates, and decisions.
-- `order_details`: Order, shipping, and warranty info.
-- `financialtracking`: Payouts, profit, and financials.
-- `communicationlogs`: Owner communication and approval.
-- `performancemetrics`: Item sales metrics and analytics.
+- `listing_default_status`: UI default filter & creation default when request omits status (e.g., 'draft'). Frontend dropdown reads this key.
 
 All columns must use snake_case and match the schema exactly. No legacy, quoted, or camelCase names are allowed.
 

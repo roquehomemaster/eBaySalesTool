@@ -69,11 +69,12 @@
           "manufacturer": {"type": "string"},
           "model": {"type": "string"},
           "serial_number": {"type": "string"},
-          "sku_barcode": {"type": "string"},
+          "sku": {"type": "string"},
+          "barcode": {"type": "string"},
           "created_at": {"type": "string", "format": "date-time"},
           "updated_at": {"type": "string", "format": "date-time"}
         },
-        "required": ["sku_barcode"]
+  "required": ["sku"]
       },
       "CatalogArray": {
         "type": "array",

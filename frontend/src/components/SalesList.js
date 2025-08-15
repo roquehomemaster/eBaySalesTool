@@ -46,6 +46,14 @@ const SalesList = () => {
       rowRenderer={rowRenderer}
       detailsRenderer={detailsRenderer}
       pageKey="sales"
+      filterConfig={{
+        Date: { type: 'text', placeholder: 'date' },
+        Item: { type: 'text', placeholder: 'item' },
+        Quantity: { type: 'text', placeholder: 'qty' },
+        Price: { type: 'text', placeholder: 'price' },
+        Total: { type: 'text', placeholder: 'total' },
+        Buyer: { type: 'text', placeholder: 'buyer' }
+      }}
     />
   );
 };

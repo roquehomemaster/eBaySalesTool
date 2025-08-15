@@ -90,19 +90,33 @@ VALUES
 
 -- Insert catalog items and capture item_ids
 WITH ins_item1 AS (
-  INSERT INTO catalog (description, manufacturer, model, serial_number, sku_barcode, created_at, updated_at)
-  VALUES ('Test Item 1', 'TestCo', 'ModelA', 'SN123', 'SKU123', NOW(), NOW())
+  INSERT INTO catalog (description, manufacturer, model, sku, barcode, created_at, updated_at)
+  VALUES ('Test Item 1', 'TestCo', 'ModelA', 'SKU123', '0123456789012', NOW(), NOW())
+  ON CONFLICT (sku) DO UPDATE SET updated_at = EXCLUDED.updated_at
   RETURNING item_id
 ), ins_item2 AS (
-  INSERT INTO catalog (description, manufacturer, model, serial_number, sku_barcode, created_at, updated_at)
-  VALUES ('Test Item 2', 'TestCo', 'ModelB', 'SN124', 'SKU124', NOW(), NOW())
+  INSERT INTO catalog (description, manufacturer, model, sku, barcode, created_at, updated_at)
+  VALUES ('Test Item 2', 'TestCo', 'ModelB', 'SKU124', '0123456789013', NOW(), NOW())
+  ON CONFLICT (sku) DO UPDATE SET updated_at = EXCLUDED.updated_at
+  RETURNING item_id
+), cam AS (
+  INSERT INTO catalog (description, manufacturer, model, sku, barcode, created_at, updated_at)
+  VALUES ('Vintage Camera', 'Canon', 'AE-1', 'CAM-AE1', 'CAM12345', NOW(), NOW())
+  ON CONFLICT (sku) DO UPDATE SET updated_at = EXCLUDED.updated_at
+  RETURNING item_id
+), vase AS (
+  INSERT INTO catalog (description, manufacturer, model, sku, barcode, created_at, updated_at)
+  VALUES ('Antique Vase', 'Unknown', 'N/A', 'VAS-ANTQ', 'VAS67890', NOW(), NOW())
+  ON CONFLICT (sku) DO UPDATE SET updated_at = EXCLUDED.updated_at
   RETURNING item_id
 )
 -- Insert listings referencing catalog items
-INSERT INTO listing (title, listing_price, item_id, status, watchers, item_condition_description, payment_method, shipping_method, created_at, updated_at)
+INSERT INTO listing (title, listing_price, item_id, status, watchers, item_condition_description, payment_method, shipping_method, serial_number, manufacture_date, created_at, updated_at)
 VALUES
-  ('Sample Listing 1', 150.00, (SELECT item_id FROM ins_item1), 'active', 0, 'New', 'PayPal', 'Standard', NOW(), NOW()),
-  ('Sample Listing 2', 75.00, (SELECT item_id FROM ins_item2), 'active', 0, 'Used', 'Credit Card', 'Express', NOW(), NOW());
+  ('Sample Listing 1', 150.00, (SELECT item_id FROM ins_item1), 'active', 0, 'New', 'PayPal', 'Standard', 'SN123', CURRENT_DATE, NOW(), NOW()),
+  ('Sample Listing 2', 75.00, (SELECT item_id FROM ins_item2), 'active', 0, 'Used', 'Credit Card', 'Express', 'SN124', CURRENT_DATE, NOW(), NOW()),
+  ('Camera Listing', 200.00, (SELECT item_id FROM cam), 'active', 0, 'Used - Excellent', 'PayPal', 'Standard', '12345', '2024-01-15', NOW(), NOW()),
+  ('Vase Listing', 90.00, (SELECT item_id FROM vase), 'active', 0, 'Antique - Good', 'Credit Card', 'Express', '67890', '2023-12-10', NOW(), NOW());
 
 -- Insert sales referencing listings and ownerships
 WITH l1 AS (SELECT listing_id FROM listing ORDER BY listing_id ASC LIMIT 1),

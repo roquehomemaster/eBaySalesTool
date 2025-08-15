@@ -23,7 +23,7 @@ describe('Listing Ownership History', () => {
     ownerAId = ownerA.ownership_id;
     ownerBId = ownerB.ownership_id;
     const uniqueSku = 'SKU-HIST-' + Date.now();
-    const cat = await Catalog.create({ description: 'History Item', manufacturer: 'HistCo', model: 'H100', serial_number: 'HIST123', sku_barcode: uniqueSku });
+  const cat = await Catalog.create({ description: 'History Item', manufacturer: 'HistCo', model: 'H100', serial_number: 'HIST123', sku: uniqueSku, barcode: uniqueSku + 'B' });
     catalogItemId = cat.item_id;
   });
 

@@ -1,13 +1,13 @@
-PASS tests/listingDetailsChangeHistory.test.js
+PASS tests/listingStatusWorkflow.test.js
 PASS src/tests/authApi.test.js
   ● Console
 
     console.log
       DEBUG: Created role for user test: {
-        created_at: 2025-08-13T00:47:50.811Z,
-        updated_at: 2025-08-13T00:47:50.811Z,
+        created_at: 2025-08-15T16:53:09.017Z,
+        updated_at: 2025-08-15T16:53:09.017Z,
         role_id: 4,
-        name: 'user_role_475412',
+        name: 'user_role_450873',
         description: null
       } role_id: 4
 
@@ -28,9 +28,9 @@ PASS tests/itemApi.test.js
         name: 'SequelizeUniqueConstraintError',
         errors: [
           ValidationErrorItem {
-            message: 'sku_barcode must be unique',
+            message: 'sku must be unique',
             type: 'unique violation',
-            path: 'sku_barcode',
+            path: 'sku',
             value: 'SKU-DUPLICATE-TEST',
             origin: 'DB',
             instance: [catalog],
@@ -39,7 +39,7 @@ PASS tests/itemApi.test.js
             validatorArgs: []
           }
         ],
-        parent: error: duplicate key value violates unique constraint "catalog_sku_barcode_key"
+        parent: error: duplicate key value violates unique constraint "catalog_sku_key"
             at Parser.parseErrorMessage (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\parser.ts:369:69)
             at Parser.handlePacket (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\parser.ts:187:21)
             at Parser.parse (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\parser.ts:102:30)
@@ -49,10 +49,10 @@ PASS tests/itemApi.test.js
             at readableAddChunk (node:internal/streams/readable:341:9)
             at Socket.Readable.push (node:internal/streams/readable:278:10)
             at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
-          length: 234,
+          length: 210,
           severity: 'ERROR',
           code: '23505',
-          detail: 'Key (sku_barcode)=(SKU-DUPLICATE-TEST) already exists.',
+          detail: 'Key (sku)=(SKU-DUPLICATE-TEST) already exists.',
           hint: undefined,
           position: undefined,
           internalPosition: undefined,
@@ -62,22 +62,22 @@ PASS tests/itemApi.test.js
           table: 'catalog',
           column: undefined,
           dataType: undefined,
-          constraint: 'catalog_sku_barcode_key',
+          constraint: 'catalog_sku_key',
           file: 'nbtinsert.c',
           line: '664',
           routine: '_bt_check_unique',
-          sql: 'INSERT INTO "catalog" ("item_id","description","manufacturer","model","serial_number","sku_barcode","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6,$7) RETURNING "item_id","description","manufacturer","model","serial_number","sku_barcode","created_at","updated_at";',
+          sql: 'INSERT INTO "catalog" ("item_id","description","manufacturer","model","sku","barcode","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6,$7) RETURNING "item_id","description","manufacturer","model","sku","barcode","created_at","updated_at";',
           parameters: [
             'Test Catalog 3',
             'TestCo',
             'T1000',
-            'SN125',
             'SKU-DUPLICATE-TEST',
-            '2025-08-12 20:47:51.357 +00:00',
-            '2025-08-12 20:47:51.357 +00:00'
+            'SKU-DUPLICATE-TESTB',
+            '2025-08-15 12:53:09.548 +00:00',
+            '2025-08-15 12:53:09.548 +00:00'
           ]
         },
-        original: error: duplicate key value violates unique constraint "catalog_sku_barcode_key"
+        original: error: duplicate key value violates unique constraint "catalog_sku_key"
             at Parser.parseErrorMessage (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\parser.ts:369:69)
             at Parser.handlePacket (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\parser.ts:187:21)
             at Parser.parse (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\parser.ts:102:30)
@@ -87,10 +87,10 @@ PASS tests/itemApi.test.js
             at readableAddChunk (node:internal/streams/readable:341:9)
             at Socket.Readable.push (node:internal/streams/readable:278:10)
             at TCP.onStreamRead (node:internal/stream_base_commons:190:23) {
-          length: 234,
+          length: 210,
           severity: 'ERROR',
           code: '23505',
-          detail: 'Key (sku_barcode)=(SKU-DUPLICATE-TEST) already exists.',
+          detail: 'Key (sku)=(SKU-DUPLICATE-TEST) already exists.',
           hint: undefined,
           position: undefined,
           internalPosition: undefined,
@@ -100,23 +100,23 @@ PASS tests/itemApi.test.js
           table: 'catalog',
           column: undefined,
           dataType: undefined,
-          constraint: 'catalog_sku_barcode_key',
+          constraint: 'catalog_sku_key',
           file: 'nbtinsert.c',
           line: '664',
           routine: '_bt_check_unique',
-          sql: 'INSERT INTO "catalog" ("item_id","description","manufacturer","model","serial_number","sku_barcode","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6,$7) RETURNING "item_id","description","manufacturer","model","serial_number","sku_barcode","created_at","updated_at";',
+          sql: 'INSERT INTO "catalog" ("item_id","description","manufacturer","model","sku","barcode","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6,$7) RETURNING "item_id","description","manufacturer","model","sku","barcode","created_at","updated_at";',
           parameters: [
             'Test Catalog 3',
             'TestCo',
             'T1000',
-            'SN125',
             'SKU-DUPLICATE-TEST',
-            '2025-08-12 20:47:51.357 +00:00',
-            '2025-08-12 20:47:51.357 +00:00'
+            'SKU-DUPLICATE-TESTB',
+            '2025-08-15 12:53:09.548 +00:00',
+            '2025-08-15 12:53:09.548 +00:00'
           ]
         },
-        fields: { sku_barcode: 'SKU-DUPLICATE-TEST' },
-        sql: 'INSERT INTO "catalog" ("item_id","description","manufacturer","model","serial_number","sku_barcode","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6,$7) RETURNING "item_id","description","manufacturer","model","serial_number","sku_barcode","created_at","updated_at";'
+        fields: { sku: 'SKU-DUPLICATE-TEST' },
+        sql: 'INSERT INTO "catalog" ("item_id","description","manufacturer","model","sku","barcode","created_at","updated_at") VALUES (DEFAULT,$1,$2,$3,$4,$5,$6,$7) RETURNING "item_id","description","manufacturer","model","sku","barcode","created_at","updated_at";'
       }
 
     [0m [90m 25 |[39m     } [36mcatch[39m (error) {
@@ -124,63 +124,29 @@ PASS tests/itemApi.test.js
     [31m[1m>[22m[39m[90m 27 |[39m         console[33m.[39merror([32m'Error in createCatalog:'[39m[33m,[39m error)[33m;[39m
      [90m    |[39m                 [31m[1m^[22m[39m
      [90m 28 |[39m         [36mif[39m (error[33m.[39mname [33m===[39m [32m'SequelizeUniqueConstraintError'[39m) {
-     [90m 29 |[39m             [36mreturn[39m res[33m.[39mstatus([35m409[39m)[33m.[39mjson({ message[33m:[39m [32m'Duplicate SKU/Barcode'[39m })[33m;[39m
+     [90m 29 |[39m             [36mreturn[39m res[33m.[39mstatus([35m409[39m)[33m.[39mjson({ message[33m:[39m [32m'Duplicate SKU or Barcode'[39m })[33m;[39m
      [90m 30 |[39m         }[0m
 
       at error (src/controllers/itemController.js:27:17)
 
-PASS tests/listingOwnershipHistory.test.js
+PASS tests/listingDetailsChangeHistory.test.js
+PASS tests/listingApi.test.js
+PASS tests/customerApi.test.js
 PASS tests/historyEndpoint.test.js
 PASS tests/ownershipApi.test.js
-PASS tests/customerApi.test.js
-PASS tests/listingApi.test.js
+PASS tests/listingOwnershipHistory.test.js
+PASS tests/listingDefaultStatusConfig.test.js
 PASS tests/listingAudit.test.js
-FAIL tests/listingItemIdImmutable.test.js
-  ● Listing item_id immutability › attempting to change item_id is ignored and not audited
-
-    expected 200 "OK", got 500 "Internal Server Error"
-
-    [0m [90m 21 |[39m       [33m.[39mput([32m`/api/listings/${listingId}`[39m)
-     [90m 22 |[39m       [33m.[39msend({ item_id[33m:[39m [35m9999[39m[33m,[39m listing_price[33m:[39m [32m'10.5'[39m }) [90m// listing_price as string to test normalization[39m
-    [31m[1m>[22m[39m[90m 23 |[39m       [33m.[39mexpect([35m200[39m)[33m;[39m
-     [90m    |[39m        [31m[1m^[22m[39m
-     [90m 24 |[39m     [36mconst[39m getRes [33m=[39m [36mawait[39m request(app)[33m.[39m[36mget[39m([32m`/api/listings/${listingId}`[39m)[33m;[39m
-     [90m 25 |[39m     expect(getRes[33m.[39mbody[33m.[39mitem_id)[33m.[39mtoBe(originalItemId)[33m;[39m [90m// unchanged[39m
-     [90m 26 |[39m     [90m// Ensure no audit update row recorded for item_id change[39m[0m
-
-      at Object.expect (tests/listingItemIdImmutable.test.js:23:8)
-      ----
-      at Test._assertStatus (node_modules/supertest/lib/test.js:267:14)
-      at node_modules/supertest/lib/test.js:323:13
-      at Test._assertFunction (node_modules/supertest/lib/test.js:300:13)
-      at Test.assert (node_modules/supertest/lib/test.js:179:23)
-      at Server.localAssert (node_modules/supertest/lib/test.js:135:14)
-
+PASS tests/listingItemIdImmutable.test.js
 PASS tests/ebayInfoApi.test.js
+PASS tests/listingStatusDefault.test.js
 PASS src/tests/customerApi.test.js
-PASS tests/auditLoggerNumericNormalization.test.js
+PASS tests/listingStatusWorkflowAdmin.test.js
 PASS tests/entityConstants.test.js
+PASS tests/auditLoggerNumericNormalization.test.js
 
-Test Suites: 1 failed, 13 passed, 14 total
-Tests:       1 failed, 63 passed, 64 total
+Test Suites: 18 passed, 18 total
+Tests:       72 passed, 72 total
 Snapshots:   0 total
-Time:        7.292 s
+Time:        10.87 s
 Ran all test suites matching /tests/i.
-
-Jest has detected the following 1 open handle potentially keeping Jest from exiting:
-
-  ●  TCPWRAP
-
-    [0m [90m 19 |[39m     jest[33m.[39msetTimeout([35m60000[39m)[33m;[39m
-     [90m 20 |[39m     [90m// Use API endpoint to seed and reset the database inside the container[39m
-    [31m[1m>[22m[39m[90m 21 |[39m     [36mconst[39m res [33m=[39m [36mawait[39m request(app)[33m.[39mpost([32m'/api/populate-database'[39m)[33m;[39m
-     [90m    |[39m                                    [31m[1m^[22m[39m
-     [90m 22 |[39m     [36mif[39m (res[33m.[39mstatusCode [33m!==[39m [35m200[39m) {
-     [90m 23 |[39m       [36mthrow[39m [36mnew[39m [33mError[39m([32m`Database seeding failed: ${res.statusCode} ${JSON.stringify(res.body)}`[39m)[33m;[39m
-     [90m 24 |[39m     }[0m
-
-      at Test.serverAddress (node_modules/supertest/lib/test.js:63:35)
-      at new Test (node_modules/supertest/lib/test.js:49:14)
-      at Object.obj.<computed> [as post] (node_modules/supertest/index.js:39:18)
-      at Object.post (src/tests/authApi.test.js:21:36)
-

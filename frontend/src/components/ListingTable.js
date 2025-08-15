@@ -3,8 +3,40 @@ import ListWithDetails from './ListWithDetails';
 import apiService from '../services/apiService';
 
 const ListingTable = () => {
+  const ALL_VALUE = '__ALL__';
+  const [statusOptions, setStatusOptions] = React.useState([]);
+  const [workflowLoaded, setWorkflowLoaded] = React.useState(false);
+
+  // Load workflow & default status once
+  React.useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const wf = await apiService.getListingStatusWorkflow();
+  if (!active) { return; }
+  const options = Array.isArray(wf?.nodes) ? wf.nodes.map(n => n.status) : Object.keys(wf?.graph || {});
+        const unique = [...new Set(options)].sort();
+        setStatusOptions(unique);
+        const def = (wf && wf.default_status) ? wf.default_status : 'draft';
+  // status default captured via filter row by defaultValue in filterConfig when we wire it
+      } catch (_) {
+        setStatusOptions(['draft']);
+      } finally {
+  if (active) { setWorkflowLoaded(true); }
+      }
+    })();
+    return () => { active = false; };
+  }, []);
+
   const fetchList = async () => {
-    const response = await apiService.getListings();
+    const params = {};
+  // Status filtering handled by backend only if provided by query param; we read it from localStorage persisted state when available.
+  try {
+    const persisted = JSON.parse(window.localStorage.getItem('tableState:listings')||'{}');
+    const statusVal = persisted?.filters?.Status;
+    if (statusVal && statusVal !== ALL_VALUE) { params.status = statusVal; }
+  } catch(_) {}
+    const response = await apiService.getListings(params);
     if (Array.isArray(response)) {
       return response;
     }
@@ -17,15 +49,15 @@ const ListingTable = () => {
     return [];
   };
 
-  const columns = ['Title', 'Listing Price', 'Status', 'Item ID', 'Created At', 'Updated At'];
+  const STATUS_COL = 'Status';
+  const columns = ['Title', 'Listing Price', STATUS_COL, 'Item ID', 'Created'];
   const rowRenderer = (listing) => (
     <>
       <td>{listing.title}</td>
       <td>{listing.listing_price}</td>
       <td>{listing.status}</td>
       <td>{listing.item_id}</td>
-      <td>{listing.created_at ? new Date(listing.created_at).toLocaleString() : ''}</td>
-      <td>{listing.updated_at ? new Date(listing.updated_at).toLocaleString() : ''}</td>
+  <td>{listing.created_at ? new Date(listing.created_at).toLocaleString() : ''}</td>
     </>
   );
 
@@ -37,7 +69,7 @@ const ListingTable = () => {
       const [error, setError] = React.useState(null);
   const [createMode, setCreateMode] = React.useState(false);
   const [editMode, setEditMode] = React.useState(false);
-  const [form, setForm] = React.useState({ title: '', listing_price: '', item_id: '', ownership_id: '' });
+  const [form, setForm] = React.useState({ title: '', listing_price: '', item_id: '', ownership_id: '', serial_number: '', manufacture_date: '' });
       const [saving, setSaving] = React.useState(false);
       const [catalog, setCatalog] = React.useState([]);
   const [ownerships, setOwnerships] = React.useState([]);
@@ -147,19 +179,23 @@ const ListingTable = () => {
       const startCreate = () => {
         setCreateMode(true);
         setError(null);
-  setForm({ title: '', listing_price: '', item_id: '', ownership_id: '' });
+  setForm({ title: '', listing_price: '', item_id: '', ownership_id: '', serial_number: '', manufacture_date: '' });
       };
       const startEdit = () => {
-        if (!data?.listing) { return; }
+        if (!data?.listing && !listing) { return; }
         setEditMode(true);
         setError(null);
-  // Pull ownership from listing direct column
-  const initialOwnership = data.listing.ownership_id ? String(data.listing.ownership_id) : '';
+        const listingDetail = data?.listing || {};
+        // Fallbacks: use row listing fields if detail not yet populated
+        const fallbackItemId = listingDetail.item_id != null ? listingDetail.item_id : listing?.item_id;
+        const fallbackOwnershipId = listingDetail.ownership_id != null ? listingDetail.ownership_id : listing?.ownership_id;
         setForm({
-          title: data.listing.title || '',
-          listing_price: data.listing.listing_price != null ? String(data.listing.listing_price) : '',
-          item_id: data.listing.item_id != null ? String(data.listing.item_id) : '',
-          ownership_id: initialOwnership
+          title: listingDetail.title || listing?.title || '',
+          listing_price: listingDetail.listing_price != null ? String(listingDetail.listing_price) : (listing?.listing_price != null ? String(listing.listing_price) : ''),
+          item_id: fallbackItemId != null ? String(fallbackItemId) : '',
+          ownership_id: fallbackOwnershipId != null ? String(fallbackOwnershipId) : '',
+          serial_number: listingDetail.serial_number || '',
+          manufacture_date: listingDetail.manufacture_date || ''
         });
       };
       const cancelCreate = () => {
@@ -186,8 +222,13 @@ const ListingTable = () => {
             listing_price: Number(form.listing_price),
             item_id: Number(form.item_id),
             ownership_id: Number(form.ownership_id),
-            status: 'draft'
+            serial_number: form.serial_number || undefined,
+            manufacture_date: form.manufacture_date || undefined
           };
+          // Only set initial status when creating (avoid clobbering existing status on edit)
+          if (createMode) {
+            payload.status = 'draft';
+          }
           if (createMode) {
             const created = await apiService.createListing(payload);
             await helpers?.refreshList?.((it) => (it.listing_id && created?.listing_id) ? it.listing_id === created.listing_id : (it.title === payload.title && it.item_id === payload.item_id));
@@ -248,6 +289,8 @@ const ListingTable = () => {
                 <h4 style={{ margin: '6px 0' }}>eBay Listing</h4>
                 <div className="form-row"><label>* Title</label><input name="title" value={form.title} onChange={onChange} /></div>
                 <div className="form-row"><label>* Listing Price</label><input name="listing_price" type="number" step="0.01" value={form.listing_price} onChange={onChange} /></div>
+                <div className="form-row"><label>Serial Number</label><input name="serial_number" value={form.serial_number} onChange={onChange} placeholder="e.g. SN123" /></div>
+                <div className="form-row"><label>Manufacture Date</label><input name="manufacture_date" type="date" value={form.manufacture_date} onChange={onChange} /></div>
                 <div className="form-row"><label>Payment Method</label><input name="payment_method" disabled placeholder="Optional (later)" /></div>
                 <div className="form-row"><label>Shipping Method</label><input name="shipping_method" disabled placeholder="Optional (later)" /></div>
               </div>
@@ -258,7 +301,7 @@ const ListingTable = () => {
                   <select name="item_id" value={form.item_id} onChange={onChange}>
                     <option value="">Select item…</option>
                     {catalog.map((c) => (
-                      <option key={c.item_id} value={c.item_id}>{c.description} ({c.manufacturer} {c.model})</option>
+                      <option key={c.item_id} value={String(c.item_id)}>{c.description} ({c.manufacturer} {c.model})</option>
                     ))}
                   </select>
                 </div>
@@ -271,7 +314,7 @@ const ListingTable = () => {
                    <select name="ownership_id" value={form.ownership_id} onChange={onChange}>
                     <option value="">Select owner…</option>
                     {ownerships.map((o) => (
-                      <option key={o.ownership_id} value={o.ownership_id}>{`${o.first_name || ''} ${o.last_name || ''}`.trim() || o.email || `Owner ${o.ownership_id}`}</option>
+                      <option key={o.ownership_id} value={String(o.ownership_id)}>{`${o.first_name || ''} ${o.last_name || ''}`.trim() || o.email || `Owner ${o.ownership_id}`}</option>
                     ))}
                   </select>
                 </div>
@@ -313,13 +356,13 @@ const ListingTable = () => {
             <div className="group">
               <Section
                 title="eBay Listing"
-                rows={entriesFromObj(data.listing, ['title','status','listing_price','payment_method','shipping_method','watchers','item_condition_description'])}
+                rows={entriesFromObj(data.listing, ['title','status','listing_price','serial_number','manufacture_date','payment_method','shipping_method','watchers','item_condition_description'])}
               />
             </div>
             <div className="group">
               <Section
                 title="Product Details"
-                rows={entriesFromObj(data.catalog, ['manufacturer','model','description','serial_number','sku_barcode'])}
+                rows={entriesFromObj(data.catalog, ['manufacturer','model','description','sku','barcode'])}
               />
             </div>
 
@@ -469,14 +512,49 @@ const ListingTable = () => {
     return <Details/>;
   };
 
+  // Provide status options to generic filter row once loaded
+  const filterConfig = React.useMemo(() => ({
+    Title: { type: 'text', placeholder: 'title contains' },
+    'Listing Price': { type: 'text', placeholder: 'price' },
+    Status: workflowLoaded ? {
+      type: 'select',
+      options: statusOptions.map(s => ({ value: s, label: s })),
+      allowAll: true,
+      allowAllValue: ALL_VALUE,
+      allowAllLabel: 'ALL'
+    } : undefined,
+  'Item ID': { type: 'text', placeholder: 'item id' },
+  'Created': { type: 'text', placeholder: 'date' }
+  }), [workflowLoaded, statusOptions]);
+
+  // Determine initial default filters (only applied if no persisted state yet)
+  const initialFiltersRef = React.useRef(null);
+  if (initialFiltersRef.current === null) {
+    try {
+      const existing = JSON.parse(window.localStorage.getItem('tableState:listings')||'{}');
+      if (existing && existing.filters && Object.keys(existing.filters).length > 0) {
+        initialFiltersRef.current = existing.filters; // respect existing
+      } else {
+        // set default status if workflow provided one
+        // We'll read default from statusOptions presence (workflowLoaded) but we captured it earlier as 'def' variable; replicate logic
+        // Simpler: attempt to parse workflow default from a cached key if stored by backend (not stored), fallback 'draft'
+        initialFiltersRef.current = { Status: 'draft' };
+      }
+    } catch(_) {
+      initialFiltersRef.current = { Status: 'draft' };
+    }
+  }
+
   return (
     <ListWithDetails
       title="eBay Listings"
       fetchList={fetchList}
       columns={columns}
       rowRenderer={rowRenderer}
-  detailsRenderer={detailsRenderer}
+      detailsRenderer={detailsRenderer}
       pageKey="listings"
+      filterConfig={filterConfig}
+      initialFilters={initialFiltersRef.current || {}}
     />
   );
 };

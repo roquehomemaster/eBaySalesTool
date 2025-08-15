@@ -72,7 +72,8 @@ CREATE TABLE catalog (
     manufacturer VARCHAR,
     model VARCHAR,
     serial_number VARCHAR,
-    sku_barcode VARCHAR UNIQUE,
+    sku VARCHAR UNIQUE,
+    barcode VARCHAR UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -263,18 +264,15 @@ INSERT INTO appconfig (config_key, config_value, data_type)
 VALUES ('testdata', 'true', 'string')
 ON CONFLICT (config_key) DO UPDATE SET config_value = 'true', data_type = 'string';
 
--- Seed history display limit (used for change history pagination)
 INSERT INTO appconfig (config_key, config_value, data_type)
 VALUES ('history_display_limit','7','int')
 ON CONFLICT (config_key) DO NOTHING;
 
--- Listing status workflow (ordered JSON array of allowed statuses)
--- Linear fallback workflow (kept for backward compatibility) now uses 'listed' instead of legacy 'active'
 INSERT INTO appconfig (config_key, config_value, data_type)
 VALUES ('listing_status_workflow', '["draft","ready_to_list","listed","sold","shipped","in_warranty","ready_for_payment","complete"]', 'json')
 ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value, data_type='json';
+INSERT INTO appconfig (config_key, config_value, data_type) VALUES ('listing_default_status','draft','text') ON CONFLICT (config_key) DO NOTHING;
 
--- Branching status graph (authoritative when present). Keys=states, values=array of allowed next states.
 INSERT INTO appconfig (config_key, config_value, data_type)
 VALUES (
     'listing_status_graph',

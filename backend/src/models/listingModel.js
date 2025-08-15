@@ -37,6 +37,8 @@ const Listing = sequelize.define('listing', {
     allowNull: true,
     field: 'shipping_method'
   },
+  serial_number: { type: DataTypes.STRING },
+  manufacture_date: { type: DataTypes.DATEONLY },
   created_at: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,

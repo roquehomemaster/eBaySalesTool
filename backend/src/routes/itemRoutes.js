@@ -60,7 +60,8 @@ const router = express.Router();
  *               category:
  *                 type: string
  *                 description: The category of the item
- *               sku_barcode:
+ *               sku:
+ *               barcode:
  *                 type: string
  *                 description: The SKU or barcode of the item
  *               images:

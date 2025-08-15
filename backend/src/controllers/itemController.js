@@ -8,7 +8,7 @@ const { ENTITY } = require('../constants/entities');
 exports.createCatalog = async (req, res) => {
     try {
         // Basic validation for required fields
-        const requiredFields = ['description', 'manufacturer', 'model', 'serial_number', 'sku_barcode'];
+    const requiredFields = ['description', 'manufacturer', 'model', 'sku'];
         for (const field of requiredFields) {
             if (!req.body[field]) {
                 return res.status(400).json({ message: `Missing required field: ${field}` });
@@ -26,7 +26,7 @@ exports.createCatalog = async (req, res) => {
         // Hide raw error details from client and log server-side
         console.error('Error in createCatalog:', error);
         if (error.name === 'SequelizeUniqueConstraintError') {
-            return res.status(409).json({ message: 'Duplicate SKU/Barcode' });
+            return res.status(409).json({ message: 'Duplicate SKU or Barcode' });
         }
         res.status(500).json({ message: 'Error creating catalog entry', error: error.message, details: error.errors || undefined });
     }
@@ -139,7 +139,7 @@ exports.searchCatalog = async (req, res) => {
         const { name, sku, minPrice, maxPrice, category } = req.query;
         const where = {};
         if (name) { where.description = { [Op.iLike]: `%${name}%` }; }
-        if (sku) { where.sku_barcode = sku; }
+    if (sku) { where.sku = sku; }
         if (category) { where.category = category; }
         if (minPrice || maxPrice) { where.price = {}; }
         if (minPrice) { where.price = { ...where.price, [Op.gte]: parseFloat(minPrice) }; }

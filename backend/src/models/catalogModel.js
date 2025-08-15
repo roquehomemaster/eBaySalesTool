@@ -9,8 +9,8 @@ const Catalog = sequelize.define('catalog', {
   description: { type: DataTypes.STRING },
   manufacturer: { type: DataTypes.STRING },
   model: { type: DataTypes.STRING },
-  serial_number: { type: DataTypes.STRING },
-  sku_barcode: { type: DataTypes.STRING, unique: true },
+  sku: { type: DataTypes.STRING, unique: true },
+  barcode: { type: DataTypes.STRING, unique: true },
   created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
   updated_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
 }, {

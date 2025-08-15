@@ -48,17 +48,24 @@ exports.createListing = async (req, res) => {
             }
         }
 
-        // Prepare listing data only after validation
-        // Ensure status is initialized at creation (default 'draft' if not provided or blank)
+        // Determine default status (configurable via appconfig: listing_default_status)
         let initialStatus = req.body.status;
         if (initialStatus === undefined || initialStatus === null || (typeof initialStatus === 'string' && initialStatus.trim() === '')) {
             initialStatus = 'draft';
+            try {
+                const defRes = await pool.query("SELECT config_value FROM appconfig WHERE config_key = 'listing_default_status'");
+                if (defRes.rowCount > 0 && defRes.rows[0].config_value && defRes.rows[0].config_value.trim() !== '') {
+                    initialStatus = defRes.rows[0].config_value.trim();
+                }
+            } catch (_) { /* ignore errors, fallback to draft */ }
         }
         const listingData = {
             title: req.body.title,
             listing_price: req.body.listing_price,
             item_id: item_id,
-            status: initialStatus
+            status: initialStatus,
+            serial_number: req.body.serial_number || null,
+            manufacture_date: req.body.manufacture_date || null
         };
     const newListing = await Listing.create(listingData);
 
@@ -86,6 +93,8 @@ exports.createListing = async (req, res) => {
             listing_price: response.listing_price,
             item_id: response.item_id,
             status: response.status,
+            serial_number: response.serial_number,
+            manufacture_date: response.manufacture_date,
             created_at: response.created_at,
             updated_at: response.updated_at
         });
@@ -162,7 +171,7 @@ exports.updateListingById = async (req, res) => {
             }
         }
     // Whitelist allowed mutable fields to avoid unintended changes (e.g., immutable item_id)
-    const ALLOWED_UPDATE_FIELDS = ['title', 'listing_price', 'status', 'ownership_id'];
+    const ALLOWED_UPDATE_FIELDS = ['title', 'listing_price', 'status', 'ownership_id', 'serial_number', 'manufacture_date'];
     const updateData = {};
     for (const key of ALLOWED_UPDATE_FIELDS) {
         if (Object.prototype.hasOwnProperty.call(req.body, key)) {
@@ -170,12 +179,10 @@ exports.updateListingById = async (req, res) => {
         }
     }
     // Coerce numeric-like strings for DECIMAL fields
-    if (updateData.listing_price !== undefined && updateData.listing_price !== null) {
-        if (typeof updateData.listing_price === 'string' && /^[-+]?\d+(?:\.\d+)?$/.test(updateData.listing_price.trim())) {
-            const num = Number(updateData.listing_price);
-            if (!Number.isNaN(num)) {
-                updateData.listing_price = num; // ensure numeric for Sequelize/PG
-            }
+    if (updateData.listing_price !== undefined && updateData.listing_price !== null && typeof updateData.listing_price === 'string' && /^[-+]?\d+(?:\.\d+)?$/.test(updateData.listing_price.trim())) {
+        const num = Number(updateData.listing_price);
+        if (!Number.isNaN(num)) {
+            updateData.listing_price = num; // ensure numeric for Sequelize/PG
         }
     }
     // Validate status transition if status present

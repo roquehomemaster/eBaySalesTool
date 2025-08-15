@@ -1,10 +1,12 @@
+-- NOTE: This top-level seed file is legacy and NOT used by the automated build.
+-- Canonical seed lives at backend/database/seeds/sampleData.sql.
+-- Keep here only for reference; update both if intentionally diverging.
 
 -- Insert Catalog records (for API compatibility)
 
--- Insert catalog records for FK integrity
-INSERT INTO catalog (item_id, description, manufacturer, model, serial_number, sku_barcode, created_at, updated_at) VALUES
-  (1, 'Vintage Camera', 'Canon', 'AE-1', '12345', 'CAM12345', NOW(), NOW()),
-  (2, 'Antique Vase', 'Unknown', 'N/A', '67890', 'VAS67890', NOW(), NOW());
+INSERT INTO catalog (item_id, description, manufacturer, model, sku, barcode, created_at, updated_at) VALUES
+  (1, 'Vintage Camera', 'Canon', 'AE-1', 'CAM-AE1', 'CAM12345', NOW(), NOW()),
+  (2, 'Antique Vase', 'Unknown', 'N/A', 'VAS-ANTQ', 'VAS67890', NOW(), NOW());
 
 
 
@@ -45,9 +47,9 @@ INSERT INTO customer (customer_id, first_name, last_name, email, phone, address,
   (2, 'Jane', 'Smith', 'jane.smith@example.com', '555-5678', '456 Elm St', 'active', NOW(), NOW());
 
 -- Insert listing records required for sales FK (item_id must exist in catalog)
-INSERT INTO listing (listing_id, title, listing_price, item_id, status, watchers, item_condition_description, payment_method, shipping_method, created_at, updated_at) VALUES
-  (1, 'Sample Listing 1', 150.00, 1, 'active', 0, 'New', 'PayPal', 'Standard', NOW(), NOW()),
-  (2, 'Sample Listing 2', 75.00, 2, 'active', 0, 'Used', 'Credit Card', 'Express', NOW(), NOW());
+INSERT INTO listing (listing_id, title, listing_price, item_id, status, watchers, item_condition_description, payment_method, shipping_method, serial_number, manufacture_date, created_at, updated_at) VALUES
+  (1, 'Sample Listing 1', 150.00, 1, 'active', 0, 'New', 'PayPal', 'Standard', '12345', '2024-01-15', NOW(), NOW()),
+  (2, 'Sample Listing 2', 75.00, 2, 'active', 0, 'Used', 'Credit Card', 'Express', '67890', '2023-12-10', NOW(), NOW());
 
 -- Insert sales records (using correct columns)
 INSERT INTO sales (sale_id, listing_id, sold_price, sold_date, sold_shipping_collected, taxes, ownership_id, negotiated_terms, negotiated_terms_calculation, sales_channel, customer_feedback)

@@ -11,7 +11,7 @@ describe('Listing API', () => {
     jest.setTimeout(60000);
     // Global seed already executed; create isolated catalog entry for this suite
     const uniqueSku = 'SKU' + Date.now();
-    const catalogEntry = await Catalog.create({ description: 'Test Item', manufacturer: 'TestCo', model: 'T1000', serial_number: 'SN123', sku_barcode: uniqueSku });
+  const catalogEntry = await Catalog.create({ description: 'Test Item', manufacturer: 'TestCo', model: 'T1000', serial_number: 'SN123', sku: uniqueSku, barcode: uniqueSku + 'B' });
     catalogItemId = catalogEntry.item_id;
   }, 60000);
 

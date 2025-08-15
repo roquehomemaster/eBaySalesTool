@@ -28,7 +28,7 @@ describe('Listing Status Workflow', () => {
       };
       await request(app).post('/api/listings/status/workflow').send({ graph: canonical });
     }
-    const catalogRes = await request(app).post('/api/catalog').send({ description: 'WF Cat', manufacturer: 'M', model: 'X', serial_number: 'SNWF', sku_barcode: `SKU-WF-${Date.now()}` });
+  const catalogRes = await request(app).post('/api/catalog').send({ description: 'WF Cat', manufacturer: 'M', model: 'X', serial_number: 'SNWF', sku: `SKU-WF-${Date.now()}`, barcode: `BC-WF-${Date.now()}` });
     itemId = catalogRes.body.item_id;
     const createRes = await request(app).post('/api/listings').send({ title: 'WF Listing', listing_price: 10.0, item_id: itemId });
     listingId = createRes.body.listing_id;

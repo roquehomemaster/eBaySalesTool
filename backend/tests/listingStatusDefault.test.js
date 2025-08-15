@@ -7,12 +7,20 @@ const app = require('../src/app');
 const { pool } = require('../src/utils/database');
 
 describe('Listing status default', () => {
-  test('create listing without status -> status=draft and only create audit contains status', async () => {
-    const catalogRes = await request(app).post('/api/catalog').send({ description: 'Status Test Cat', manufacturer: 'M', model: 'X', serial_number: 'S1', sku_barcode: `SKU-STATUS-${Date.now()}` });
+  test('create listing without status -> status matches configured default and only create audit contains status', async () => {
+  const catalogRes = await request(app).post('/api/catalog').send({ description: 'Status Test Cat', manufacturer: 'M', model: 'X', serial_number: 'S1', sku: `SKU-STATUS-${Date.now()}`, barcode: `BC-STATUS-${Date.now()}` });
     const itemId = catalogRes.body.item_id;
     const createRes = await request(app).post('/api/listings').send({ title: 'Status Test Listing', listing_price: 5.55, item_id: itemId });
     expect(createRes.status).toBe(201);
-    expect(createRes.body.status).toBe('draft');
+    // Determine current configured default (fallback 'draft')
+    let expectedDefault = 'draft';
+    try {
+      const cfg = await pool.query("SELECT config_value FROM appconfig WHERE config_key='listing_default_status'");
+      if (cfg.rowCount > 0 && cfg.rows[0].config_value) {
+        expectedDefault = cfg.rows[0].config_value.trim();
+      }
+    } catch (_) { /* ignore */ }
+    expect(createRes.body.status).toBe(expectedDefault);
     const listingId = createRes.body.listing_id;
     const audits = await pool.query("SELECT * FROM historylogs WHERE entity='listing' AND entity_id=$1 ORDER BY created_at ASC", [listingId]);
     const createAudit = audits.rows.find(r => r.action === 'create');

@@ -133,9 +133,9 @@ This ensures seeding is idempotent and robust, preventing duplicate key errors o
 
 **Example:**
 ```sql
-INSERT INTO "Catalog" (description, manufacturer, model, serial_number, sku_barcode)
+INSERT INTO "Catalog" (description, manufacturer, model, serial_number, sku, barcode)
 VALUES (...)
-ON CONFLICT (sku_barcode) DO NOTHING;
+ON CONFLICT (sku) DO NOTHING; -- sku is the unique business key; barcode may duplicate across products
 ```
 
 This SOP applies to all tables and seed files in this project.

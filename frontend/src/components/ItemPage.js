@@ -69,7 +69,8 @@ const ItemPage = () => {
                             <p><strong>Weight:</strong> {selectedItem.weight}</p>
                             <p><strong>Condition:</strong> {selectedItem.item_condition}</p>
                             <p><strong>Category:</strong> {selectedItem.category}</p>
-                            <p><strong>SKU/Barcode:</strong> {selectedItem.sku_barcode}</p>
+                            <p><strong>SKU:</strong> {selectedItem.sku}</p>
+                            <p><strong>Barcode:</strong> {selectedItem.barcode}</p>
                             <button>Save Changes</button>
                             <button>Delete Item</button>
                             <button>Generate Listing</button>

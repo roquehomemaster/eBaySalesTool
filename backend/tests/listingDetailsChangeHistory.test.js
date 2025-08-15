@@ -13,7 +13,7 @@ describe('Listing Details Change History Limit', () => {
   beforeAll(async () => {
     // Create a catalog item for listing
     const uniqueSku = 'SKU-DETAILS-CH-' + Date.now();
-    const cat = await Catalog.create({ description: 'Details CH Item', manufacturer: 'DetCo', model: 'D100', serial_number: 'DET' + Date.now(), sku_barcode: uniqueSku });
+  const cat = await Catalog.create({ description: 'Details CH Item', manufacturer: 'DetCo', model: 'D100', serial_number: 'DET' + Date.now(), sku: uniqueSku, barcode: uniqueSku + 'B' });
     itemId = cat.item_id;
   });
 

@@ -21,7 +21,8 @@ const CatalogTable = () => {
     const rowRenderer = (entry) => (
         <>
             <td>{entry.description}</td>
-            <td>{entry.sku_barcode}</td>
+            <td>{entry.sku}</td>
+            <td>{entry.barcode}</td>
             <td>{entry.category || ''}</td>
             <td>{entry.manufacturer}</td>
             <td>{entry.model}</td>
@@ -85,7 +86,7 @@ const CatalogTable = () => {
                         <div className="group">
                             <Section
                                 title="Product Details"
-                                rows={entriesFromObj(entry, ['description','manufacturer','model','serial_number','sku_barcode','category'])}
+                                rows={entriesFromObj(entry, ['description','manufacturer','model','sku','barcode','category'])}
                             />
                         </div>
 
@@ -133,6 +134,14 @@ const CatalogTable = () => {
         return <Details/>;
     };
 
+    const filterConfig = React.useMemo(() => ({
+        Description: { type: 'text', placeholder: 'desc contains' },
+        'SKU/Barcode': { type: 'text', placeholder: 'sku' },
+        Category: { type: 'text', placeholder: 'category' },
+        Manufacturer: { type: 'text', placeholder: 'mfg' },
+        Model: { type: 'text', placeholder: 'model' }
+    }), []);
+
     return (
         <ListWithDetails
             title="Catalog List"
@@ -141,6 +150,7 @@ const CatalogTable = () => {
             rowRenderer={rowRenderer}
             detailsRenderer={detailsRenderer}
             pageKey="catalog"
+            filterConfig={filterConfig}
         />
     );
 };
