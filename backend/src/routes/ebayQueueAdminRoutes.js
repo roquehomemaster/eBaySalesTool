@@ -7,6 +7,8 @@
 const express = require('express');
 const router = express.Router();
 const { EbayChangeQueue, EbayFailedEvent } = require('../../models/ebayIntegrationModels');
+const { ingestRawListings } = require('../integration/ebay/rawIngestionService');
+const { spawn } = require('child_process');
 
 function parseIntSafe(v, d){ const n = parseInt(v,10); return Number.isNaN(n)?d:n; }
 
@@ -84,3 +86,67 @@ router.post('/failed-events/:id/replay', async (req,res) => {
 });
 
 module.exports = router;
+
+// POST /admin/ebay/retrieve - trigger raw ingestion of provided item IDs (comma list)
+router.post('/retrieve', async (req, res) => {
+  try {
+    const idsRaw = (req.body && (req.body.itemIds || req.body.ids)) || req.query.itemIds || req.query.ids || '';
+    const itemIds = String(idsRaw).split(',').map(s=>s.trim()).filter(Boolean);
+    if (!itemIds.length) { return res.status(400).json({ error: 'no_item_ids' }); }
+    const dryRun = req.body && typeof req.body.dryRun === 'boolean' ? req.body.dryRun : (process.env.RETRIEVE_DRY_RUN === 'true');
+    const summary = await ingestRawListings({ itemIds, dryRun });
+    res.json({ summary, dryRun });
+  } catch(e){ res.status(500).json({ error: e.message }); }
+});
+
+// POST /admin/ebay/map/run - trigger mapping batch (spawns node script) and return parsed summary
+router.post('/map/run', async (req,res) => {
+  try {
+    const dryRun = req.body && typeof req.body.dryRun === 'boolean' ? req.body.dryRun : (process.env.EBAY_RAW_MAP_DRY_RUN !== 'false');
+    const env = { ...process.env };
+    if (dryRun) { env.EBAY_RAW_MAP_DRY_RUN = 'true'; } else { env.EBAY_RAW_MAP_DRY_RUN = 'false'; }
+    const scriptPath = require('path').resolve(__dirname, '../../scripts/import/map_pending_listings.js');
+    let stdout = '';
+    let stderr = '';
+    const MAX_BUFFER = 64 * 1024; // 64KB cap to avoid runaway output
+    const child = spawn('node', [scriptPath], { env });
+    let finished = false;
+    const timeoutMs = parseInt(process.env.MAP_RUN_TIMEOUT_MS || '15000', 10);
+    const timer = setTimeout(() => {
+      if (!finished) {
+        finished = true;
+        try { child.kill('SIGKILL'); } catch(_) { /* ignore */ }
+        return res.status(504).json({ error: 'mapping_timeout', dryRun, raw: { stdout, stderr } });
+      }
+    }, timeoutMs);
+    function appendLimited(buf, chunk){
+      if (buf.length >= MAX_BUFFER) { return buf; }
+      let next = buf + chunk;
+      if (next.length > MAX_BUFFER) { next = next.slice(0, MAX_BUFFER) + '\n...[truncated]'; }
+      return next;
+    }
+    child.stdout.on('data', d => { stdout = appendLimited(stdout, d.toString()); });
+    child.stderr.on('data', d => { stderr = appendLimited(stderr, d.toString()); });
+    child.on('error', err => {
+      if (finished) { return; }
+      finished = true; clearTimeout(timer);
+      return res.status(500).json({ error: 'spawn_failed', message: err.message, dryRun });
+    });
+    child.on('close', code => {
+      if (finished) { return; }
+      finished = true; clearTimeout(timer);
+      let parsed = null; let summaryLine;
+      try {
+        const lines = stdout.split(/\r?\n/).filter(Boolean);
+        summaryLine = lines.reverse().find(l => l.includes('Mapping pass complete'));
+        if (summaryLine) {
+          const braceIdx = summaryLine.indexOf('{');
+            if (braceIdx !== -1) {
+              parsed = JSON.parse(summaryLine.slice(braceIdx));
+            }
+        }
+      } catch(parseErr){ /* swallow parse error */ }
+      res.json({ exitCode: code, dryRun, summary: parsed, raw: { stdout, stderr }, timeoutMs });
+    });
+  } catch(e){ res.status(500).json({ error: e.message }); }
+});
