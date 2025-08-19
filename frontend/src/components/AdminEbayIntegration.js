@@ -1,22 +1,14 @@
 import React from 'react';
 import apiService from '../services/apiService';
+import axios from 'axios';
 
 // Lightweight client for admin eBay endpoints (extend apiService or inline fetch)
-async function fetchJson(path, params) {
-  const url = new URL(`http://localhost:5000${path}`);
-  if (params) {
-    Object.entries(params).forEach(([k, v]) => {
-      const shouldInclude = v !== undefined && v !== null && v !== '';
-      if (shouldInclude) {
-        url.searchParams.set(k, v);
-      }
-    });
-  }
-  const res = await fetch(url.toString(), { headers: { 'X-Admin-Auth': localStorage.getItem('ebayAdminKey') || '' } });
-  if (!res.ok) {
-    throw new Error(`Request failed ${res.status}`);
-  }
-  return res.json();
+const ADMIN_API_BASE = '/api/admin/ebay';
+function adminHeaders(){ return { 'X-Admin-Auth': localStorage.getItem('ebayAdminKey') || '' }; }
+async function fetchJson(path, params){
+  const url = ADMIN_API_BASE + path + (params ? ('?' + new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v])=> v!==undefined && v!==null && v!=='' ))).toString()) : '');
+  const resp = await axios.get(url, { headers: adminHeaders() });
+  return resp.data;
 }
 
 const SectionCard = ({ title, actions, children }) => (
@@ -63,6 +55,8 @@ export default function AdminEbayIntegration(){
   const [queue,setQueue] = React.useState([]);
   const [drift,setDrift] = React.useState([]);
   const [snapshots,setSnapshots] = React.useState([]);
+  const [selectedSnapshots,setSelectedSnapshots] = React.useState([]); // up to 2 ids
+  const [snapshotDiff,setSnapshotDiff] = React.useState(null);
   const [health,setHealth] = React.useState(null);
   const [metrics,setMetrics] = React.useState(null);
   const [dead,setDead] = React.useState({ deadQueue:[], failedEvents:[] });
@@ -108,9 +102,7 @@ export default function AdminEbayIntegration(){
     setError(null); setRetrieveResult(null);
     try {
       const body = { itemIds: retrieveIds, dryRun: false };
-      const res = await fetch('http://localhost:5000/api/admin/ebay/retrieve', { method:'POST', headers:{ 'Content-Type':'application/json', 'X-Admin-Auth': localStorage.getItem('ebayAdminKey')||'' }, body: JSON.stringify(body) });
-      if(!res.ok){ throw new Error('Retrieve failed '+res.status); }
-      const json = await res.json();
+  const { data: json } = await axios.post(`${ADMIN_API_BASE}/retrieve`, body, { headers:{ ...adminHeaders(), 'Content-Type':'application/json' } });
       setRetrieveResult(json);
       fetchAll(); // refresh after retrieve
     } catch(e){ setError(e.message); }
@@ -118,12 +110,29 @@ export default function AdminEbayIntegration(){
   async function triggerMap(dry=true){
     setError(null); setMapResult(null);
     try {
-      const res = await fetch('http://localhost:5000/api/admin/ebay/map/run', { method:'POST', headers:{ 'Content-Type':'application/json', 'X-Admin-Auth': localStorage.getItem('ebayAdminKey')||'' }, body: JSON.stringify({ dryRun: dry }) });
-      if(!res.ok){ throw new Error('Map run failed '+res.status); }
-      const json = await res.json();
+  const { data: json } = await axios.post(`${ADMIN_API_BASE}/map/run`, { dryRun: dry }, { headers:{ ...adminHeaders(), 'Content-Type':'application/json' } });
       setMapResult(json);
       fetchAll();
     } catch(e){ setError(e.message); }
+  }
+
+  async function loadSnapshotDiff(){
+    setSnapshotDiff(null);
+    if(selectedSnapshots.length !== 2){ return; }
+    const [a,b] = selectedSnapshots;
+    try {
+      const diff = await fetchJson(`/api/admin/ebay/snapshots/${a}/diff/${b}`);
+      setSnapshotDiff(diff);
+    } catch(e){ setSnapshotDiff({ error: e.message }); }
+  }
+
+  function toggleSnapshot(id){
+    setSnapshotDiff(null);
+    setSelectedSnapshots(prev => {
+      let next = prev.includes(id) ? prev.filter(x=>x!==id) : [...prev, id];
+      if(next.length > 2){ next = [next[1], next[2]]; }
+      return next;
+    });
   }
 
   React.useEffect(()=>{ fetchAll(); /* eslint-disable-next-line */ }, []);
@@ -135,9 +144,9 @@ export default function AdminEbayIntegration(){
     return ()=>clearInterval(id); 
   }, [autoRefresh]);
 
-  async function retryQueue(id){ try { await fetch(`http://localhost:5000/api/admin/ebay/queue/${id}/retry`, { method:'POST', headers:{ 'X-Admin-Auth': localStorage.getItem('ebayAdminKey')||'' }}); fetchAll(); } catch(e){ setError(e.message); } }
-  async function replayFailed(id){ try { await fetch(`http://localhost:5000/api/admin/ebay/failed-events/${id}/replay`, { method:'POST', headers:{ 'X-Admin-Auth': localStorage.getItem('ebayAdminKey')||'' }}); fetchAll(); } catch(e){ setError(e.message); } }
-  async function refreshPolicies(){ try { await fetch('http://localhost:5000/api/admin/ebay/policies/refresh', { method:'POST', headers:{ 'X-Admin-Auth': localStorage.getItem('ebayAdminKey')||'' }}); fetchAll(); } catch(e){ setError(e.message); } }
+  async function retryQueue(id){ try { await axios.post(`${ADMIN_API_BASE}/queue/${id}/retry`, {}, { headers: adminHeaders() }); fetchAll(); } catch(e){ setError(e.message); } }
+  async function replayFailed(id){ try { await axios.post(`${ADMIN_API_BASE}/failed-events/${id}/replay`, {}, { headers: adminHeaders() }); fetchAll(); } catch(e){ setError(e.message); } }
+  async function refreshPolicies(){ try { await axios.post(`${ADMIN_API_BASE}/policies/refresh`, {}, { headers: adminHeaders() }); fetchAll(); } catch(e){ setError(e.message); } }
 
   const overviewCards = (
     <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))', gap:16 }}>
@@ -169,6 +178,18 @@ export default function AdminEbayIntegration(){
           </div>
         ) : '—'}
       </SectionCard>
+      <SectionCard title="Metrics" actions={<button onClick={fetchAll}>Refresh</button>}>
+        {metrics ? (
+          <div style={{ fontSize:12, display:'flex', flexDirection:'column', gap:2 }}>
+            <div>Publish attempts: {metrics.counters?.['publish.attempt']||0}</div>
+            <div>Publish successes: {metrics.counters?.['publish.success']||0}</div>
+            <div>Publish errors: {metrics.counters?.['publish.errors']||0}</div>
+            <div>Recon drift events: {['internal_only','external_only','both_changed','snapshot_stale'].map(k=> (
+              <span key={k} style={{ marginRight:6 }}>{k}:{metrics.counters?.[`recon.drift_${k}`]||0}</span>
+            ))}</div>
+          </div>
+        ) : '—'}
+      </SectionCard>
     </div>
   );
 
@@ -183,7 +204,40 @@ export default function AdminEbayIntegration(){
       </div>
     </div>,
     drift: <Table columns={[{key:'drift_event_id',label:'ID'},{key:'ebay_listing_id',label:'Listing'},{key:'classification',label:'Class',render:r=> <Badge kind={r.classification}>{r.classification}</Badge>},{key:'local_hash',label:'Local Hash',render:r=> (r.local_hash||'').slice(0,8)},{key:'created_at',label:'At',render:r=> new Date(r.created_at).toLocaleString()}]} rows={drift} empty="No drift events" />,
-  snapshots: <Table columns={[{key:'snapshot_id',label:'ID'},{key:'ebay_listing_id',label:'Listing'},{key:'source_event',label:'Source'},{key:'snapshot_hash',label:'Hash',render:r=> (r.snapshot_hash||'').slice(0,8)},{key:'description_revision_count',label:'Rev'},{key:'created_at',label:'At',render:r=> new Date(r.created_at).toLocaleString()}]} rows={snapshots} empty="No snapshots" />,
+  snapshots: <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+    <Table columns={[
+      {key:'_sel', label:'', render:r=> <input type="checkbox" checked={selectedSnapshots.includes(r.snapshot_id)} onChange={()=>toggleSnapshot(r.snapshot_id)} />},
+      {key:'snapshot_id',label:'ID'},
+      {key:'ebay_listing_id',label:'Listing'},
+      {key:'source_event',label:'Source'},
+      {key:'snapshot_hash',label:'Hash',render:r=> (r.snapshot_hash||'').slice(0,8)},
+      {key:'description_revision_count',label:'Rev'},
+      {key:'created_at',label:'At',render:r=> new Date(r.created_at).toLocaleString()}
+    ]} rows={snapshots} empty="No snapshots" />
+    <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+      <span style={{ fontSize:12 }}>Select exactly two snapshots to diff.</span>
+      <button disabled={selectedSnapshots.length!==2} onClick={loadSnapshotDiff}>Diff</button>
+      {selectedSnapshots.length===2 && <span style={{ fontSize:11, color:'#555' }}>{selectedSnapshots[0]} vs {selectedSnapshots[1]}</span>}
+    </div>
+    {snapshotDiff && (
+      snapshotDiff.error ? <div style={{ background:'#ffebee', padding:8, border:'1px solid #ffcdd2', borderRadius:4 }}>Diff error: {snapshotDiff.error}</div> :
+      <div style={{ border:'1px solid #e0e0e0', borderRadius:4, maxHeight:300, overflow:'auto', fontSize:11 }}>
+        <table style={{ width:'100%', borderCollapse:'collapse' }}>
+          <thead><tr style={{ background:'#fafbfc' }}><th style={{ textAlign:'left', padding:4 }}>Path</th><th style={{ textAlign:'left', padding:4 }}>Before</th><th style={{ textAlign:'left', padding:4 }}>After</th></tr></thead>
+          <tbody>
+            {Object.entries(snapshotDiff.diff||{}).map(([path,change]) => (
+              <tr key={path} style={{ borderBottom:'1px solid #f1f3f5' }}>
+                <td style={{ padding:4, fontFamily:'monospace' }}>{path}</td>
+                <td style={{ padding:4, color:'#b71c1c' }}>{JSON.stringify(change.before)}</td>
+                <td style={{ padding:4, color:'#1b5e20' }}>{JSON.stringify(change.after)}</td>
+              </tr>
+            ))}
+            {(!snapshotDiff.diff || Object.keys(snapshotDiff.diff).length===0) && <tr><td colSpan={3} style={{ padding:6, textAlign:'center' }}>No changes</td></tr>}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </div>,
     policies: <Table columns={[{key:'policy_cache_id',label:'ID'},{key:'policy_type',label:'Type'},{key:'name',label:'Name'},{key:'content_hash',label:'Hash',render:r=> (r.content_hash||'').slice(0,8)}]} rows={policy} empty="No policies" />,
     dead: <div style={{ display:'grid', gap:16 }}>
       <SectionCard title="Dead Queue"><Table columns={[{key:'queue_id',label:'ID'},{key:'intent',label:'Intent'},{key:'error_reason',label:'Error'},{key:'_actions',label:'',render:r=> <button onClick={()=>retryQueue(r.queue_id)}>Retry</button>}]} rows={dead.deadQueue} empty="None" /></SectionCard>
