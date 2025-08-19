@@ -7,6 +7,7 @@
 const express = require('express');
 const router = express.Router();
 const { EbayListingSnapshot } = require('../../models/ebayIntegrationModels');
+const { sequelize } = require('../utils/database');
 let diffUtil; try { diffUtil = require('../integration/ebay/diffUtil'); } catch(_) { /* optional */ }
 
 function parseIntSafe(v, d){ const n = parseInt(v,10); return Number.isNaN(n)?d:n; }
@@ -19,7 +20,20 @@ router.get('/snapshots', async (req, res) => {
     const where = {};
     if (ebay_listing_id) { where.ebay_listing_id = parseIntSafe(ebay_listing_id, 0); }
     const rows = await EbayListingSnapshot.findAll({ where, order: [['snapshot_id','DESC']], limit, offset });
-    res.json({ items: rows, pagination: { limit, offset, count: rows.length } });
+    // For each unique listing id gather description revision count (best-effort)
+    const listingIds = [...new Set(rows.map(r=>r.ebay_listing_id).filter(Boolean))];
+    let revisionCounts = {};
+    if (listingIds.length){
+      try {
+        const [results] = await sequelize.query(`SELECT ebay_listing_id, COUNT(*) as revision_count FROM listing_description_history WHERE ebay_listing_id IN (:ids) GROUP BY ebay_listing_id` , { replacements: { ids: listingIds } });
+        revisionCounts = Object.fromEntries(results.map(r => [r.ebay_listing_id, Number(r.revision_count)]));
+      } catch(_) { /* ignore */ }
+    }
+    const enriched = rows.map(r => {
+      const base = typeof r.toJSON === 'function' ? r.toJSON() : r; // support mocked plain objects in tests
+      return { ...base, description_revision_count: revisionCounts[base.ebay_listing_id] || 0 };
+    });
+    res.json({ items: enriched, pagination: { limit, offset, count: rows.length } });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

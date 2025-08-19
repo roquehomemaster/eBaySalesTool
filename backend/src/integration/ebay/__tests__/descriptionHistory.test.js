@@ -9,6 +9,27 @@ const { EbayListing } = require('../../../../models/ebayIntegrationModels');
 describe('description history versioning', () => {
   beforeAll(async () => {
     await sequelize.authenticate();
+    // Ensure required tables exist (in case migrations not applied in isolated test run)
+    try { await Catalog.sync(); } catch(_) { /* ignore */ }
+    try { await Listing.sync(); } catch(_) { /* ignore */ }
+    try { await EbayListing.sync(); } catch(_) { /* ignore */ }
+    // Fallback create listing_description_history if migrations not executed
+    try {
+      await sequelize.query('SELECT 1 FROM listing_description_history LIMIT 1');
+    } catch (e) {
+      await sequelize.query(`CREATE TABLE IF NOT EXISTS listing_description_history (
+        id BIGSERIAL PRIMARY KEY,
+        listing_id INTEGER NOT NULL,
+        ebay_listing_id INTEGER NULL,
+        revision_hash VARCHAR(64) NOT NULL,
+        raw_html TEXT NOT NULL,
+        captured_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        source TEXT NOT NULL DEFAULT 'import',
+        is_current BOOLEAN NOT NULL DEFAULT true
+      );`);
+      await sequelize.query("CREATE UNIQUE INDEX IF NOT EXISTS uq_ldh_listing_revision ON listing_description_history(listing_id, revision_hash);");
+      await sequelize.query("CREATE INDEX IF NOT EXISTS ix_ldh_listing_captured ON listing_description_history(listing_id, captured_at);");
+    }
   });
 
   afterAll(async () => {
@@ -19,7 +40,7 @@ describe('description history versioning', () => {
     // Create catalog/listing/ebay listing
     const cat = await Catalog.create({ manufacturer:'TestCo', model:'ModelX' });
     const listing = await Listing.create({ title:'Item X', listing_price: 10.0, item_id: cat.item_id, status:'imported', watchers:0 });
-    const ebay = await EbayListing.create({ internal_listing_id: listing.listing_id, external_item_id: 'ITEM-X', lifecycle_state:'imported' });
+  const ebay = await EbayListing.create({ internal_listing_id: listing.listing_id, external_item_id: 'ITEM-X', lifecycle_state:'imported' });
 
     async function insertRevision(html){
       const crypto = require('crypto');
