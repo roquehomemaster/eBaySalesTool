@@ -1,87 +1,122 @@
 {
-  "paths": {
-    "/api/listings": {
-      "get": {
-        "summary": "List listings",
-        "tags": ["Listing"],
-        "responses": {
-          "200": {
-            "description": "Listing collection",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "listings": {"type": "array", "items": {"$ref": "#/components/schemas/Listing"}},
-                    "total": {"type": "integer"},
-                    "page": {"type": "integer"},
-                    "pageSize": {"type": "integer"}
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "summary": "Create listing",
-        "tags": ["Listing"],
-        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ListingCreate"}}}},
-        "responses": {"201": {"description": "Created"}, "400": {"description": "Validation error"}}
-      }
-    },
-    "/api/listings/{id}": {
-      "get": {"summary": "Get listing", "tags": ["Listing"], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Listing", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Listing"}}}}, "404": {"description": "Not found"}}},
-      "put": {"summary": "Update listing", "tags": ["Listing"], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ListingUpdate"}}}}, "responses": {"200": {"description": "Updated"}, "400": {"description": "Validation error"}, "404": {"description": "Not found"}}},
-      "delete": {"summary": "Delete listing", "tags": ["Listing"], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Deleted"}, "404": {"description": "Not found"}}}
-    },
-    "/api/listings/{id}/details": {
-      "get": {"summary": "Get listing aggregated details", "tags": ["Listing"], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Listing details payload"}, "404": {"description": "Not found"}}}
-    },
-    "/api/listings/status/workflow": {
-      "get": {"summary": "Get status workflow graph", "tags": ["Listing"], "responses": {"200": {"description": "Workflow graph"}}},
-      "post": {"summary": "Update status workflow graph", "tags": ["Listing"], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "properties": {"graph": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}}}, "required": ["graph"]}}}}, "responses": {"200": {"description": "Updated"}, "400": {"description": "Invalid graph"}}}
-    }
-  },
-  "components": {
-    "schemas": {
-      "Listing": {
-        "type": "object",
-        "properties": {
-          "listing_id": {"type": "integer"},
-          "title": {"type": "string"},
-          "listing_price": {"type": "number", "format": "float"},
-          "item_id": {"type": "integer"},
-          "ownership_id": {"type": "integer", "nullable": true},
-          "status": {"type": "string", "description": "Dynamic; see /api/listings/status/workflow"},
-          "watchers": {"type": "integer"},
-          "item_condition_description": {"type": "string"},
-          "payment_method": {"type": "string"},
-          "shipping_method": {"type": "string"},
-          "created_at": {"type": "string", "format": "date-time"},
-          "updated_at": {"type": "string", "format": "date-time"}
-        }
-      },
-      "ListingCreate": {
-        "type": "object",
-        "required": ["title", "listing_price", "item_id"],
-        "properties": {
-          "title": {"type": "string"},
-          "listing_price": {"type": "number"},
-          "item_id": {"type": "integer"},
-          "ownership_id": {"type": "integer"},
-          "status": {"type": "string", "description": "Optional initial status (defaults to draft)"}
-        }
-      },
-      "ListingUpdate": {
-        "type": "object",
-        "properties": {
-          "title": {"type": "string"},
-          "listing_price": {"type": "number"},
-          "status": {"type": "string"},
-          "ownership_id": {"type": "integer"}
-        }
-      }
-    }
-  }
+	"paths": {
+		"/api/listings": {
+			"get": {
+				"summary": "List listings",
+				"tags": ["Listing"],
+				"parameters": [
+					{"in": "query", "name": "page", "schema": {"type": "integer", "minimum": 1, "default": 1}},
+					{"in": "query", "name": "pageSize", "schema": {"type": "integer", "minimum": 1, "maximum": 200, "default": 50}},
+					{"in": "query", "name": "status", "schema": {"type": "string"}}
+				],
+				"responses": {
+					"200": {
+						"description": "Listing collection",
+						"content": {
+							"application/json": {
+								"schema": {"$ref": "#/components/schemas/ListingList"},
+								"example": {
+									"listings": [
+										{"listing_id": 1, "title": "Sample", "listing_price": 19.99, "status": "draft"}
+									],
+									"total": 1,
+									"page": 1,
+									"pageSize": 50
+								}
+							}
+						}
+					},
+					"500": {"description": "Server error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+				}
+			},
+			"post": {
+				"summary": "Create listing",
+				"tags": ["Listing"],
+				"requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ListingCreate"}}}},
+				"responses": {
+					"201": {"description": "Created", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Listing"}}}},
+						"400": {"description": "Validation error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+						"500": {"description": "Server error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+				}
+			}
+		},
+		"/api/listings/{id}": {
+			"get": {
+				"summary": "Get listing",
+				"tags": ["Listing"],
+				"parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+				"responses": {
+					"200": {"description": "Listing", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Listing"}}}},
+					"404": {"description": "Not found", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+					"500": {"description": "Server error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+				}
+			},
+			"put": {
+				"summary": "Update listing",
+				"tags": ["Listing"],
+				"parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+				"requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ListingUpdate"}}}},
+				"responses": {
+					"200": {"description": "Updated", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Listing"}}}},
+					"400": {"description": "Validation error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+					"404": {"description": "Not found", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+					"500": {"description": "Server error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+				}
+			},
+			"delete": {
+				"summary": "Delete listing",
+				"tags": ["Listing"],
+				"parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+				"responses": {
+					"200": {"description": "Deleted"},
+					"404": {"description": "Not found", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+					"500": {"description": "Server error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+				}
+			}
+		},
+		"/api/listings/{id}/details": {
+			"get": {
+				"summary": "Get listing aggregated details",
+				"tags": ["Listing"],
+				"parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+				"responses": {
+					"200": {"description": "Listing details payload", "content": {"application/json": {"schema": {"type": "object"}}}},
+					"404": {"description": "Not found", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+					"500": {"description": "Server error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+				}
+			}
+		},
+		"/api/listings/status/workflow": {
+			"get": {
+				"summary": "Get status workflow graph",
+				"tags": ["Listing"],
+				"responses": {
+					"200": {"description": "Workflow graph", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/StatusWorkflowGraph"}}}},
+					"500": {"description": "Server error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+				}
+			},
+			"post": {
+				"summary": "Update status workflow graph",
+				"tags": ["Listing"],
+				"requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/StatusWorkflowGraphUpdate"}}}},
+				"responses": {
+					"200": {"description": "Updated"},
+					"400": {"description": "Invalid graph", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+					"500": {"description": "Server error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"ErrorResponse": {"type": "object", "properties": {"error": {"type": "string"}, "message": {"type": "string"}}, "required": ["error", "message"]},
+			"ListingList": {"type": "object", "properties": {"listings": {"type": "array", "items": {"$ref": "#/components/schemas/Listing"}}, "total": {"type": "integer"}, "page": {"type": "integer"}, "pageSize": {"type": "integer"}}},
+			"StatusWorkflowGraph": {"type": "object", "properties": {"graph": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}}}},
+			"StatusWorkflowGraphUpdate": {"type": "object", "properties": {"graph": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}}}, "required": ["graph"]},
+			"Listing": {"type": "object", "properties": {"listing_id": {"type": "integer"}, "title": {"type": "string"}, "listing_price": {"type": "number", "format": "float"}, "item_id": {"type": "integer"}, "ownership_id": {"type": "integer", "nullable": true}, "status": {"type": "string", "description": "Dynamic; see /api/listings/status/workflow"}, "watchers": {"type": "integer"}, "item_condition_description": {"type": "string"}, "payment_method": {"type": "string"}, "shipping_method": {"type": "string"}, "created_at": {"type": "string", "format": "date-time"}, "updated_at": {"type": "string", "format": "date-time"}}},
+			"ListingCreate": {"type": "object", "required": ["title", "listing_price", "item_id"], "properties": {"title": {"type": "string"}, "listing_price": {"type": "number"}, "item_id": {"type": "integer"}, "ownership_id": {"type": "integer"}, "status": {"type": "string", "description": "Optional initial status (defaults to draft)"}}},
+			"ListingUpdate": {"type": "object", "properties": {"title": {"type": "string"}, "listing_price": {"type": "number"}, "status": {"type": "string"}, "ownership_id": {"type": "integer"}}}
+		}
+	}
 }
+

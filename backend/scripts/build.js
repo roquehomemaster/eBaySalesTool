@@ -107,12 +107,44 @@ function buildBackend(config) {
             env: { ...process.env, PATH: process.env.PATH },
         };
         try {
-            log(`Running npm install in backend path: ${backendPath}`);
-            log(`Environment Variables: ${JSON.stringify(backendBuildOptions.env)}`);
-            execSync('npm.cmd install --no-update-notifier --no-audit', backendBuildOptions);
+            if (process.env.SKIP_NPM_INSTALL === 'true') {
+                log('SKIP_NPM_INSTALL=true -> skipping backend dependency install.');
+            } else {
+                log(`Installing backend dependencies in: ${backendPath}`);
+                const lockExists = fs.existsSync(path.join(backendPath, 'package-lock.json'));
+                const installCmd = lockExists ? 'npm.cmd ci --no-audit' : 'npm.cmd install --no-audit --no-update-notifier';
+                log(`Using command: ${installCmd}`);
+                execSync(installCmd, backendBuildOptions);
+                // Forbidden dependency scan (prevent reintroduction of removed tech like MongoDB)
+                const forbidden = ['mongoose', 'mongodb'];
+                const pkg = JSON.parse(fs.readFileSync(path.join(backendPath, 'package.json'), 'utf-8'));
+                const deps = { ...(pkg.dependencies||{}), ...(pkg.devDependencies||{}) };
+                const found = Object.keys(deps).filter(d => forbidden.includes(d));
+                if (found.length) {
+                    log(`Forbidden dependencies detected: ${found.join(', ')}`);
+                    throw new Error('Forbidden dependencies present');
+                }
+            }
             verifyDependencies(backendPath);
             execSync('npm.cmd run build', backendBuildOptions);
             log('Backend build completed successfully.');
+            // Generate merged Swagger spec so runtime /api-docs is up-to-date
+            try {
+                log('Generating merged Swagger specification...');
+                execSync('node scripts/generate_swagger.js', backendBuildOptions);
+                log('Swagger specification generated successfully.');
+                try {
+                    log('Validating swagger.json...');
+                    execSync('node scripts/validate_swagger.js', backendBuildOptions);
+                    log('Swagger validation complete.');
+                } catch (ve) {
+                    log('Swagger validation failed: ' + ve.message);
+                    process.exit(1);
+                }
+            } catch (e) {
+                log('Error generating Swagger specification: ' + e.message);
+                process.exit(1);
+            }
         } catch (error) {
             log(`Error building backend: ${error.message}`);
             process.exit(1);
@@ -133,9 +165,15 @@ function buildFrontend(config) {
             env: { ...process.env, PATH: process.env.PATH },
         };
         try {
-            log(`Running npm install in frontend path: ${frontendPath}`);
-            log(`Environment Variables: ${JSON.stringify(frontendBuildOptions.env)}`);
-            execSync('npm.cmd install --no-update-notifier --no-audit', frontendBuildOptions);
+            if (process.env.SKIP_NPM_INSTALL === 'true') {
+                log('SKIP_NPM_INSTALL=true -> skipping frontend dependency install.');
+            } else {
+                log(`Installing frontend dependencies in: ${frontendPath}`);
+                const lockExists = fs.existsSync(path.join(frontendPath, 'package-lock.json'));
+                const installCmd = lockExists ? 'npm.cmd ci --no-audit' : 'npm.cmd install --no-audit --no-update-notifier';
+                log(`Using command: ${installCmd}`);
+                execSync(installCmd, frontendBuildOptions);
+            }
             verifyDependencies(frontendPath);
             execSync('npm.cmd run build', frontendBuildOptions);
             log('Frontend build completed successfully.');
@@ -460,6 +498,28 @@ async function main() {
     await startDockerContainers(config);
     await verifyAllContainersHealth();
     await waitForDatabaseReadiness(config);
+    // Runtime Swagger endpoint validation to catch blank UI issues early
+    try {
+        log('Validating runtime Swagger endpoints (HTTP)...');
+        const axios = require('axios');
+        // Try primary path first
+        const spec1 = await axios.get('http://localhost:5000/swagger.json', { timeout: 5000 }).then(r=>r.data).catch(()=>null);
+        const spec2 = await axios.get('http://localhost:5000/api-docs/swagger.json', { timeout: 5000 }).then(r=>r.data).catch(()=>null);
+        if (!spec1 && !spec2) {
+            throw new Error('Both /swagger.json and /api-docs/swagger.json are unreachable');
+        }
+        const spec = spec2 || spec1;
+        if (!spec.openapi && !spec.swagger) {
+            throw new Error('Swagger endpoint returned JSON without openapi/swagger field');
+        }
+        if (!spec.paths || Object.keys(spec.paths).length === 0) {
+            throw new Error('Swagger spec has zero paths (unexpected)');
+        }
+        log(`Swagger runtime validation OK (paths=${Object.keys(spec.paths).length}).`);
+    } catch (e) {
+        log('Runtime Swagger validation FAILED: ' + e.message);
+        process.exit(1);
+    }
     // Always seed the database before tests to ensure a known state for testing
     if (config.testdata === true) {
         log('Seeding database before tests to ensure a known state for testing...');

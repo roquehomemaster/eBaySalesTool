@@ -8,26 +8,29 @@ ARG SEED_VERSION=dev
 WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json
-COPY package*.json ./ 
+COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies (use npm ci if lock present for deterministic builds)
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 # Install curl for healthcheck
 RUN apk add --no-cache curl
 
-# Copy only necessary files
-COPY package*.json ./
+# Copy source
 COPY src ./src
+# Include backend scripts (swagger generation, validation, build helpers)
+COPY scripts ./scripts
+# Include root-level models directory (contains ebayIntegrationModels.js consolidated definitions)
+COPY models ./models
 # Copy seed version marker first (if exists) then full seeds to force layer invalidation when version changes
 COPY database/seeds/.seed_version ./database/seeds/.seed_version
 COPY database/seeds ./database/seeds
 
-# Generate swagger.json inside the image (merge fragments)
-RUN node scripts/generate_swagger.js || echo '{"paths":{}}' > swagger.json
+# Generate and validate swagger.json inside the image (merge fragments)
+RUN node scripts/generate_swagger.js && node scripts/validate_swagger.js
 
-# Expose the application port
-EXPOSE 3000
+# Expose the actual application port (Express defaults to 5000 in app.js)
+EXPOSE 5000
 
 # Start the application
 CMD ["node", "src/app.js"]

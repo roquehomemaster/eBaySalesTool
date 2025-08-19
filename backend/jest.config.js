@@ -1,6 +1,6 @@
 module.exports = {
   testEnvironment: 'node',
-  testMatch: ['**/tests/**/*.test.js'],
+  testMatch: ['**/tests/**/*.test.js', '**/src/integration/ebay/__tests__/**/*.test.js'],
   // Use single worker for now because tests mutate shared DB state; can revisit with isolation
   maxWorkers: 1,
   globalSetup: '<rootDir>/tests/globalSetup.js',

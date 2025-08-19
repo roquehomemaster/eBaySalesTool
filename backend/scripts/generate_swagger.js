@@ -78,6 +78,70 @@ for (const file of files) {
 }
 
 // Write merged swagger.json
+// Ensure required top-level metadata so Swagger UI renders
+if (!mainSwagger.openapi && !mainSwagger.swagger) {
+  mainSwagger.openapi = '3.0.1';
+}
+if (!mainSwagger.info) {
+  mainSwagger.info = {
+    title: 'eBay Sales Tool API',
+    version: process.env.APP_VERSION || '1.0.0',
+    description: 'Automatically merged API specification. Edit fragment *.swagger.json files in backend/src/swagger and rerun generator.'
+  };
+}
+if (!mainSwagger.servers) {
+  mainSwagger.servers = [
+    { url: process.env.SWAGGER_SERVER_URL || 'http://localhost:5000', description: 'Default server' }
+  ];
+}
+// Ensure components object exists
+mainSwagger.components = mainSwagger.components || {};
+// Provide a default API key auth scheme if not already defined (used for admin endpoints)
+if (!mainSwagger.components.securitySchemes) {
+  mainSwagger.components.securitySchemes = {};
+}
+if (!mainSwagger.components.securitySchemes.AdminApiKey) {
+  mainSwagger.components.securitySchemes.AdminApiKey = {
+    type: 'apiKey',
+    in: 'header',
+    name: 'X-Admin-Auth',
+    description: 'Admin API key required for protected /api/admin/ebay endpoints.'
+  };
+}
+// Common error response schemas
+if (!mainSwagger.components.responses) {
+  mainSwagger.components.responses = {};
+}
+if (!mainSwagger.components.responses.UnauthorizedError) {
+  mainSwagger.components.responses.UnauthorizedError = {
+    description: 'Unauthorized – missing or invalid admin API key',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            error: { type: 'string', example: 'Unauthorized' }
+          }
+        }
+      }
+    }
+  };
+}
+if (!mainSwagger.components.responses.ForbiddenError) {
+  mainSwagger.components.responses.ForbiddenError = {
+    description: 'Forbidden – authenticated but lacking permission',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            error: { type: 'string', example: 'Forbidden' }
+          }
+        }
+      }
+    }
+  };
+}
 fs.writeFileSync(rootSwaggerPath, JSON.stringify(mainSwagger, null, 2));
 console.log('Swagger JSON merged and written to', rootSwaggerPath);
 

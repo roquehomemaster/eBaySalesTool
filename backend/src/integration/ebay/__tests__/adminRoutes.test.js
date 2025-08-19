@@ -1,0 +1,80 @@
+const express = require('express');
+
+jest.mock('../../../../models/ebayIntegrationModels', () => {
+  const queue = [ { queue_id:1, priority:5, created_at:new Date(), status:'error', error_reason:'x', update: async f => Object.assign(queue[0], f) } ];
+  const snapshots = [
+    { snapshot_id: 10, ebay_listing_id: 1, snapshot_json: { a:1, b:{ c:2 } } },
+    { snapshot_id: 11, ebay_listing_id: 1, snapshot_json: { a:1, b:{ c:3 } } }
+  ];
+  const syncLogs = [
+    { sync_log_id: 100, ebay_listing_id:1, operation:'create', result:'success', response_code:201 },
+    { sync_log_id: 101, ebay_listing_id:1, operation:'update', result:'retry', response_code:429 }
+  ];
+  const policies = [
+    { policy_cache_id: 1, policy_type: 'shipping', external_id: 'S1', name: 'ShipPolicy1' },
+    { policy_cache_id: 2, policy_type: 'return', external_id: 'R1', name: 'ReturnPolicy1' }
+  ];
+  return {
+    EbayChangeQueue: { findAll: jest.fn(async () => queue), findOne: jest.fn(async ({ where:{ queue_id } }) => queue.find(q=>q.queue_id===queue_id) || null) },
+    EbayListingSnapshot: { findAll: jest.fn(async () => snapshots), findOne: jest.fn(async ({ where:{ snapshot_id } }) => snapshots.find(s=>s.snapshot_id===snapshot_id) || null) },
+    EbaySyncLog: { findAll: jest.fn(async () => syncLogs) },
+    EbayPolicyCache: { findAll: jest.fn(async () => policies), destroy: jest.fn(async () => 1) },
+    _seed: { queue, snapshots, syncLogs }
+  };
+});
+
+const request = require('supertest');
+const queueRoutes = require('../../../routes/ebayQueueAdminRoutes');
+const snapshotRoutes = require('../../../routes/ebaySnapshotAdminRoutes');
+const syncLogRoutes = require('../../../routes/ebaySyncLogAdminRoutes');
+const policyRoutes = require('../../../routes/ebayPolicyAdminRoutes');
+
+function buildApp(){
+  const app = express();
+  app.use(express.json());
+  app.use('/api/admin/ebay', queueRoutes);
+  app.use('/api/admin/ebay', snapshotRoutes);
+  app.use('/api/admin/ebay', syncLogRoutes);
+  app.use('/api/admin/ebay', policyRoutes);
+  return app;
+}
+
+describe('eBay admin routes', () => {
+  let app;
+  beforeEach(()=>{ app = buildApp(); });
+
+  test('GET /api/admin/ebay/queue returns queue items', async () => {
+    const res = await request(app).get('/api/admin/ebay/queue');
+    expect(res.status).toBe(200);
+    expect(res.body.items.length).toBe(1);
+  });
+
+  test('POST retry transitions error -> pending', async () => {
+    const res = await request(app).post('/api/admin/ebay/queue/1/retry');
+    expect(res.status).toBe(200);
+  });
+
+  test('GET snapshots list', async () => {
+    const res = await request(app).get('/api/admin/ebay/snapshots');
+    expect(res.status).toBe(200);
+    expect(res.body.items.length).toBeGreaterThan(0);
+  });
+
+  test('GET snapshot diff', async () => {
+    const res = await request(app).get('/api/admin/ebay/snapshots/10/diff/11');
+    expect(res.status).toBe(200);
+    expect(res.body.diff['/b/c'].after).toBe(3);
+  });
+
+  test('GET sync logs list', async () => {
+    const res = await request(app).get('/api/admin/ebay/sync/logs');
+    expect(res.status).toBe(200);
+    expect(res.body.items.length).toBe(2);
+  });
+
+  test('GET policies list', async () => {
+    const res = await request(app).get('/api/admin/ebay/policies');
+    expect(res.status).toBe(200);
+    expect(res.body.items.length).toBe(2);
+  });
+});
