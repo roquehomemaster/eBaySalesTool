@@ -2,6 +2,7 @@ const express = require('express');
 
 jest.mock('../../../../models/ebayIntegrationModels', () => {
   const queue = [ { queue_id:1, priority:5, created_at:new Date(), status:'error', error_reason:'x', update: async f => Object.assign(queue[0], f) } ];
+  const failedEvents = [ { failed_event_id: 5, ebay_listing_id: 1, intent: 'update', payload_hash:'h1', last_error:'boom' } ];
   const snapshots = [
     { snapshot_id: 10, ebay_listing_id: 1, snapshot_json: { a:1, b:{ c:2 } } },
     { snapshot_id: 11, ebay_listing_id: 1, snapshot_json: { a:1, b:{ c:3 } } }
@@ -15,7 +16,8 @@ jest.mock('../../../../models/ebayIntegrationModels', () => {
     { policy_cache_id: 2, policy_type: 'return', external_id: 'R1', name: 'ReturnPolicy1' }
   ];
   return {
-    EbayChangeQueue: { findAll: jest.fn(async () => queue), findOne: jest.fn(async ({ where:{ queue_id } }) => queue.find(q=>q.queue_id===queue_id) || null) },
+  EbayChangeQueue: { findAll: jest.fn(async () => queue), findOne: jest.fn(async ({ where:{ queue_id } }) => queue.find(q=>q.queue_id===queue_id) || null), create: jest.fn(async obj => ({ queue_id: 2, ...obj })) },
+  EbayFailedEvent: { findAll: jest.fn(async () => failedEvents), findOne: jest.fn(async ({ where:{ failed_event_id } }) => failedEvents.find(f=>f.failed_event_id===failed_event_id) || null) },
     EbayListingSnapshot: { findAll: jest.fn(async () => snapshots), findOne: jest.fn(async ({ where:{ snapshot_id } }) => snapshots.find(s=>s.snapshot_id===snapshot_id) || null) },
     EbaySyncLog: { findAll: jest.fn(async () => syncLogs) },
     EbayPolicyCache: { findAll: jest.fn(async () => policies), destroy: jest.fn(async () => 1) },
@@ -24,6 +26,20 @@ jest.mock('../../../../models/ebayIntegrationModels', () => {
 });
 
 const request = require('supertest');
+// Mock child_process for /map/run endpoint
+jest.mock('child_process', () => ({
+  spawn: jest.fn(() => {
+    const { EventEmitter } = require('events');
+    const emitter = new EventEmitter();
+    process.nextTick(() => {
+      emitter.stdout.emit('data', 'Mapping pass complete {"mapped":1,"skipped":0}\n');
+      emitter.emit('close', 0);
+    });
+    emitter.stdout = new EventEmitter();
+    emitter.stderr = new EventEmitter();
+    return emitter;
+  })
+}));
 const queueRoutes = require('../../../routes/ebayQueueAdminRoutes');
 const snapshotRoutes = require('../../../routes/ebaySnapshotAdminRoutes');
 const syncLogRoutes = require('../../../routes/ebaySyncLogAdminRoutes');
@@ -47,6 +63,20 @@ describe('eBay admin routes', () => {
     const res = await request(app).get('/api/admin/ebay/queue');
     expect(res.status).toBe(200);
     expect(res.body.items.length).toBe(1);
+  });
+
+  test('POST retrieve ingests raw ids (dry-run default)', async () => {
+    const res = await request(app).post('/api/admin/ebay/retrieve').send({ itemIds: '101,102' });
+    expect(res.status).toBe(200);
+    expect(res.body.summary.requested).toBe(2);
+  });
+
+  test('POST map/run returns parsed summary', async () => {
+    const res = await request(app).post('/api/admin/ebay/map/run').send({ dryRun: true });
+    expect(res.status).toBe(200);
+    expect(res.body.exitCode).toBe(0);
+    expect(res.body.summary).toBeTruthy();
+    expect(res.body.summary.mapped).toBe(1);
   });
 
   test('POST retry transitions error -> pending', async () => {
