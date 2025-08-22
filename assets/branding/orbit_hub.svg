@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-label="Orbit Hub Concept">
+  <rect width="640" height="360" fill="#F8FAFC"/>
+  <defs>
+    <radialGradient id="orb" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2563EB" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#1E40AF"/>
+    </radialGradient>
+  </defs>
+  <!-- Central orb / logo placeholder -->
+  <circle cx="320" cy="180" r="70" fill="url(#orb)"/>
+  <!-- Stylized F (two chevrons) -->
+  <path d="M300 160 L340 160 L332 170 L308 170 L308 182 L340 182 L332 192 L300 192 Z" fill="white" opacity="0.9"/>
+  <circle cx="355" cy="150" r="6" fill="#F59E0B"/>
+  <!-- Orbit rings -->
+  <ellipse cx="320" cy="180" rx="140" ry="70" fill="none" stroke="#2563EB" stroke-width="2" opacity="0.25"/>
+  <ellipse cx="320" cy="180" rx="190" ry="100" fill="none" stroke="#2563EB" stroke-width="2" opacity="0.15"/>
+  <!-- Capability nodes -->
+  <g stroke="#1E40AF" stroke-width="2" fill="white" font-family="Inter,Arial" font-size="11" text-anchor="middle">
+    <circle cx="180" cy="180" r="28" fill="white"/>
+    <text x="180" y="185" fill="#1E40AF">Publish</text>
+    <circle cx="460" cy="180" r="28" fill="white"/>
+    <text x="460" y="185" fill="#1E40AF">Drift</text>
+    <circle cx="320" cy="70" r="24" fill="white"/>
+    <text x="320" y="75" fill="#1E40AF">Snap</text>
+    <circle cx="320" cy="290" r="24" fill="white"/>
+    <text x="320" y="295" fill="#1E40AF">Policy</text>
+  </g>
+  <!-- Connector lines -->
+  <line x1="250" y1="180" x2="410" y2="180" stroke="#2563EB" stroke-width="2" stroke-dasharray="6 6"/>
+  <line x1="320" y1="110" x2="320" y2="250" stroke="#2563EB" stroke-width="2" stroke-dasharray="6 6"/>
+  <text x="320" y="24" font-family="Inter,Arial" font-size="14" fill="#1E40AF" text-anchor="middle">Capabilities Orbit</text>
+</svg>

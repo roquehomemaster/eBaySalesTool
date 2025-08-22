@@ -11,6 +11,7 @@ import ListingTable from './components/ListingTable';
 import AdminAppConfig from './components/AdminAppConfig';
 import AdminUrls from './components/AdminUrls';
 import AdminLayout from './components/AdminLayout';
+import AdminEbayIntegration from './components/AdminEbayIntegration';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/admin" element={<AdminLayout />}> 
             <Route path="appconfig" element={<AdminAppConfig />} />
             <Route path="urls" element={<AdminUrls />} />
+            <Route path="ebay" element={<AdminEbayIntegration />} />
             <Route index element={<AdminAppConfig />} />
           </Route>
           <Route path="/add-sale" element={<SalesForm />} />

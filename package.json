@@ -1,27 +1,29 @@
 {
-  "name": "ebaysalestool",
+  "name": "listflowhq",
   "version": "1.0.0",
-  "description": "## Overview The eBay Sales Tool is a web-based application designed to assist businesses in selling and tracking items on eBay. This tool provides functionalities for managing sales, tracking profits, conducting product research, and integrating with QuickBooks for financial management.",
+  "description": "## Overview ListFlowHQ is a web-based application for managing listings, catalog data, and multi-channel sync (initially eBay).",
   "main": "index.js",
   "scripts": {
     "start": "concurrently \"npm start --prefix backend\" \"npm start --prefix frontend\"",
-    "test": "npm test --prefix backend && npm test --prefix frontend"
+    "test": "npm test --prefix backend && npm test --prefix frontend",
+    "branding:jpg": "node scripts/convert_branding_images.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/roquehomemaster/eBaySalesTool.git"
+    "url": "git+https://github.com/roquehomemaster/ListFlowHQ.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/roquehomemaster/eBaySalesTool/issues"
+    "url": "https://github.com/roquehomemaster/ListFlowHQ/issues"
   },
-  "homepage": "https://github.com/roquehomemaster/eBaySalesTool#readme",
+  "homepage": "https://github.com/roquehomemaster/ListFlowHQ#readme",
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "sharp": "^0.33.4"
   },
   "dependencies": {
-    "ebaysalestool": "file:"
+    "listflowhq": "file:"
   }
 }

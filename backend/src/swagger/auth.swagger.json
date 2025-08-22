@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "eBay Sales Tool API",
+    "title": "ListFlowHQ API",
     "version": "1.0.0",
-    "description": "API documentation for the eBay Sales Tool"
+    "description": "API documentation for ListFlowHQ (formerly eBay Sales Tool)"
   },
   "servers": [
     {

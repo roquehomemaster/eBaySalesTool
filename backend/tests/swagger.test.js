@@ -20,6 +20,7 @@ describe('Swagger endpoints', () => {
     const html = res.text || '';
     expect(html.toLowerCase()).not.toContain('petstore');
     // Basic sanity: ensure our title or project keyword appears
-    expect(html).toMatch(/eBay Sales Tool API Docs|eBay Sales Tool/i);
+  // Accept either the new brand or (temporarily) the legacy name during transition
+  expect(html).toMatch(/ListFlowHQ API Docs|ListFlowHQ|eBay Sales Tool API Docs|eBay Sales Tool/i);
   });
 });

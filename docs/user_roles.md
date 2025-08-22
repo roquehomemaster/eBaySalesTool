@@ -1,7 +1,7 @@
 # User Roles and Permissions
 
 ## **Overview**
-This document outlines the roles and permissions implemented in the eBay Sales Tool application. Each role defines the level of access and actions a user can perform.
+This document outlines the roles and permissions implemented in the ListFlowHQ application (formerly eBay Sales Tool). Each role defines the level of access and actions a user can perform.
 
 ---
 

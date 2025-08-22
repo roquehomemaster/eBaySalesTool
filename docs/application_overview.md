@@ -1,48 +1,65 @@
-# eBay Sales Tool - Application Overview
+# ListFlowHQ - Application Overview (formerly eBay Sales Tool)
 
 ## **Overview**
-The eBay Sales Tool is a comprehensive web-based application designed to assist businesses in managing and tracking their eBay sales. It provides features for item management, owner management, sales tracking, and payout calculations, all integrated into a user-friendly interface.
+ListFlowHQ is a comprehensive web-based application designed to assist businesses in managing and tracking multi-channel (initially eBay) sales. It provides features for item management, owner management, sales tracking, and payout calculations, all integrated into a user-friendly interface.
 
 ---
 
 ## **Application Structure**
-The application is divided into three main components:
+The application is divided into three main components (Internal Domain + Planned External Integration Layer):
 
 ### **1. Backend**
-- **Framework**: Node.js with Express.
-- **Purpose**: Handles API requests, business logic, and database interactions.
-- **Key Features**:
-  - CRUD operations for items, owners, and sales.
-  - Integration with eBay API for real-time updates.
-  - Payout calculation logic based on item-specific or owner-inherited terms.
-- **Key Files**:
-  - `models/`: Contains Mongoose schemas for `Item`, `Owner`, and `Sales`.
-  - `routes/`: Defines API endpoints for items, owners, and sales.
-  - `controllers/`: Implements business logic for API endpoints.
-  - `utils/`: Utility functions for API interactions and data processing.
+- **Framework**: Node.js (Express) with Sequelize (PostgreSQL).
+- **Purpose**: Handles internal API requests, business logic, workflow validation, and data persistence.
+- **Key Internal Features**:
+  - CRUD operations for catalog, listings, owners, sales (sales module evolving).
+  - Configurable listing status graph stored in AppConfig.
+  - Separation between internal listing workflow and (planned) eBay integration.
+  - Seed & migration system enabling reproducible environments.
+- **Key Directories**:
+  - `backend/models/`: Sequelize model definitions.
+  - `backend/migrations/` & `database/migrations/`: Schema evolution (legacy + current).
+  - `backend/src/controllers/`: Request handling & validation.
+  - `backend/src/routes/`: Express route definitions.
+  - `backend/src/utils/`: Shared utilities (instrumentation, db, etc.).
+  - `backend/scripts/`: Build/test/seed/generation scripts (only use sanctioned scripts for builds & swagger generation).
 
 ### **2. Frontend**
 - **Framework**: React.
-- **Purpose**: Provides a user-friendly interface for managing items, owners, and sales.
+- **Purpose**: Presents admin & operational interfaces (listing management, configuration, URL catalog, future eBay monitoring dashboards).
 - **Key Features**:
-  - Interactive list and details view for items.
-  - Tabbed interface for item details (Details, Pricing, Shipping Info, Owner, History).
-  - Search and sort functionality for item lists.
-  - Responsive design for desktop and mobile.
-- **Key Files**:
-  - `components/`: Reusable React components for forms, tables, and research tools.
-  - `services/`: API service for interacting with the backend.
-  - `context/`: Context API for managing authentication and global state.
+  - List + detail views with tabbed sub-navigation.
+  - Persisted table state (filters/sorts) per list.
+  - Admin subtabs (App Config, Application URLs) with inline editing and dynamic graph visualization (planned).
+  - Extensible components enabling future eBay snapshot & queue monitoring UIs.
+- **Structure**:
+  - `frontend/src/components/`: Shared UI components.
+  - `frontend/src/pages/` or `routes/`: Page-level components (varies by repo structure).
+  - `frontend/src/hooks/`: Custom React hooks (e.g., persisted table state).
+  - `frontend/src/services/`: API abstractions.
 
-### **3. Database**
+### **3. Database (Internal)**
 - **Type**: PostgreSQL.
-- **Purpose**: Stores data for items, owners, and sales.
-- **Key Features**:
-  - Relational structure for efficient data management.
-  - Migration and seeding scripts for database initialization.
-- **Key Files**:
-  - `migrations/`: SQL scripts for creating database schema.
-  - `seeds/`: Sample data for testing and development.
+- **Purpose**: Stores internal domain entities (catalog, listing, ownership, configuration, history, etc.).
+- **Features**:
+  - Branching listing status workflow (configurable graph) with validation.
+  - Distinct sku vs barcode separation (recent refactor).
+  - Listing fields include `serial_number`, `manufacture_date` (recent refactor) and status default from AppConfig.
+- **Assets**:
+  - `database/migrations/` & `backend/migrations/`: Evolution scripts (some legacy duplication scheduled for consolidation).
+  - `backend/scripts/seedDatabase.js`: Controlled seed process (avoid Docker cache issues via seed versioning marker).
+
+### **4. eBay Integration Layer (Planned / Isolated)**
+- Implemented via separate `ebay_*` tables (see dedicated documents below) ensuring domain separation.
+- Provides projection, queue, publisher, reconciliation, and snapshot subsystems.
+- No direct UI coupling until monitoring panels are added.
+
+---
+## **eBay Integration Documentation Links**
+- See `docs/ebay_integration_architecture.md` for architectural overview, tables, flows.
+- See `docs/ebay_snapshot_strategy.md` for immutable snapshot design.
+
+---
 
 ---
 
@@ -68,7 +85,7 @@ The application is divided into three main components:
 
 ---
 
-## **Listing Item Clarification**
+## **Listing Item Clarification (Internal Domain)**
 
 ### **Definition**
 A **Listing Item** is the top-level entity representing an item being listed for sale on eBay. It includes information from the **Item Master**, the **Listing Item Owner**, and its associated states.
@@ -128,10 +145,12 @@ Status meanings (selected):
 
 Transition validation: updates to `status` are only accepted if the target is in the allowed next array for the current status (after normalizing legacy 'active' to 'listed'). Same-to-same transitions are no-ops and allowed.
 
-Configuration precedence:
+Configuration precedence (highest to lowest):
 1. `listing_status_graph` (JSON object) – authoritative branching model.
-2. `listing_status_workflow` (JSON array) – linear fallback converted to a chain.
-3. Built-in default graph (above) – if neither config key set.
+2. `listing_status_workflow` (JSON array) – linear fallback converted to chain.
+3. Built-in default graph (above) – used when neither config key is set.
+
+Status default is configurable via AppConfig key `listing_default_status` (falls back to `draft`).
 
 Admin updates: POST `/api/listings/status/workflow` with `{ graph: { state:[next,...] } }` to atomically replace the graph. GET `/api/listings/status/workflow` returns the active graph (materialized, including implicitly referenced nodes).
 
@@ -338,22 +357,25 @@ The `AppConfig` table is designed to store application-wide configuration settin
 
 ---
 
-## **Key Files and Directories**
+## **Key Files and Directories (Updated)**
+### Backend
+- `backend/models/`: Sequelize models.
+- `backend/src/controllers/`: API controllers.
+- `backend/src/routes/`: Routes.
+- `backend/src/utils/`: Shared utilities (instrumentation, db, etc.).
+- `backend/scripts/`: Build, seed, swagger generation (use only sanctioned scripts).
 
-### **Backend**
-- `models/`: Mongoose schemas for database models.
-- `routes/`: API endpoints for items, owners, and sales.
-- `controllers/`: Business logic for API endpoints.
-- `utils/`: Helper functions for API interactions.
+### Frontend
+- `frontend/src/components/`: Reusable UI.
+- `frontend/src/hooks/`: Custom hooks.
+- `frontend/src/services/`: API layer.
+- `frontend/src/...`: Pages/routes per implementation.
 
-### **Frontend**
-- `components/`: React components for UI elements.
-- `services/`: API service for backend communication.
-- `context/`: Context API for global state management.
-
-### **Database**
-- `migrations/`: SQL scripts for schema creation.
-- `seeds/`: Sample data for testing.
+### Database & Integration
+- `database/migrations/` / `backend/migrations/`: Schema migrations.
+- `backend/scripts/seedDatabase.js`: Seed logic.
+- `docs/ebay_integration_architecture.md`: eBay integration design.
+- `docs/ebay_snapshot_strategy.md`: Snapshot strategy.
 
 ---
 

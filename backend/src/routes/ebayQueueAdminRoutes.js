@@ -92,7 +92,7 @@ router.post('/retrieve', async (req, res) => {
   try {
     const idsRaw = (req.body && (req.body.itemIds || req.body.ids)) || req.query.itemIds || req.query.ids || '';
     const itemIds = String(idsRaw).split(',').map(s=>s.trim()).filter(Boolean);
-    if (!itemIds.length) { return res.status(400).json({ error: 'no_item_ids' }); }
+  if (!itemIds.length) { return res.status(400).json({ error: 'no_item_ids', message: 'At least one itemId is required' }); }
     const dryRun = req.body && typeof req.body.dryRun === 'boolean' ? req.body.dryRun : (process.env.RETRIEVE_DRY_RUN === 'true');
     const summary = await ingestRawListings({ itemIds, dryRun });
     res.json({ summary, dryRun });
@@ -103,8 +103,17 @@ router.post('/retrieve', async (req, res) => {
 router.post('/map/run', async (req,res) => {
   try {
     const dryRun = req.body && typeof req.body.dryRun === 'boolean' ? req.body.dryRun : (process.env.EBAY_RAW_MAP_DRY_RUN !== 'false');
+  const maxItems = req.body && Number.isInteger(req.body.maxItems) ? req.body.maxItems : undefined;
+  const simulateDelayMs = req.body && Number.isInteger(req.body.simulateDelayMs) ? req.body.simulateDelayMs : undefined; // test-only aid
+    if (req.body && Object.prototype.hasOwnProperty.call(req.body, 'maxItems')) {
+      if (!Number.isInteger(req.body.maxItems) || req.body.maxItems < 1) {
+        return res.status(400).json({ error: 'invalid_maxItems', message: 'maxItems must be a positive integer' });
+      }
+    }
     const env = { ...process.env };
     if (dryRun) { env.EBAY_RAW_MAP_DRY_RUN = 'true'; } else { env.EBAY_RAW_MAP_DRY_RUN = 'false'; }
+  if (maxItems && maxItems > 0) { env.EBAY_RAW_MAP_BATCH_SIZE = String(maxItems); }
+  if (simulateDelayMs && process.env.NODE_ENV === 'test') { env.MAP_TEST_DELAY_MS = String(simulateDelayMs); }
     const scriptPath = require('path').resolve(__dirname, '../../scripts/import/map_pending_listings.js');
     let stdout = '';
     let stderr = '';
@@ -146,7 +155,14 @@ router.post('/map/run', async (req,res) => {
             }
         }
       } catch(parseErr){ /* swallow parse error */ }
-      res.json({ exitCode: code, dryRun, summary: parsed, raw: { stdout, stderr }, timeoutMs });
+      // Derive logs array (strip summary line) limited to last 20 lines for response readability
+      let logs = [];
+      try {
+        const allLines = stdout.split(/\r?\n/).filter(Boolean);
+        const filtered = allLines.filter(l => !l.includes('Mapping pass complete'));
+        logs = filtered.slice(-20);
+      } catch(_) { /* ignore */ }
+      res.json({ exitCode: code, dryRun, summary: parsed, logs, raw: { stdout, stderr }, timeoutMs });
     });
   } catch(e){ res.status(500).json({ error: e.message }); }
 });

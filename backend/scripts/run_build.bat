@@ -31,7 +31,7 @@ if %ERRORLEVEL% neq 0 (
 
 REM Check if Docker containers are already running
 for /f "tokens=1,2,3,4,5*" %%a in ('docker ps -a --format "{{.Names}} {{.Status}}"') do (
-    if "%%a"=="postgres_db" (
+    if "%%a"=="listflowhq-db" (
         docker-compose -f f:\Dev\eBaySalesTool\docker-compose.yml down -v
         echo Existing Docker containers found. Bringing them down with -v.
     )
@@ -49,7 +49,7 @@ REM Wait for the database container to be healthy before running migrations
 set HEALTH_CHECK_RETRIES=30
 set HEALTH_CHECK_DELAY=10
 for /L %%i in (1,1,%HEALTH_CHECK_RETRIES%) do (
-    for /f "tokens=*" %%H in ('docker inspect --format="{{.State.Health.Status}}" postgres_db 2^>nul') do set "HEALTH_STATUS=%%H"
+    for /f "tokens=*" %%H in ('docker inspect --format="{{.State.Health.Status}}" listflowhq-db 2^>nul') do set "HEALTH_STATUS=%%H"
     echo Attempt %%i: PostgreSQL container status: !HEALTH_STATUS!
     if "!HEALTH_STATUS!"=="healthy" (
         echo PostgreSQL container is healthy.
@@ -63,7 +63,7 @@ exit /b 1
 
 :run_migrations
 REM Single canonical schema apply (01_init executed only on brand-new container by docker-entrypoint-initdb.d)
-docker exec -i postgres_db psql -U postgres -d ebay_sales_tool < f:/Dev/eBaySalesTool/backend/database/recreate_schema.sql
+docker exec -i listflowhq-db psql -U postgres -d ebay_sales_tool < f:/Dev/eBaySalesTool/backend/database/recreate_schema.sql
 if %ERRORLEVEL% neq 0 (
     echo Error: Failed to run recreate_schema.sql.
     exit /b 1

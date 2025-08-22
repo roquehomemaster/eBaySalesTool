@@ -11,6 +11,7 @@ let integrityAudit; try { integrityAudit = require('./integrityAuditJob'); } cat
 let reconTimer = null;
 let auditTimer = null;
 let driftRetentionTimer = null;
+let alertHistoryRetentionTimer = null;
 let reconRunning = false;
 let auditRunning = false;
 
@@ -30,7 +31,7 @@ async function tickReconciliation(){
 }
 
 function startSchedulers(){
-  if (process.env.NODE_ENV === 'test') { return; } // do not schedule during tests
+  if (process.env.NODE_ENV === 'test' && process.env.ALLOW_SCHEDULERS_UNDER_TEST !== 'true') { return; } // skip unless explicitly allowed
   if (process.env.EBAY_RECON_ENABLED === 'true') {
     const intervalMs = parseInt(process.env.EBAY_RECON_INTERVAL_MS || '300000', 10); // default 5m
     reconTimer = setInterval(tickReconciliation, intervalMs).unref();
@@ -54,9 +55,20 @@ function startSchedulers(){
   if (process.env.EBAY_DRIFT_RETENTION_ENABLED === 'true') {
     try {
       const { runDriftRetention } = require('./driftRetentionJob');
-      const intervalMs = 24*60*60*1000; // 24h
+      const intervalMs = process.env.EBAY_DRIFT_RETENTION_INTERVAL_MS ? parseInt(process.env.EBAY_DRIFT_RETENTION_INTERVAL_MS,10) : 24*60*60*1000; // 24h default
       driftRetentionTimer = setInterval(() => { runDriftRetention().catch(()=>{}); }, intervalMs).unref();
-      setTimeout(()=>{ runDriftRetention().catch(()=>{}); }, 30000).unref();
+      const initialDelay = process.env.EBAY_DRIFT_RETENTION_INITIAL_DELAY_MS ? parseInt(process.env.EBAY_DRIFT_RETENTION_INITIAL_DELAY_MS,10) : 30000;
+      setTimeout(()=>{ runDriftRetention().catch(()=>{}); }, initialDelay).unref();
+    } catch(_) { /* ignore */ }
+  }
+  // Alert history retention daily (if persistence + retention days configured)
+  if (process.env.EBAY_ALERT_HISTORY_RETENTION_ENABLED === 'true') {
+    try {
+      const { _internal: { pruneAlertHistory } } = require('../../routes/ebayMetricsAdminRoutes');
+      const intervalMs = process.env.EBAY_ALERT_HISTORY_RETENTION_INTERVAL_MS ? parseInt(process.env.EBAY_ALERT_HISTORY_RETENTION_INTERVAL_MS,10) : 24*60*60*1000; // 24h default
+      alertHistoryRetentionTimer = setInterval(() => { pruneAlertHistory().catch(()=>{}); }, intervalMs).unref();
+      const initialDelay = process.env.EBAY_ALERT_HISTORY_RETENTION_INITIAL_DELAY_MS ? parseInt(process.env.EBAY_ALERT_HISTORY_RETENTION_INITIAL_DELAY_MS,10) : 45000;
+      setTimeout(()=>{ pruneAlertHistory().catch(()=>{}); }, initialDelay).unref();
     } catch(_) { /* ignore */ }
   }
 }
@@ -65,6 +77,7 @@ function stopSchedulers(){
   if (reconTimer) { clearInterval(reconTimer); reconTimer = null; }
   if (auditTimer) { clearInterval(auditTimer); auditTimer = null; }
   if (driftRetentionTimer) { clearInterval(driftRetentionTimer); driftRetentionTimer = null; }
+  if (alertHistoryRetentionTimer) { clearInterval(alertHistoryRetentionTimer); alertHistoryRetentionTimer = null; }
 }
 
 module.exports = { startSchedulers, stopSchedulers };

@@ -1,0 +1,143 @@
+{
+  "paths": {
+    "/api/admin/ebay/retrieve": {
+      "post": {
+        "summary": "Ingest raw eBay listing payloads (comma-separated IDs) and persist raw data.",
+        "description": "Retrieves raw listing payloads from eBay. When dryRun=true, nothing is written to the database; the summary reflects the simulated outcome.",
+        "tags": ["eBay Admin"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "itemIds": {"type": "string", "description": "Comma or whitespace separated list of eBay listing item IDs."},
+                  "dryRun": {"type": "boolean", "default": true}
+                },
+                "required": ["itemIds"],
+                "example": {"itemIds": "101,102,103", "dryRun": true}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful retrieval (real or simulated).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "dryRun": {"type": "boolean"},
+                    "summary": {"$ref": "#/components/schemas/RawIngestionSummary"}
+                  },
+                  "required": ["dryRun","summary"],
+                  "example": {
+                    "dryRun": true,
+                    "summary": {"requested": 3, "fetched": 3, "succeeded": 3, "inserted": 0, "duplicates": 0, "skipped": 0, "errors": 0, "invalidIds": 0, "transientErrors": 0, "permanentErrors": 0, "retries": 0, "backpressureDelays": 1, "avgAttempts": 1.0, "durationMs": 842}
+                  }
+                }
+              }
+            }
+          },
+          "400": {"description": "Validation error (missing or invalid itemIds).","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"},"example": {"error":"no_item_ids","message":"At least one itemId is required"}}}},
+            "500": {"description": "Unexpected server error.","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"},"example": {"error":"internal_error","message":"Unexpected failure"}}}}
+        }
+      }
+    },
+    "/api/admin/ebay/map/run": {
+      "post": {
+        "summary": "Execute the raw->domain mapping pipeline over new/unmapped items.",
+        "description": "Runs the mapping pass. When dryRun=true, performs read-only simulation and returns a summary without persisting domain entities.",
+        "tags": ["eBay Admin"],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dryRun": {"type": "boolean", "default": true},
+                  "maxItems": {"type": "integer", "minimum": 1, "description": "Optional cap on number of raw items to map this run."}
+                },
+                "example": {"dryRun": true, "maxItems": 500}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mapping run completed (success, partial, or failed).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "dryRun": {"type": "boolean"},
+                    "exitCode": {"type": "integer", "description": "0=success, >0 indicates partial or failure."},
+                    "summary": {"$ref": "#/components/schemas/MappingRunSummary"},
+                    "logs": {"type": "array", "items": {"type": "string"}, "description": "Key log lines or messages from the run."}
+                  },
+                  "required": ["dryRun","exitCode","summary"],
+                  "example": {
+                    "dryRun": false,
+                    "exitCode": 0,
+                    "summary": {"status": "success", "startedAt": "2025-08-20T12:34:56.000Z", "finishedAt": "2025-08-20T12:34:59.200Z", "durationMs": 3200, "processed": 450, "mapped": 450, "skipped": 0, "errors": 0, "selected": 450, "dryRun": false, "limit": 500},
+                    "logs": ["Starting mapping run...","Processed 450 items","Mapping run complete"]
+                  }
+                }
+              }
+            }
+          },
+          "400": {"description": "Invalid request","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"},"example": {"error":"invalid_maxItems","message":"maxItems must be a positive integer"}}}},
+          "504": {"description": "Mapping run timed out.","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"},"example": {"error":"mapping_timeout","message":"Mapping run exceeded timeout"}}}},
+          "500": {"description": "Unexpected server error.","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"},"example": {"error":"spawn_failed","message":"Failed to spawn mapping process"}}}}
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RawIngestionSummary": {
+        "type": "object",
+        "properties": {
+          "requested": {"type": "integer", "description": "Count of IDs provided in the request."},
+          "fetched": {"type": "integer", "description": "Count of IDs successfully fetched from eBay API."},
+          "succeeded": {"type": "integer", "description": "Count of raw payloads successfully processed (pre-insert)."},
+          "inserted": {"type": "integer", "description": "Number of new raw rows inserted (non-dry run)."},
+          "duplicates": {"type": "integer", "description": "Rows skipped due to existing identical payload hash."},
+          "skipped": {"type": "integer", "description": "Rows intentionally skipped (e.g., validation failure)."},
+          "errors": {"type": "integer", "description": "Count of hard errors encountered per item."},
+          "invalidIds": {"type": "integer", "description": "Number of provided IDs failing basic validation regex."},
+          "transientErrors": {"type": "integer", "description": "Errors deemed retryable (may have succeeded after retry)."},
+          "permanentErrors": {"type": "integer", "description": "Errors deemed non-retryable resulting in item failure."},
+          "retries": {"type": "integer", "description": "Total retry attempts performed across all items."},
+          "backpressureDelays": {"type": "integer", "description": "Number of times ingestion paused due to near rate limit depletion."},
+          "avgAttempts": {"type": "number", "format": "float", "description": "Average fetch attempts per successfully fetched item (includes initial)."},
+          "durationMs": {"type": "integer", "description": "Total elapsed time of retrieval in milliseconds."},
+          "errorSamples": {"type": "array", "items": {"type": "string"}, "description": "Subset of representative error messages (truncated)."}
+        },
+        "required": ["requested","fetched","succeeded","inserted","duplicates","skipped","errors","invalidIds","durationMs"]
+      },
+          "MappingRunSummary": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string", "enum": ["success","partial","failed"], "description": "Overall result classification."},
+          "startedAt": {"type": "string", "format": "date-time"},
+          "finishedAt": {"type": "string", "format": "date-time"},
+          "durationMs": {"type": "integer"},
+          "processed": {"type": "integer", "description": "Total raw records examined."},
+          "mapped": {"type": "integer", "description": "Successfully mapped into domain entities."},
+          "skipped": {"type": "integer", "description": "Dropped or already mapped."},
+          "errors": {"type": "integer", "description": "Count of mapping failures."},
+              "selected": {"type": "integer", "description": "Raw rows selected for this run prior to filtering (matches processed + maybe early filtered)."},
+              "dryRun": {"type": "boolean", "description": "Whether the mapping run executed in dry-run mode (duplicated at top-level for convenience)."},
+          "limit": {"type": "integer", "description": "Batch processing limit used for this run."},
+          "errorSamples": {"type": "array", "items": {"type": "string"}, "description": "Representative errors (may be truncated)."}
+        },
+            "required": ["status","startedAt","finishedAt","durationMs","processed","mapped","skipped","errors","selected","dryRun"]
+      }
+    }
+  }
+}

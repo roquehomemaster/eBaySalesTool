@@ -1,8 +1,8 @@
-# eBay Sales Tool Database Reference: Table Creation and Seeding Order
+# ListFlowHQ Database Reference: Table Creation and Seeding Order
 
 ## Table Dependency and Creation Order
 
-This document describes the correct order for creating and seeding tables in the eBay Sales Tool database, based on Sequelize model definitions and foreign key relationships. Use this as a reference for writing or reviewing seed scripts and migrations.
+This document describes the correct order for creating and seeding tables in the ListFlowHQ database (formerly eBay Sales Tool), based on Sequelize model definitions and foreign key relationships. Use this as a reference for writing or reviewing seed scripts and migrations.
 
 ---
 

@@ -5,6 +5,8 @@
  * Future phases: build payload, call eBay adapter, snapshot, retry logic, error handling.
  */
 const { EbayChangeQueue, EbayListing, EbaySyncLog, EbayFailedEvent } = require('../../../models/ebayIntegrationModels');
+// Allow tests to inject a lightweight stand-in for EbayChangeQueue to avoid Sequelize
+function getQueueModel(){ return global.__TEST_EBAY_QUEUE_MODEL__ || EbayChangeQueue; }
 let metrics; try { metrics = require('./metrics'); } catch(_) { /* optional */ }
 let snapshotService; try { snapshotService = require('./snapshotService'); } catch(_) { /* optional */ }
 const { buildProjection } = require('./projectionBuilder');
@@ -22,14 +24,66 @@ function hashAttempt(base){ return crypto.createHash('sha256').update(base).dige
  * @returns {Promise<object>} result summary
  */
 async function runOnce() {
-  const item = await EbayChangeQueue.findOne({
+  const QueueModel = getQueueModel();
+  // Optional decay of stale max item wait metric
+  if (metrics) {
+    try {
+      const decayWindow = parseInt(process.env.QUEUE_MAX_WAIT_DECAY_WINDOW_MS || '0', 10);
+      if (decayWindow > 0) {
+        const lastUpdateTs = metrics._internal_state.queue_max_item_wait_last_update_ts;
+        const nowTs = Date.now();
+        if (lastUpdateTs && (nowTs - lastUpdateTs) > decayWindow) {
+          const mode = (process.env.QUEUE_MAX_WAIT_DECAY_MODE || 'reset').toLowerCase();
+          const currentMax = metrics._internal_state.queue_max_item_wait_ms || 0;
+          if (currentMax > 0) {
+            let newVal = 0;
+            if (mode === 'halve') {
+              newVal = Math.floor(currentMax / 2);
+            } else if (mode === 'hold') {
+              newVal = currentMax; // no change, but mark stale (mainly for experimentation)
+            } else { // reset
+              newVal = 0;
+            }
+            metrics._internal_state.queue_max_item_wait_ms = newVal;
+            metrics.setGauge('queue.max_item_wait_ms', newVal);
+            metrics.setGauge('queue.max_item_wait_decayed', 1);
+            try { metrics.mark('queue.max_item_wait_last_decay'); } catch(_) { /* ignore */ }
+          }
+        } else {
+          // Clear stale indicator each run if not decaying
+          metrics.setGauge('queue.max_item_wait_decayed', 0);
+        }
+      }
+    } catch(_) { /* ignore */ }
+  }
+  const item = await QueueModel.findOne({
     where: { status: 'pending' },
     order: [ ['priority', 'ASC'], ['created_at', 'ASC'] ]
   });
+    // Oldest pending age gauge (approx using fetched ordered item)
     if (metrics) {
       try {
-        const depth = await EbayChangeQueue.count({ where:{ status:'pending' } });
+        if (item && item.created_at) {
+          const age = Date.now() - new Date(item.created_at).getTime();
+          metrics.setGauge('queue.oldest_pending_age_ms', age >= 0 ? age : 0);
+        } else {
+          metrics.setGauge('queue.oldest_pending_age_ms', 0);
+        }
+      } catch(_) { /* ignore */ }
+    }
+    if (metrics) {
+      try {
+  const depth = await QueueModel.count({ where:{ status:'pending' } });
         metrics.setGauge('queue.pending_depth', depth);
+        const threshold = parseInt(process.env.EBAY_QUEUE_BACKLOG_READY_THRESHOLD || '0', 10);
+        if (threshold > 0) {
+          if (depth >= threshold) {
+            metrics.setGauge('queue.backlog_exceeded', 1);
+            metrics.mark('queue.backlog_last_exceeded');
+          } else {
+            metrics.setGauge('queue.backlog_exceeded', 0);
+          }
+        }
       } catch(_) { /* ignore */ }
     }
     if (!item) {
@@ -39,6 +93,35 @@ async function runOnce() {
   // Mark processing
   await item.update({ status: 'processing', last_attempt_at: new Date(), attempts: item.attempts + 1 });
   if (metrics) { metrics.inc('queue.dequeue'); metrics.mark('queue.last_process_start'); }
+  if (metrics && item && item.created_at) {
+    try {
+      const waitMs = Date.now() - new Date(item.created_at).getTime();
+      if (waitMs >= 0) {
+        metrics.observe('queue.item_wait_ms', waitMs);
+        metrics.setGauge('queue.last_item_wait_ms', waitMs);
+        try {
+          // Maintain bounded recent wait samples for sliding-window burn-rate evaluation
+          const cap = parseInt(process.env.QUEUE_WAIT_SAMPLES_CAP || '2000', 10);
+          const arr = metrics._internal_state.queue_item_wait_samples || (metrics._internal_state.queue_item_wait_samples = []);
+          arr.push({ ts: Date.now(), wait: waitMs });
+          if (arr.length > cap) { arr.splice(0, arr.length - cap); }
+          try { metrics.setGauge('queue.wait_samples_cap', cap); } catch(_) { /* ignore */ }
+        } catch(_) { /* ignore */ }
+        const snapMax = metrics._internal_state.queue_max_item_wait_ms || 0;
+        if (waitMs > snapMax) {
+          metrics._internal_state.queue_max_item_wait_ms = waitMs;
+          metrics._internal_state.queue_max_item_wait_last_update_ts = Date.now();
+          metrics.setGauge('queue.max_item_wait_ms', waitMs);
+          try { metrics.mark('queue.max_item_wait_last_update'); } catch(_) { /* ignore */ }
+          try { metrics.inc('queue.max_item_wait_update'); } catch(_) { /* ignore */ }
+          try {
+            const logger = require('../../../utils/logger');
+            logger.warn(JSON.stringify({ event: 'queue_wait_max_update', waitMs, previousMaxMs: snapMax, ts: Date.now() }));
+          } catch(_) { /* logging optional */ }
+        }
+      }
+    } catch(_) { /* ignore */ }
+  }
   // (Mock publish) Simply mark listing lifecycle_state if create intent
   try {
     const listing = await EbayListing.findOne({ where: { ebay_listing_id: item.ebay_listing_id } });

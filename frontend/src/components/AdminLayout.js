@@ -4,7 +4,8 @@ import './AdminLayout.css';
 
 const tabs = [
   { label: 'App Config', path: 'appconfig' },
-  { label: 'App URLs', path: 'urls' }
+  { label: 'App URLs', path: 'urls' },
+  { label: 'eBay Integration', path: 'ebay' }
 ];
 
 const AdminLayout = () => {

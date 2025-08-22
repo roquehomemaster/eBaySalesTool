@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-label="Data Stream Concept">
+  <rect width="640" height="360" fill="#F8FAFC"/>
+  <!-- Modular blocks -->
+  <g stroke="#1E40AF" stroke-width="2" fill="white" font-family="Inter,Arial" font-size="11" text-anchor="middle">
+    <rect x="60" y="70" width="90" height="60" rx="8"/>
+    <text x="105" y="105" fill="#1E40AF">Inventory</text>
+    <rect x="60" y="150" width="90" height="60" rx="8"/>
+    <text x="105" y="185" fill="#1E40AF">Pricing</text>
+    <rect x="60" y="230" width="90" height="60" rx="8"/>
+    <text x="105" y="265" fill="#1E40AF">Policy</text>
+  </g>
+  <!-- Merge arrows -->
+  <path d="M150 100 C210 100 210 180 270 180" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="round"/>
+  <path d="M150 180 H270" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="round"/>
+  <path d="M150 260 C210 260 210 180 270 180" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="round"/>
+  <path d="M270 180 l-14 -12 v24 z" fill="#2563EB"/>
+  <!-- Gradient channel -->
+  <defs>
+    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1E40AF"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+  </defs>
+  <rect x="270" y="150" width="150" height="60" rx="30" fill="url(#flow)" opacity="0.15"/>
+  <!-- Final listing tile -->
+  <g stroke="#1E40AF" stroke-width="2" fill="white">
+    <rect x="450" y="110" width="140" height="140" rx="12"/>
+    <rect x="465" y="125" width="55" height="55" rx="6" fill="#E0ECFF" stroke="#2563EB"/>
+    <line x1="525" y1="140" x2="580" y2="140" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+    <line x1="525" y1="155" x2="580" y2="155" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+    <line x1="465" y1="195" x2="580" y2="195" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="575" cy="225" r="18" fill="#10B981" stroke="#0F766E" stroke-width="2"/>
+    <path d="M566 225 l8 8 12-14" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="450" y="100" font-family="Inter,Arial" font-size="14" fill="#1E40AF">Optimized Output</text>
+</svg>

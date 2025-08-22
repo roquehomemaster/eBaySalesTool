@@ -1,4 +1,16 @@
 {
+  "openapi": "3.0.1",
+  "info": {
+    "title": "ListFlowHQ API",
+    "version": "1.0.0",
+    "description": "Consolidated API specification for the ListFlowHQ backend (formerly eBay Sales Tool). This file is generated; edit fragment .swagger.json files under backend/src/swagger and run generate_swagger.js."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Local development"
+    }
+  ],
   "paths": {
     "/api/listings/status/workflow": {
       "get": {
@@ -8,7 +20,24 @@
         ],
         "responses": {
           "200": {
-            "description": "Workflow graph"
+            "description": "Workflow graph",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusWorkflowGraph"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       },
@@ -22,21 +51,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "graph": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "required": [
-                  "graph"
-                ]
+                "$ref": "#/components/schemas/StatusWorkflowGraphUpdate"
               }
             }
           }
@@ -46,7 +61,422 @@
             "description": "Updated"
           },
           "400": {
-            "description": "Invalid graph"
+            "description": "Invalid graph",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/ebay/metrics": {
+      "get": {
+        "summary": "Get eBay integration metrics snapshot",
+        "tags": [
+          "eBay Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Metrics object"
+          }
+        }
+      }
+    },
+    "/api/admin/ebay/health": {
+      "get": {
+        "summary": "Get eBay integration health summary",
+        "tags": [
+          "eBay Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Health summary"
+          }
+        }
+      }
+    },
+    "/api/admin/ebay/transactions": {
+      "get": {
+        "summary": "List transaction log entries (filterable)",
+        "tags": [
+          "eBay Admin"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "channel",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "operation",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ebay_listing_id",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "csv"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction list or CSV"
+          }
+        }
+      }
+    },
+    "/api/admin/ebay/queue": {
+      "get": {
+        "summary": "List change queue items",
+        "tags": [
+          "eBay Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Queue items"
+          }
+        }
+      }
+    },
+    "/api/admin/ebay/queue/{id}/retry": {
+      "post": {
+        "summary": "Retry a failed/dead queue item",
+        "tags": [
+          "eBay Admin"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retried"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/api/admin/ebay/queue/dead-letter": {
+      "get": {
+        "summary": "List dead queue & failed events",
+        "tags": [
+          "eBay Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Dead letters"
+          }
+        }
+      }
+    },
+    "/api/admin/ebay/failed-events/{id}/replay": {
+      "post": {
+        "summary": "Replay a failed event",
+        "tags": [
+          "eBay Admin"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Replayed"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/api/admin/ebay/snapshots": {
+      "get": {
+        "summary": "List listing snapshots",
+        "tags": [
+          "eBay Admin"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ebay_listing_id",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Snapshots"
+          }
+        }
+      }
+    },
+    "/api/admin/ebay/snapshots/{id}": {
+      "get": {
+        "summary": "Get a snapshot by id",
+        "tags": [
+          "eBay Admin"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Snapshot"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/api/admin/ebay/snapshots/{a}/diff/{b}": {
+      "get": {
+        "summary": "Diff two snapshots",
+        "tags": [
+          "eBay Admin"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "a",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "b",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Diff result"
+          }
+        }
+      }
+    },
+    "/api/admin/ebay/sync/logs": {
+      "get": {
+        "summary": "List sync log entries",
+        "tags": [
+          "eBay Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Logs"
+          }
+        }
+      }
+    },
+    "/api/admin/ebay/policies": {
+      "get": {
+        "summary": "List cached policies",
+        "tags": [
+          "eBay Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Policies"
+          }
+        }
+      }
+    },
+    "/api/admin/ebay/drift-events": {
+      "get": {
+        "summary": "List drift events",
+        "tags": [
+          "eBay Admin"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "classification",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "listingId",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "fromMs",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "toMs",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Drift events"
+          }
+        }
+      }
+    },
+    "/api/admin/ebay/drift-events/summary": {
+      "get": {
+        "summary": "Drift classification counts",
+        "tags": [
+          "eBay Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Counts"
+          }
+        }
+      }
+    },
+    "/api/admin/ebay/drift-events/retention/run": {
+      "post": {
+        "summary": "Trigger drift retention cleanup",
+        "tags": [
+          "eBay Admin"
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "retentionDays": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Retention result"
           }
         }
       }
@@ -3081,30 +3511,64 @@
         "tags": [
           "Listing"
         ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Listing collection",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "listings": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Listing"
-                      }
-                    },
-                    "total": {
-                      "type": "integer"
-                    },
-                    "page": {
-                      "type": "integer"
-                    },
-                    "pageSize": {
-                      "type": "integer"
+                  "$ref": "#/components/schemas/ListingList"
+                },
+                "example": {
+                  "listings": [
+                    {
+                      "listing_id": 1,
+                      "title": "Sample",
+                      "listing_price": 19.99,
+                      "status": "draft"
                     }
-                  }
+                  ],
+                  "total": 1,
+                  "page": 1,
+                  "pageSize": 50
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -3128,10 +3592,34 @@
         },
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Listing"
+                }
+              }
+            }
           },
           "400": {
-            "description": "Validation error"
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -3164,7 +3652,24 @@
             }
           },
           "404": {
-            "description": "Not found"
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       },
@@ -3195,13 +3700,44 @@
         },
         "responses": {
           "200": {
-            "description": "Updated"
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Listing"
+                }
+              }
+            }
           },
           "400": {
-            "description": "Validation error"
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Not found"
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       },
@@ -3225,7 +3761,24 @@
             "description": "Deleted"
           },
           "404": {
-            "description": "Not found"
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -3248,10 +3801,1063 @@
         ],
         "responses": {
           "200": {
-            "description": "Listing details payload"
+            "description": "Listing details payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Not found"
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ebay/metrics": {
+      "get": {
+        "summary": "Get eBay integration metrics snapshot",
+        "tags": [
+          "eBay Admin"
+        ],
+        "security": [
+          {
+            "AdminHeaderAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Metrics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetricsSnapshot"
+                },
+                "example": {
+                  "counters": {
+                    "drift.detected": 12,
+                    "queue.processed": 150
+                  },
+                  "gauges": {
+                    "queue.depth": 3
+                  },
+                  "timestamps": {
+                    "lastDriftDetected": "2025-08-18T10:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "internal_error",
+                  "message": "Unexpected failure"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ebay/health": {
+      "get": {
+        "summary": "Get eBay integration health summary",
+        "tags": [
+          "eBay Admin"
+        ],
+        "security": [
+          {
+            "AdminHeaderAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthSummary"
+                },
+                "example": {
+                  "featureFlags": {
+                    "DRIFT_RETENTION_ENABLED": true
+                  },
+                  "metrics": {
+                    "queue.depth": 3
+                  },
+                  "summary": {
+                    "changeDetector.msSinceLastRun": 5231,
+                    "retention.msSinceLastRun": 86400000
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ebay/transactions": {
+      "get": {
+        "summary": "List transaction log entries",
+        "tags": [
+          "eBay Admin"
+        ],
+        "security": [
+          {
+            "AdminHeaderAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "channel",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "operation",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ebay_listing_id",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 100
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "csv"
+              ],
+              "default": "json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transactions JSON or CSV",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionList"
+                },
+                "example": {
+                  "items": [
+                    {
+                      "txn_id": 1,
+                      "ebay_listing_id": 10,
+                      "operation": "CREATE_LISTING",
+                      "status": "success",
+                      "latency_ms": 345,
+                      "created_at": "2025-08-18T09:59:00Z"
+                    }
+                  ],
+                  "pagination": {
+                    "limit": 100,
+                    "offset": 0,
+                    "count": 1,
+                    "total": 250
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ebay/queue": {
+      "get": {
+        "summary": "List change queue items",
+        "tags": [
+          "eBay Admin"
+        ],
+        "security": [
+          {
+            "AdminHeaderAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Queue items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueueItemList"
+                },
+                "example": {
+                  "items": [
+                    {
+                      "queue_id": 101,
+                      "ebay_listing_id": 10,
+                      "intent": "updatePrice",
+                      "status": "pending"
+                    }
+                  ],
+                  "pagination": {
+                    "limit": 100,
+                    "offset": 0,
+                    "count": 1,
+                    "total": 4
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ebay/queue/{id}/retry": {
+      "post": {
+        "summary": "Retry a queue item",
+        "tags": [
+          "eBay Admin"
+        ],
+        "security": [
+          {
+            "AdminHeaderAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retried"
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "not_found",
+                  "message": "Queue item not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ebay/queue/dead-letter": {
+      "get": {
+        "summary": "List dead queue + failed events",
+        "tags": [
+          "eBay Admin"
+        ],
+        "security": [
+          {
+            "AdminHeaderAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dead letters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeadLetterSet"
+                },
+                "example": {
+                  "dead": [],
+                  "failed": [
+                    {
+                      "failed_event_id": 5,
+                      "ebay_listing_id": 11,
+                      "intent": "updateQuantity",
+                      "last_error": "timeout"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ebay/failed-events/{id}/replay": {
+      "post": {
+        "summary": "Replay failed event",
+        "tags": [
+          "eBay Admin"
+        ],
+        "security": [
+          {
+            "AdminHeaderAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Replayed"
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ebay/snapshots": {
+      "get": {
+        "summary": "List snapshots",
+        "tags": [
+          "eBay Admin"
+        ],
+        "security": [
+          {
+            "AdminHeaderAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ebay_listing_id",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Snapshots",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SnapshotList"
+                },
+                "example": {
+                  "items": [
+                    {
+                      "snapshot_id": 10,
+                      "ebay_listing_id": 1,
+                      "snapshot_hash": "abc123",
+                      "created_at": "2025-08-18T09:00:00Z"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ebay/snapshots/{id}": {
+      "get": {
+        "summary": "Get snapshot by id",
+        "tags": [
+          "eBay Admin"
+        ],
+        "security": [
+          {
+            "AdminHeaderAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EbayListingSnapshot"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ebay/snapshots/{a}/diff/{b}": {
+      "get": {
+        "summary": "Diff two snapshots",
+        "tags": [
+          "eBay Admin"
+        ],
+        "security": [
+          {
+            "AdminHeaderAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "a",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "b",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Diff",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "added": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "removed": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "changed": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ebay/sync/logs": {
+      "get": {
+        "summary": "List sync log entries",
+        "tags": [
+          "eBay Admin"
+        ],
+        "security": [
+          {
+            "AdminHeaderAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sync logs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ebay/policies": {
+      "get": {
+        "summary": "List cached policies",
+        "tags": [
+          "eBay Admin"
+        ],
+        "security": [
+          {
+            "AdminHeaderAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Policies",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ebay/drift-events": {
+      "get": {
+        "summary": "List drift events",
+        "tags": [
+          "eBay Admin"
+        ],
+        "security": [
+          {
+            "AdminHeaderAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "classification",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "internal_only",
+                "external_only",
+                "both_changed",
+                "snapshot_stale"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "listingId",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "fromMs",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "toMs",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Drift events",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DriftEventsList"
+                },
+                "example": {
+                  "items": [
+                    {
+                      "drift_event_id": 1,
+                      "ebay_listing_id": 10,
+                      "classification": "external_only",
+                      "created_at": "2025-08-18T10:00:00Z"
+                    }
+                  ],
+                  "pagination": {
+                    "limit": 100,
+                    "offset": 0,
+                    "count": 1,
+                    "total": 53
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ebay/drift-events/summary": {
+      "get": {
+        "summary": "Drift classification counts",
+        "tags": [
+          "eBay Admin"
+        ],
+        "security": [
+          {
+            "AdminHeaderAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Counts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DriftSummary"
+                },
+                "example": {
+                  "counts": {
+                    "external_only": 20,
+                    "internal_only": 5,
+                    "both_changed": 3,
+                    "snapshot_stale": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/ebay/drift-events/retention/run": {
+      "post": {
+        "summary": "Trigger drift retention",
+        "tags": [
+          "eBay Admin"
+        ],
+        "security": [
+          {
+            "AdminHeaderAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "retentionDays": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Retention result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetentionResult"
+                },
+                "example": {
+                  "deleted": 42,
+                  "retentionDays": 30,
+                  "cutoff": "2025-07-19T00:00:00Z",
+                  "skipped": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/ebay/retrieve": {
+      "post": {
+        "summary": "Ingest raw eBay listing payloads (comma-separated IDs) and persist raw data.",
+        "description": "Retrieves raw listing payloads from eBay. When dryRun=true, nothing is written to the database; the summary reflects the simulated outcome.",
+        "tags": [
+          "eBay Admin"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "itemIds": {
+                    "type": "string",
+                    "description": "Comma or whitespace separated list of eBay listing item IDs."
+                  },
+                  "dryRun": {
+                    "type": "boolean",
+                    "default": true
+                  }
+                },
+                "required": [
+                  "itemIds"
+                ],
+                "example": {
+                  "itemIds": "101,102,103",
+                  "dryRun": true
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful retrieval (real or simulated).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "dryRun": {
+                      "type": "boolean"
+                    },
+                    "summary": {
+                      "$ref": "#/components/schemas/RawIngestionSummary"
+                    }
+                  },
+                  "required": [
+                    "dryRun",
+                    "summary"
+                  ],
+                  "example": {
+                    "dryRun": true,
+                    "summary": {
+                      "requested": 3,
+                      "fetched": 3,
+                      "succeeded": 3,
+                      "inserted": 0,
+                      "duplicates": 0,
+                      "skipped": 0,
+                      "errors": 0,
+                      "invalidIds": 0,
+                      "transientErrors": 0,
+                      "permanentErrors": 0,
+                      "retries": 0,
+                      "backpressureDelays": 1,
+                      "avgAttempts": 1,
+                      "durationMs": 842
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error (missing or invalid itemIds).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "no_item_ids",
+                  "message": "At least one itemId is required"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "internal_error",
+                  "message": "Unexpected failure"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/ebay/map/run": {
+      "post": {
+        "summary": "Execute the raw->domain mapping pipeline over new/unmapped items.",
+        "description": "Runs the mapping pass. When dryRun=true, performs read-only simulation and returns a summary without persisting domain entities.",
+        "tags": [
+          "eBay Admin"
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dryRun": {
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "maxItems": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Optional cap on number of raw items to map this run."
+                  }
+                },
+                "example": {
+                  "dryRun": true,
+                  "maxItems": 500
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mapping run completed (success, partial, or failed).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "dryRun": {
+                      "type": "boolean"
+                    },
+                    "exitCode": {
+                      "type": "integer",
+                      "description": "0=success, >0 indicates partial or failure."
+                    },
+                    "summary": {
+                      "$ref": "#/components/schemas/MappingRunSummary"
+                    },
+                    "logs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Key log lines or messages from the run."
+                    }
+                  },
+                  "required": [
+                    "dryRun",
+                    "exitCode",
+                    "summary"
+                  ],
+                  "example": {
+                    "dryRun": false,
+                    "exitCode": 0,
+                    "summary": {
+                      "status": "success",
+                      "startedAt": "2025-08-20T12:34:56.000Z",
+                      "finishedAt": "2025-08-20T12:34:59.200Z",
+                      "durationMs": 3200,
+                      "processed": 450,
+                      "mapped": 450,
+                      "skipped": 0,
+                      "errors": 0,
+                      "selected": 450,
+                      "dryRun": false,
+                      "limit": 500
+                    },
+                    "logs": [
+                      "Starting mapping run...",
+                      "Processed 450 items",
+                      "Mapping run complete"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "invalid_maxItems",
+                  "message": "maxItems must be a positive integer"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "spawn_failed",
+                  "message": "Failed to spawn mapping process"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Mapping run timed out.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "mapping_timeout",
+                  "message": "Mapping run exceeded timeout"
+                }
+              }
+            }
           }
         }
       }
@@ -4167,6 +5773,611 @@
           },
           "ownership_id": {
             "type": "integer"
+          }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "count": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        }
+      },
+      "EbayChangeQueue": {
+        "type": "object",
+        "properties": {
+          "queue_id": {
+            "type": "integer"
+          },
+          "ebay_listing_id": {
+            "type": "integer"
+          },
+          "intent": {
+            "type": "string"
+          },
+          "payload_hash": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "integer"
+          },
+          "attempts": {
+            "type": "integer"
+          },
+          "error_reason": {
+            "type": "string"
+          },
+          "next_earliest_run_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "last_attempt_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "EbayFailedEvent": {
+        "type": "object",
+        "properties": {
+          "failed_event_id": {
+            "type": "integer"
+          },
+          "ebay_listing_id": {
+            "type": "integer"
+          },
+          "intent": {
+            "type": "string"
+          },
+          "payload_hash": {
+            "type": "string"
+          },
+          "request_payload": {
+            "type": "object"
+          },
+          "last_error": {
+            "type": "string"
+          },
+          "attempts": {
+            "type": "integer"
+          },
+          "last_attempt_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "EbayListingSnapshot": {
+        "type": "object",
+        "properties": {
+          "snapshot_id": {
+            "type": "integer"
+          },
+          "ebay_listing_id": {
+            "type": "integer"
+          },
+          "snapshot_hash": {
+            "type": "string"
+          },
+          "snapshot_json": {
+            "type": "object"
+          },
+          "diff_from_prev_json": {
+            "type": "object"
+          },
+          "source_event": {
+            "type": "string"
+          },
+          "dedup_of_snapshot_id": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "EbayTransactionLog": {
+        "type": "object",
+        "properties": {
+          "txn_id": {
+            "type": "integer"
+          },
+          "ebay_listing_id": {
+            "type": "integer"
+          },
+          "correlation_id": {
+            "type": "string"
+          },
+          "direction": {
+            "type": "string"
+          },
+          "channel": {
+            "type": "string"
+          },
+          "operation": {
+            "type": "string"
+          },
+          "request_url": {
+            "type": "string"
+          },
+          "request_method": {
+            "type": "string"
+          },
+          "request_body": {
+            "type": "object"
+          },
+          "response_code": {
+            "type": "integer"
+          },
+          "response_body": {
+            "type": "object"
+          },
+          "status": {
+            "type": "string"
+          },
+          "error_classification": {
+            "type": "string"
+          },
+          "latency_ms": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "EbayDriftEvent": {
+        "type": "object",
+        "properties": {
+          "drift_event_id": {
+            "type": "integer"
+          },
+          "ebay_listing_id": {
+            "type": "integer"
+          },
+          "classification": {
+            "type": "string",
+            "enum": [
+              "internal_only",
+              "external_only",
+              "both_changed",
+              "snapshot_stale"
+            ]
+          },
+          "local_hash": {
+            "type": "string"
+          },
+          "remote_hash": {
+            "type": "string"
+          },
+          "snapshot_hash": {
+            "type": "string"
+          },
+          "details_json": {
+            "type": "object"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error",
+          "message"
+        ]
+      },
+      "HealthSummary": {
+        "type": "object",
+        "properties": {
+          "featureFlags": {
+            "type": "object"
+          },
+          "metrics": {
+            "type": "object"
+          },
+          "summary": {
+            "type": "object"
+          }
+        }
+      },
+      "MetricsSnapshot": {
+        "type": "object",
+        "properties": {
+          "counters": {
+            "type": "object"
+          },
+          "gauges": {
+            "type": "object"
+          },
+          "timestamps": {
+            "type": "object"
+          }
+        }
+      },
+      "TransactionList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EbayTransactionLog"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          }
+        }
+      },
+      "QueueItemList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EbayChangeQueue"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          }
+        }
+      },
+      "DeadLetterSet": {
+        "type": "object",
+        "properties": {
+          "dead": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EbayChangeQueue"
+            }
+          },
+          "failed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EbayFailedEvent"
+            }
+          }
+        }
+      },
+      "SnapshotList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EbayListingSnapshot"
+            }
+          }
+        }
+      },
+      "DriftEventsList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EbayDriftEvent"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          }
+        }
+      },
+      "DriftSummary": {
+        "type": "object",
+        "properties": {
+          "counts": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "RetentionResult": {
+        "type": "object",
+        "properties": {
+          "deleted": {
+            "type": "integer"
+          },
+          "retentionDays": {
+            "type": "integer"
+          },
+          "cutoff": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "skipped": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ListingList": {
+        "type": "object",
+        "properties": {
+          "listings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Listing"
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "pageSize": {
+            "type": "integer"
+          }
+        }
+      },
+      "StatusWorkflowGraph": {
+        "type": "object",
+        "properties": {
+          "graph": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "StatusWorkflowGraphUpdate": {
+        "type": "object",
+        "properties": {
+          "graph": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "graph"
+        ]
+      },
+      "RawIngestionSummary": {
+        "type": "object",
+        "properties": {
+          "requested": {
+            "type": "integer",
+            "description": "Count of IDs provided in the request."
+          },
+          "fetched": {
+            "type": "integer",
+            "description": "Count of IDs successfully fetched from eBay API."
+          },
+          "succeeded": {
+            "type": "integer",
+            "description": "Count of raw payloads successfully processed (pre-insert)."
+          },
+          "inserted": {
+            "type": "integer",
+            "description": "Number of new raw rows inserted (non-dry run)."
+          },
+          "duplicates": {
+            "type": "integer",
+            "description": "Rows skipped due to existing identical payload hash."
+          },
+          "skipped": {
+            "type": "integer",
+            "description": "Rows intentionally skipped (e.g., validation failure)."
+          },
+          "errors": {
+            "type": "integer",
+            "description": "Count of hard errors encountered per item."
+          },
+          "invalidIds": {
+            "type": "integer",
+            "description": "Number of provided IDs failing basic validation regex."
+          },
+          "transientErrors": {
+            "type": "integer",
+            "description": "Errors deemed retryable (may have succeeded after retry)."
+          },
+          "permanentErrors": {
+            "type": "integer",
+            "description": "Errors deemed non-retryable resulting in item failure."
+          },
+          "retries": {
+            "type": "integer",
+            "description": "Total retry attempts performed across all items."
+          },
+          "backpressureDelays": {
+            "type": "integer",
+            "description": "Number of times ingestion paused due to near rate limit depletion."
+          },
+          "avgAttempts": {
+            "type": "number",
+            "format": "float",
+            "description": "Average fetch attempts per successfully fetched item (includes initial)."
+          },
+          "durationMs": {
+            "type": "integer",
+            "description": "Total elapsed time of retrieval in milliseconds."
+          },
+          "errorSamples": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Subset of representative error messages (truncated)."
+          }
+        },
+        "required": [
+          "requested",
+          "fetched",
+          "succeeded",
+          "inserted",
+          "duplicates",
+          "skipped",
+          "errors",
+          "invalidIds",
+          "durationMs"
+        ]
+      },
+      "MappingRunSummary": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "success",
+              "partial",
+              "failed"
+            ],
+            "description": "Overall result classification."
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "durationMs": {
+            "type": "integer"
+          },
+          "processed": {
+            "type": "integer",
+            "description": "Total raw records examined."
+          },
+          "mapped": {
+            "type": "integer",
+            "description": "Successfully mapped into domain entities."
+          },
+          "skipped": {
+            "type": "integer",
+            "description": "Dropped or already mapped."
+          },
+          "errors": {
+            "type": "integer",
+            "description": "Count of mapping failures."
+          },
+          "selected": {
+            "type": "integer",
+            "description": "Raw rows selected for this run prior to filtering (matches processed + maybe early filtered)."
+          },
+          "dryRun": {
+            "type": "boolean",
+            "description": "Whether the mapping run executed in dry-run mode (duplicated at top-level for convenience)."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Batch processing limit used for this run."
+          },
+          "errorSamples": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Representative errors (may be truncated)."
+          }
+        },
+        "required": [
+          "status",
+          "startedAt",
+          "finishedAt",
+          "durationMs",
+          "processed",
+          "mapped",
+          "skipped",
+          "errors",
+          "selected",
+          "dryRun"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "AdminHeaderAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Admin-Auth"
+      },
+      "AdminApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Admin-Auth",
+        "description": "Admin API key required for protected /api/admin/ebay endpoints."
+      }
+    },
+    "responses": {
+      "UnauthorizedError": {
+        "description": "Unauthorized – missing or invalid admin API key",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Unauthorized"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ForbiddenError": {
+        "description": "Forbidden – authenticated but lacking permission",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Forbidden"
+                }
+              }
+            }
           }
         }
       }

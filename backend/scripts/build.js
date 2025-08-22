@@ -38,7 +38,7 @@ try {
     inDocker = fs.existsSync('/.dockerenv') ||
         (fs.existsSync('/proc/1/cgroup') && fs.readFileSync('/proc/1/cgroup', 'utf-8').includes('docker'));
 } catch (e) {}
-config.database.host = inDocker ? 'postgres_db' : 'localhost';
+config.database.host = inDocker ? 'listflowhq-db' : 'localhost';
 log('Debugging full config object:', JSON.stringify(config, null, 2));
 
 function setEnvironmentVariablesFromConfig(config) {
@@ -50,7 +50,7 @@ function setEnvironmentVariablesFromConfig(config) {
     } catch (e) {}
     // Use service name in Docker, static IP on host
     // Always use 'localhost' for PG_HOST unless running inside Docker
-    process.env.PG_HOST = inDocker ? 'postgres_db' : 'localhost';
+    process.env.PG_HOST = inDocker ? 'listflowhq-db' : 'localhost';
     process.env.PG_PORT = config.database.port;
     process.env.PG_USER = config.database.user;
     process.env.PG_PASSWORD = config.database.password;
@@ -260,7 +260,7 @@ function waitForAllContainers(config) {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
             const result = execSync('docker ps --filter "status=running" --format "{{.Names}}"', { encoding: 'utf-8' }).trim();
-            const expectedContainers = ['postgres_db', 'ebaysalestool-backend'];
+            const expectedContainers = ['listflowhq-db', 'listflowhq-backend'];
             const runningContainers = result.split('\n');
             if (expectedContainers.every((container) => runningContainers.includes(container))) {
                 log('All containers are fully operational.');
@@ -381,7 +381,7 @@ async function waitForContainerHealth(containerName) {
 }
 
 async function waitForAllContainersHealth() {
-    const containers = ['postgres_db', 'ebaysalestool-backend'];
+    const containers = ['listflowhq-db', 'listflowhq-backend'];
     for (const container of containers) {
         await waitForContainerHealth(container);
     }
@@ -419,7 +419,7 @@ async function verifyContainerHealth(containerName) {
 }
 
 async function verifyAllContainersHealth() {
-    const containers = ['postgres_db', 'ebaysalestool-backend'];
+    const containers = ['listflowhq-db', 'listflowhq-backend'];
     for (const container of containers) {
         await verifyContainerHealth(container);
     }
@@ -532,7 +532,7 @@ async function main() {
         try {
             const testResultsPath = path.resolve(__dirname, '../../logs/API-Test-Results.txt');
             // Windows-compatible environment variable assignment
-            // Use 'localhost' for PG_HOST on host, 'postgres_db' inside Docker
+            // Use 'localhost' for PG_HOST on host, 'listflowhq-db' inside Docker
             let inDocker = false;
             try {
                 inDocker = fs.existsSync('/.dockerenv') ||

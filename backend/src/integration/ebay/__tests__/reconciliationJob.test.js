@@ -36,4 +36,12 @@ describe('reconciliationJob', () => {
     expect(_seed.queue.length).toBe(1);
     expect(_seed.queue[0].payload_hash).toBe('h-new');
   });
+
+  test('does not enqueue duplicate drift if already pending', async () => {
+    await runReconciliation({ batchSize: 10, maxBatches: 1 });
+    const firstLen = _seed.queue.length;
+    const res2 = await runReconciliation({ batchSize: 10, maxBatches: 1 });
+    expect(res2.driftEnqueued).toBe(0);
+    expect(_seed.queue.length).toBe(firstLen);
+  });
 });

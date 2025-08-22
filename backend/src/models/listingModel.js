@@ -4,7 +4,7 @@
  * Sequelize model definition for the Listing table.
  * Maps JS camelCase fields to DB snake_case/column names.
  *
- * Author: eBay Sales Tool Team
+ * Author: ListFlowHQ Team (formerly eBay Sales Tool Team)
  * Last updated: 2025-07-10
  * -----------------------------------------------------------------------------
  */

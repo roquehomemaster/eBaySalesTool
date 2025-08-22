@@ -28,7 +28,7 @@ An **Item** represents a product listed on eBay. It is linked to an **Item Maste
 
 ## Page Layout
 1. **Header Section**:
-   - **Title**: Displayed at the top of the page, centered, with the text "eBay Sales Tool".
+  - **Title**: Displayed at the top of the page, centered, with the text "ListFlowHQ".
 
 2. **Messaging/Alert/Error Section**:
    - **Purpose**: Display messages to the user, such as success messages, errors, or alerts.

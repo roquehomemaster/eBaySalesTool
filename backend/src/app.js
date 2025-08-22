@@ -1,12 +1,12 @@
 /**
  * app.js
  * -----------------------------------------------------------------------------
- * Main entry point for the eBay Sales Tool backend Express application.
+ * Main entry point for the ListFlowHQ backend Express application (formerly eBay Sales Tool).
  *
  * - Configures middleware, routes, logging, and database connections.
  * - Serves API endpoints and Swagger documentation.
  *
- * Author: eBay Sales Tool Team
+ * Author: ListFlowHQ Team (formerly eBay Sales Tool Team)
  * Last updated: 2025-07-10
  * -----------------------------------------------------------------------------
  */
@@ -26,6 +26,9 @@ const ebayHealthAdminRoutes = require('./routes/ebayHealthAdminRoutes');
 const ebayTransactionAdminRoutes = require('./routes/ebayTransactionAdminRoutes');
 const ebayDriftAdminRoutes = require('./routes/ebayDriftAdminRoutes');
 const ebayAdminAuth = require('./middleware/ebayAdminAuth');
+// Lazy requires for readiness checks (wrapped in try/catch to avoid test impact if absent)
+let ebayCircuitBreaker; try { ebayCircuitBreaker = require('./integration/ebay/circuitBreaker'); } catch(_) { /* optional */ }
+let ebayTokenManager; try { ebayTokenManager = require('./integration/ebay/tokenManager'); } catch(_) { /* optional */ }
 const salesRoutes = require('./routes/salesRoutes');
 const customerRoutes = require('./routes/customerRoutes');
 const ebayInfoRoutes = require('./routes/ebayInfoRoutes');
@@ -40,6 +43,8 @@ const Sales = require('./models/salesModel');
 const fs = require('fs');
 const path = require('path');
 const logger = require('./utils/logger');
+// Optional metrics (used for readiness instrumentation)
+let metrics; try { metrics = require('./integration/ebay/metrics'); } catch(_) { /* optional */ }
 // Auth models (roles, users, pages, access matrix)
 const { User, Role, Page, RolePageAccess } = require('./models/authModels');
 const returnhistoryRoutes = require('./routes/returnhistoryRoutes');
@@ -58,13 +63,9 @@ const { startSchedulers } = require('./integration/ebay/scheduler');
 const logDir = '/usr/src/app/logs';
 if (!fs.existsSync(logDir)) {
     fs.mkdirSync(logDir, { recursive: true });
-    if ((process.env.LOG_LEVEL || 'info') === 'debug') {
-        console.log(`Created logs directory at ${logDir}`);
-    }
-} else {
-    if ((process.env.LOG_LEVEL || 'info') === 'debug') {
-        console.log(`Logs directory already exists at ${logDir}`);
-    }
+    if ((process.env.LOG_LEVEL || 'info') === 'debug') { console.log(`Created logs directory at ${logDir}`); }
+} else if ((process.env.LOG_LEVEL || 'info') === 'debug') {
+    console.log(`Logs directory already exists at ${logDir}`);
 }
 
 const app = express();
@@ -160,11 +161,11 @@ app.get('/api-docs/swagger.json', serveSwaggerSpec); // allow relative fetch whe
 try {
     const hasServe = swaggerUi && typeof swaggerUi.serve === 'function';
         if (!hasServe || process.env.SWAGGER_FORCE_FALLBACK === 'true') {
-                logger.warn('Using manual swagger-ui-dist fallback (reason: ' + (!hasServe ? 'serve() missing' : 'env override') + ')');
+                logger.warn('Using manual swagger-ui-dist fallback (reason: ' + (hasServe ? 'env override' : 'serve() missing') + ')');
                 const swaggerUiDist = require('swagger-ui-dist');
                 const distPath = swaggerUiDist.getAbsoluteFSPath ? swaggerUiDist.getAbsoluteFSPath() : swaggerUiDist.absolutePath();
                 // Custom responder first to override default Petstore index for /api-docs and /api-docs/
-                const customSwaggerHtml = `<!DOCTYPE html><html><head><title>eBay Sales Tool API Docs</title>
+                const customSwaggerHtml = `<!DOCTYPE html><html><head><title>ListFlowHQ API Docs</title>
 <link rel="stylesheet" type="text/css" href="./swagger-ui.css" />
 <style>body { margin:0; }</style></head>
 <body><div id="swagger-ui"></div>
@@ -202,7 +203,7 @@ window.onload = function() {
         const serveMiddlewares = Array.isArray(swaggerUi.serve) ? swaggerUi.serve : [swaggerUi.serve];
         app.use('/api-docs', ...serveMiddlewares, swaggerUi.setup(mergedSwagger, {
             explorer: true,
-            customSiteTitle: 'eBay Sales Tool API Docs',
+            customSiteTitle: 'ListFlowHQ API Docs',
             swaggerOptions: {
                 docExpansion: 'none',
                 persistAuthorization: true,
@@ -311,6 +312,127 @@ app.get('/api/health', (req, res) => {
         node: process.version,
     };
     res.status(200).json({ status: 'ok', uptimeSeconds: Math.round((Date.now()-startedAt.getTime())/1000), build: buildInfo });
+});
+
+// Readiness endpoint: returns 200 if service should accept traffic. Non-200 if degraded critical deps.
+let lastReadyState = null; // null | 'ready' | 'not_ready'
+app.get('/api/ready', async (req, res) => {
+    const issues = [];
+    // OAuth degraded gate
+    try {
+        if (ebayTokenManager) {
+            const snap = ebayTokenManager.snapshot();
+            if (snap.degraded) {
+                issues.push('oauth_degraded');
+            }
+        }
+    } catch(e){ issues.push('oauth_check_error'); }
+    // Circuit breaker open gate
+    try {
+        if (ebayCircuitBreaker && typeof ebayCircuitBreaker.status === 'function') {
+            const st = ebayCircuitBreaker.status();
+            if (st && st.open) { issues.push('circuit_breaker_open'); }
+        }
+    } catch(e){ issues.push('circuit_breaker_check_error'); }
+    // DB connectivity lightweight probe (cached outcome for small interval)
+    try {
+        const dbCheckIntervalMs = parseInt(process.env.READINESS_DB_CHECK_INTERVAL_MS || '10000', 10);
+        const timeoutMs = parseInt(process.env.READINESS_DB_CHECK_TIMEOUT_MS || '1500', 10);
+        if (!app.locals._lastDbCheck || Date.now() - app.locals._lastDbCheck.ts > dbCheckIntervalMs) {
+            const { pool } = require('./utils/database');
+            let timeoutHandle;
+            const race = Promise.race([
+                pool.query('SELECT 1').then(() => ({ ok: true })),
+                new Promise(resolve => { timeoutHandle = setTimeout(() => resolve({ ok: false, timeout: true }), timeoutMs).unref(); })
+            ]);
+            const result = await race;
+            if (timeoutHandle) { clearTimeout(timeoutHandle); }
+            app.locals._lastDbCheck = { ts: Date.now(), ok: result.ok };
+            if (!result.ok) {
+                issues.push('db_unreachable');
+                if (metrics) {
+                    metrics.setGauge('db.reachable', 0);
+                    metrics.mark('db.last_unreachable');
+                    metrics.mark('db.last_check');
+                }
+            } else if (metrics) {
+                metrics.setGauge('db.reachable', 1);
+                metrics.mark('db.last_check');
+            }
+        } else if (app.locals._lastDbCheck && app.locals._lastDbCheck.ok === false) {
+            issues.push('db_unreachable');
+            if (metrics) { metrics.setGauge('db.reachable', 0); }
+        } else if (metrics) {
+            // Cached healthy result
+            metrics.setGauge('db.reachable', 1);
+        }
+    } catch(e){
+        // If the failure looks like a query failure we classify as unreachable, otherwise generic error
+        if (e && (e.message || '').toLowerCase().includes('select 1')) {
+            issues.push('db_unreachable');
+            if (metrics) { metrics.setGauge('db.reachable', 0); metrics.mark('db.last_unreachable'); metrics.mark('db.last_check'); }
+        } else {
+            issues.push('db_check_error');
+            if (metrics) { metrics.setGauge('db.reachable', 0); metrics.mark('db.last_check'); }
+        }
+    }
+    // Queue backlog gate: if pending depth exceeds threshold, mark not ready (allows kube to scale out, etc.)
+    try {
+        const threshold = parseInt(process.env.EBAY_QUEUE_BACKLOG_READY_THRESHOLD || '0', 10);
+        if (threshold > 0) {
+            const m = require('./integration/ebay/metrics');
+            const snap = m && m.snapshot ? m.snapshot() : null;
+            if (snap) {
+                const depth = snap.gauges.queue_pending_depth || snap.gauges['queue.pending_depth'] || 0;
+                if (depth >= threshold) { issues.push('queue_backlog'); }
+            }
+        }
+    } catch(_) { /* suppress backlog check errors */ }
+    const newState = issues.length === 0 ? 'ready' : 'not_ready';
+    if (newState !== lastReadyState) {
+        const ts = Date.now();
+        const evt = { event: 'readiness_transition', from: lastReadyState, to: newState, ts };
+        if (issues.length) { evt.issues = issues; }
+        const line = JSON.stringify(evt);
+        if (newState === 'ready') { logger.info(line); } else { logger.warn(line); }
+        lastReadyState = newState;
+        if (metrics) {
+            metrics.inc('readiness.transitions');
+            metrics.inc(newState === 'ready' ? 'readiness.transitions_to_ready' : 'readiness.transitions_to_not_ready');
+            metrics.setGauge('readiness.current_state', newState === 'ready' ? 1 : 0);
+            metrics.mark('readiness.last_transition');
+            // Track transition history for flapping detection
+            const st = metrics._internal_state;
+            if (!Array.isArray(st.readinessTransitions)) { st.readinessTransitions = []; }
+            st.readinessTransitions.push(ts);
+            const windowMs = parseInt(process.env.READINESS_FLAP_WINDOW_MS || '600000', 10); // 10m default
+            const cutoff = ts - windowMs;
+            while (st.readinessTransitions.length && st.readinessTransitions[0] < cutoff) { st.readinessTransitions.shift(); }
+            // Expose flapping window metrics
+            try {
+                metrics.setGauge('readiness.flap_window_transitions', st.readinessTransitions.length);
+                metrics.setGauge('readiness.flap_window_ms', windowMs);
+            } catch(_) { /* ignore */ }
+        }
+    } else if (metrics) {
+        // Maintain current state gauge even without transition
+        metrics.setGauge('readiness.current_state', newState === 'ready' ? 1 : 0);
+        // Update flapping window gauges if internal state exists
+        try {
+            const st = metrics._internal_state;
+            if (st && Array.isArray(st.readinessTransitions)) {
+                const windowMs = parseInt(process.env.READINESS_FLAP_WINDOW_MS || '600000', 10);
+                const cutoff = Date.now() - windowMs;
+                while (st.readinessTransitions.length && st.readinessTransitions[0] < cutoff) { st.readinessTransitions.shift(); }
+                metrics.setGauge('readiness.flap_window_transitions', st.readinessTransitions.length);
+                metrics.setGauge('readiness.flap_window_ms', windowMs);
+            }
+        } catch(_) { /* ignore */ }
+    }
+    if (newState === 'ready') {
+        return res.status(200).json({ status: 'ready' });
+    }
+    return res.status(503).json({ status: 'not_ready', issues });
 });
 
 // Graceful shutdown support

@@ -17,7 +17,7 @@
 //   - Merge in all .swagger.json files from backend/src/swagger
 //   - Write the merged result to swagger.json at the project root
 //
-// Author: eBay Sales Tool Team
+// Author: ListFlowHQ Team (formerly eBay Sales Tool Team)
 // Last updated: 2025-07-10
 // -----------------------------------------------------------------------------
 

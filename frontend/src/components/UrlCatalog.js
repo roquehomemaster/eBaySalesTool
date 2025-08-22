@@ -5,14 +5,26 @@ import React from 'react';
  * If environment variables define backend host/port, uses them; else assumes same origin.
  */
 const UrlCatalog = () => {
-  const backendBase = (process.env.REACT_APP_BACKEND_BASE || '').replace(/\/$/, '') || window.location.origin;
+  // Determine backend base: prefer explicit env var; otherwise if frontend is on 3000 assume backend on 5000
+  const inferredOrigin = (() => {
+    const { protocol, hostname, port } = window.location;
+    if (process.env.REACT_APP_BACKEND_BASE) {
+      return process.env.REACT_APP_BACKEND_BASE.replace(/\/$/, '');
+    }
+    if (port === '3000') {
+      return `${protocol}//${hostname}:5000`;
+    }
+    return window.location.origin;
+  })();
+  const backendBase = inferredOrigin.replace(/\/$/, '');
   const rows = [
     { label: 'Frontend Listings', url: '/listings' },
     { label: 'Frontend Catalog', url: '/catalog' },
     { label: 'Frontend Sales', url: '/sales' },
     { label: 'Frontend Reports', url: '/reports' },
     { label: 'Admin App Config', url: '/admin/appconfig' },
-    { label: 'Swagger UI', url: backendBase + '/api-docs' },
+  { label: 'Swagger UI', url: backendBase + '/api-docs' },
+  { label: 'eBay Admin API Base', url: backendBase + '/api/admin/ebay' },
     { label: 'Health Check', url: backendBase + '/api/health' },
     { label: 'Populate DB (POST)', url: backendBase + '/api/populate-database' },
     { label: 'Catalog API', url: backendBase + '/api/catalog' },
@@ -48,7 +60,7 @@ const UrlCatalog = () => {
         </tbody>
       </table>
       <p style={{ fontSize: 12, color: '#666', marginTop: 8 }}>
-        Backend base assumed: {backendBase}. Set REACT_APP_BACKEND_BASE to override.
+  Backend base assumed: {backendBase}. Set REACT_APP_BACKEND_BASE to override (e.g. http://localhost:5000).
       </p>
     </div>
   );

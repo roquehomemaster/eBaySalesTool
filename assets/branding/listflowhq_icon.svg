@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ListFlowHQ Icon (Primary Color Variant) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="ListFlowHQ icon">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#1E40AF"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+  <!-- Outer rounded square frame -->
+  <rect x="4" y="4" width="56" height="56" rx="14" ry="14" fill="url(#g1)" />
+  <!-- Central control tower mast -->
+  <rect x="30" y="18" width="4" height="28" rx="2" fill="#F8FAFC" opacity="0.9" />
+  <!-- Three flow lanes (left to right) -->
+  <path d="M16 24c6 0 10 4 16 4s10-4 16-4" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" opacity="0.5" />
+  <path d="M16 32c6 0 10 4 16 4s10-4 16-4" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" opacity="0.85" />
+  <path d="M16 40c6 0 10 4 16 4s10-4 16-4" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" opacity="0.5" />
+  <!-- Signal / beacon arcs -->
+  <path d="M26 18c3-3 9-3 12 0" fill="none" stroke="#F8FAFC" stroke-width="2" stroke-linecap="round" opacity="0.9" />
+  <path d="M22 14c5-5 15-5 20 0" fill="none" stroke="#F8FAFC" stroke-width="2" stroke-linecap="round" opacity="0.4" />
+  <!-- Forward (publish) arrow derived from flow -->
+  <path d="M36 30l8 6-8 6v-4h-6c-5 0-9-4-9-9v-2" fill="none" stroke="url(#g2)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
+  <!-- Subtle highlight ring -->
+  <circle cx="32" cy="32" r="22" fill="none" stroke="#FFFFFF" stroke-width="1.25" opacity="0.18" />
+</svg>

@@ -21,6 +21,7 @@ set BUILD_JSON_PATH=f:/Dev/eBaySalesTool/backend/build.json
 
 REM Docker Compose File
 set DOCKER_COMPOSE_FILE=f:/Dev/eBaySalesTool/docker-compose.yml
+REM (Paths unchanged; repository folder name stays until repo rename. Branding handled in containers/package names.)
 
 REM Test Data Flag
 set TEST_DATA_FLAG=true

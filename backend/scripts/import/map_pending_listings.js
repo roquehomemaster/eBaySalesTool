@@ -11,6 +11,7 @@ const EbayListingImportRaw = require('../../src/models/ebayListingImportRawModel
 const Listing = require('../../src/models/listingModel');
 const Catalog = require('../../src/models/catalogModel');
 const { EbayListing } = require('../../models/ebayIntegrationModels');
+let metrics; try { metrics = require('../../src/integration/ebay/metrics'); } catch(_) { /* optional */ }
 
 const DRY_RUN = process.env.EBAY_RAW_MAP_DRY_RUN !== 'false';
 const MAP_LIMIT = parseInt(process.env.EBAY_RAW_MAP_BATCH_SIZE || '10', 10);
@@ -65,9 +66,11 @@ async function upsertListingAndEbay({ itemId, title, price, currency, quantitySo
 }
 
 async function run(){
+  const startedAt = new Date();
   await sequelize.authenticate();
   const rows = await EbayListingImportRaw.findAll({ where: { process_status: 'pending' }, order: [['fetched_at','ASC']], limit: MAP_LIMIT });
-  let processed=0, mapped=0;
+  if (metrics) { metrics.inc('map.runs'); metrics.inc('map.selected', rows.length); metrics.mark('map.last_run'); }
+  let processed=0, mapped=0, errors=0, skipped=0;
   for (const row of rows){
     try {
       const data = row.raw_json || {};
@@ -81,6 +84,7 @@ async function run(){
       const sku = data.sku || data.SKU || data.Item?.SKU;
       if (!itemId){ throw new Error('Missing itemId'); }
       if (DRY_RUN){
+        skipped++;
         console.log('[DRY-RUN] Would map', itemId, { title, price, currency, quantitySold, status, hasDescription: !!descriptionHtml });
       } else {
         await sequelize.transaction(async t => {
@@ -90,9 +94,13 @@ async function run(){
           await row.save({ transaction: t });
         });
         mapped++;
+        if (metrics) { metrics.inc('map.mapped'); }
       }
       processed++;
+      if (metrics) { metrics.inc('map.processed'); }
     } catch(e){
+      errors++;
+      if (metrics) { metrics.inc('map.errors'); metrics.recordError('map', e); }
       if (!DRY_RUN){
         row.process_status = 'failed';
         row.process_error = e.message;
@@ -102,7 +110,28 @@ async function run(){
       console.error('Row failed', row.import_id, e.message);
     }
   }
-  console.log('Mapping pass complete', { dryRun: DRY_RUN, selected: rows.length, processed, mapped });
+  const finishedAt = new Date();
+  const summary = {
+    status: errors ? (mapped ? 'partial' : 'failed') : 'success',
+    startedAt: startedAt.toISOString(),
+    finishedAt: finishedAt.toISOString(),
+    durationMs: finishedAt.getTime() - startedAt.getTime(),
+    processed,
+    mapped,
+    skipped,
+    errors,
+    selected: rows.length,
+    dryRun: DRY_RUN,
+    limit: MAP_LIMIT
+  };
+  if (metrics) { metrics.observe('map.run_duration_ms', summary.durationMs); }
+  // Optional artificial delay for test scenarios (to exercise timeout handling)
+  const testDelay = parseInt(process.env.MAP_TEST_DELAY_MS || '0', 10);
+  if (testDelay > 0) {
+    await new Promise(r => setTimeout(r, testDelay));
+  }
+  // Emit a machine-parseable one-line JSON form to simplify tests & tooling
+  console.log('Mapping pass complete ' + JSON.stringify(summary));
   await sequelize.close();
 }
 

@@ -22,13 +22,19 @@ async function snapshotListing(ebay_listing_id, source_event){
   const { projection, projection_hash } = await buildProjection(internal_listing_id);
   const last = await EbayListingSnapshot.findOne({ where: { ebay_listing_id }, order: [['snapshot_id','DESC']] });
   if(last && last.snapshot_hash === projection_hash){
+    // For a duplicate, always link back to the original non-dedup snapshot (root) so chains remain shallow.
+    let rootId = last.snapshot_id;
+    if(last.dedup_of_snapshot_id){
+      // If last itself was a dedup, root is the first snapshot with this hash (follow pointer once – we don't create deep chains).
+      rootId = last.dedup_of_snapshot_id;
+    }
     const dup = await EbayListingSnapshot.create({
       ebay_listing_id,
       snapshot_hash: projection_hash,
       snapshot_json: projection,
       diff_from_prev_json: {},
       source_event,
-      dedup_of_snapshot_id: last.snapshot_id
+      dedup_of_snapshot_id: rootId
     });
     return { skipped:false, dedup:true, snapshot_id: dup.snapshot_id, hash: projection_hash };
   }

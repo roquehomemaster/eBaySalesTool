@@ -3,7 +3,7 @@
  * -----------------------------------------------------------------------------
  * Sequelize model definition for the Ownership table.
  *
- * Author: eBay Sales Tool Team
+ * Author: ListFlowHQ Team (formerly eBay Sales Tool Team)
  * Last updated: 2025-07-10
  * -----------------------------------------------------------------------------
  */

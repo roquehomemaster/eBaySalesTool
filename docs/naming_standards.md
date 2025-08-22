@@ -1,6 +1,6 @@
 # Naming Standards
 
-This document defines the canonical naming conventions for the eBay Sales Tool backend.
+This document defines the canonical naming conventions for the ListFlowHQ backend (formerly eBay Sales Tool).
 All contributors MUST follow these rules. Deviations require explicit approval and an
 update to this file.
 
