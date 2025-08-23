@@ -51,7 +51,7 @@
     - Connection failed with no response.
 
 12. **Docker Network Inspection**:
-    - Verified that the backend container (`192.168.0.221`) and database container (`192.168.0.220`) are connected to the `ebaysalestool_default` network.
+    - Verified that the backend container (`192.168.0.221`) and database container (`192.168.0.220`) are connected to the `listflowhq_default` network.
     - Both containers have valid IP addresses within the `192.168.0.0/24` subnet.
 
 13. **Firewall Rule Check**:
@@ -107,7 +107,7 @@
 
 26. **Verified Running Containers**:
     - Found the database container running as `postgres_db`.
-    - Found the backend container running as `ebaysalestool-backend-1` but marked as unhealthy.
+    - Found the backend container running as `listflowhq-backend-1` but marked as unhealthy.
 
 27. **Inspected Backend Container Logs**:
     - Observed repeated messages indicating the backend was waiting for the database to become available.
@@ -167,13 +167,13 @@
     - Verified that all containers (backend, frontend, database) are running without errors.
 
 41. **Database Verification Failed**:
-    - Attempted to list tables in the `ebaysalestool` database using `psql`.
-    - Encountered an error: "database \"ebaysalestool\" does not exist".
+    - Attempted to list tables in the `listflowhq` database using `psql`.
+    - Encountered an error: "database \"listflowhq\" does not exist".
     - Next step: Verify database creation and initialization scripts.
 
 42. **Database Name Mismatch Identified**:
     - Listed all databases using `psql`.
-    - Found a database named `ebay_sales_tool` instead of `ebaysalestool`.
+    - Found a database named `ebay_sales_tool` instead of `listflowhq`.
     - Next step: Update backend and initialization scripts to use the correct database name.
 
 43. **Database Schema Verified**:

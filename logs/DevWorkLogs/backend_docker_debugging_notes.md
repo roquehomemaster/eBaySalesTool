@@ -1,4 +1,4 @@
-# eBaySalesTool Backend Docker Debugging Notes
+# ListFlowHQ Backend Docker Debugging Notes
 
 ## Summary of Issues and Resolutions (as of 2025-05-20)
 

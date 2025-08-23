@@ -1,7 +1,7 @@
-# PostgreSQL Container Issue in `eBaySalesTool`
+# PostgreSQL Container Issue in `ListFlowHQ`
 
 ## Problem Summary
-The PostgreSQL container in the `eBaySalesTool` project fails to stabilize, remaining in a restarting or unhealthy state. This issue blocks the database initialization, migrations, and the overall build process, rendering the application non-functional.
+The PostgreSQL container in the `ListFlowHQ` project fails to stabilize, remaining in a restarting or unhealthy state. This issue blocks the database initialization, migrations, and the overall build process, rendering the application non-functional.
 
 ---
 
@@ -29,7 +29,7 @@ The PostgreSQL container in the `eBaySalesTool` project fails to stabilize, rema
    - Temporarily disabled the `/docker-entrypoint-initdb.d` mount to isolate the issue.
 
 3. **Volume Management**:
-   - Removed and recreated the `ebaysalestool_db_data` volume multiple times to force reinitialization.
+   - Removed and recreated the `listflowhq_db_data` volume multiple times to force reinitialization.
 
 4. **Health Check**:
    - Verified the health check command (`pg_isready -U postgres`) and its configuration in `docker-compose.yml`.
@@ -71,7 +71,7 @@ The PostgreSQL container in the `eBaySalesTool` project fails to stabilize, rema
    - Configure PostgreSQL to produce detailed logs during startup.
 
 5. **Revisit Volume Permissions**:
-   - Ensure the `ebaysalestool_db_data` volume has the correct permissions and is not corrupted.
+   - Ensure the `listflowhq_db_data` volume has the correct permissions and is not corrupted.
 
 6. **Collaborate with a Database Expert**:
    - Consult a PostgreSQL expert to identify potential misconfigurations or compatibility issues.

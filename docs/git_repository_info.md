@@ -3,7 +3,7 @@
 ## Repository URL
 The Git repository for this project is hosted at:
 
-`https://github.com/roquehomemaster/eBaySalesTool.git`
+`https://github.com/roquehomemaster/ListFlowHQ.git`
 
 ## Purpose
 This repository contains the source code and configuration files for the ListFlowHQ project (formerly eBay Sales Tool), including backend, frontend, and database components.

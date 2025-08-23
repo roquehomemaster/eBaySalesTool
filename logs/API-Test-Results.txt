@@ -1,30 +1,107 @@
-PASS tests/listingStatusWorkflow.test.js
-PASS src/tests/authApi.test.js
-  ● Console
-
-    console.log
-      DEBUG: Created role for user test: {
-        created_at: 2025-08-15T16:53:09.017Z,
-        updated_at: 2025-08-15T16:53:09.017Z,
-        role_id: 4,
-        name: 'user_role_450873',
-        description: null
-      } role_id: 4
-
-      at Object.log (src/tests/authApi.test.js:203:15)
-
+DROP TABLE
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:4: NOTICE:  table "financialtracking" does not exist, skipping
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:5: NOTICE:  table "shippinglog" does not exist, skipping
+DROP TABLE
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:6: NOTICE:  table "communicationlogs" does not exist, skipping
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:7: NOTICE:  table "performancemetrics" does not exist, skipping
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:8: NOTICE:  table "returnhistory" does not exist, skipping
+DROP TABLE
+DROP TABLE
+DROP TABLE
+DROP TABLE
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:9: NOTICE:  table "order_details" does not exist, skipping
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:10: NOTICE:  table "saleshistory" does not exist, skipping
+DROP TABLE
+DROP TABLE
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:11: NOTICE:  table "sales" does not exist, skipping
+DROP TABLE
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:12: NOTICE:  table "listing_ownership_history" does not exist, skipping
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:13: NOTICE:  table "listing" does not exist, skipping
+DROP TABLE
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:14: NOTICE:  table "product_research" does not exist, skipping
+DROP TABLE
+DROP TABLE
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:15: NOTICE:  table "ownershipagreements" does not exist, skipping
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:16: NOTICE:  table "historylogs" does not exist, skipping
+DROP TABLE
+DROP TABLE
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:17: NOTICE:  table "customerdetails" does not exist, skipping
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:18: NOTICE:  table "ownership" does not exist, skipping
+DROP TABLE
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:19: NOTICE:  table "role_page_access" does not exist, skipping
+DROP TABLE
+DROP TABLE
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:20: NOTICE:  table "pages" does not exist, skipping
+DROP TABLE
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:21: NOTICE:  table "roles" does not exist, skipping
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:22: NOTICE:  table "application_account" does not exist, skipping
+DROP TABLE
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:23: NOTICE:  table "catalog" does not exist, skipping
+DROP TABLE
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:24: NOTICE:  table "customer" does not exist, skipping
+DROP TABLE
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:25: NOTICE:  table "ebayinfo" does not exist, skipping
+DROP TABLE
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:26: NOTICE:  table "appconfig" does not exist, skipping
+DROP TABLE
+DROP TABLE
+psql:/docker-entrypoint-initdb.d/recreate_schema.sql:27: NOTICE:  table "database_configuration" does not exist, skipping
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+2025-08-23T14:21:50.046Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+2025-08-23T14:21:50.047Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
 PASS tests/itemApi.test.js
   ● Console
 
+    console.log
+      2025-08-23T14:21:53.283Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:21:53.287Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
     console.error
       Error in createCatalog: Error: 
-          at Query.run (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\dialects\postgres\query.js:76:25)
-          at F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\sequelize.js:650:28
+          at Query.run (F:\Dev\ListFlowHQ\backend\node_modules\sequelize\src\dialects\postgres\query.js:76:25)
+          at F:\Dev\ListFlowHQ\backend\node_modules\sequelize\src\sequelize.js:650:28
           at processTicksAndRejections (node:internal/process/task_queues:95:5)
-          at PostgresQueryInterface.insert (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\dialects\abstract\query-interface.js:795:21)
-          at model.save (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\model.js:4154:35)
-          at Function.create (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\model.js:2305:12)
-          at Object.<anonymous>.exports.createCatalog (F:\Dev\eBaySalesTool\backend\src\controllers\itemController.js:17:28) {
+          at PostgresQueryInterface.insert (F:\Dev\ListFlowHQ\backend\node_modules\sequelize\src\dialects\abstract\query-interface.js:795:21)
+          at model.save (F:\Dev\ListFlowHQ\backend\node_modules\sequelize\src\model.js:4154:35)
+          at Function.create (F:\Dev\ListFlowHQ\backend\node_modules\sequelize\src\model.js:2305:12)
+          at Object.<anonymous>.exports.createCatalog (F:\Dev\ListFlowHQ\backend\src\controllers\itemController.js:17:28) {
         name: 'SequelizeUniqueConstraintError',
         errors: [
           ValidationErrorItem {
@@ -40,10 +117,10 @@ PASS tests/itemApi.test.js
           }
         ],
         parent: error: duplicate key value violates unique constraint "catalog_sku_key"
-            at Parser.parseErrorMessage (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\parser.ts:369:69)
-            at Parser.handlePacket (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\parser.ts:187:21)
-            at Parser.parse (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\parser.ts:102:30)
-            at Socket.<anonymous> (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\index.ts:7:48)
+            at Parser.parseErrorMessage (F:\Dev\ListFlowHQ\backend\node_modules\pg-protocol\src\parser.ts:369:69)
+            at Parser.handlePacket (F:\Dev\ListFlowHQ\backend\node_modules\pg-protocol\src\parser.ts:187:21)
+            at Parser.parse (F:\Dev\ListFlowHQ\backend\node_modules\pg-protocol\src\parser.ts:102:30)
+            at Socket.<anonymous> (F:\Dev\ListFlowHQ\backend\node_modules\pg-protocol\src\index.ts:7:48)
             at Socket.emit (node:events:517:28)
             at addChunk (node:internal/streams/readable:368:12)
             at readableAddChunk (node:internal/streams/readable:341:9)
@@ -73,15 +150,15 @@ PASS tests/itemApi.test.js
             'T1000',
             'SKU-DUPLICATE-TEST',
             'SKU-DUPLICATE-TESTB',
-            '2025-08-15 12:53:09.548 +00:00',
-            '2025-08-15 12:53:09.548 +00:00'
+            '2025-08-23 14:21:53.864 +00:00',
+            '2025-08-23 14:21:53.864 +00:00'
           ]
         },
         original: error: duplicate key value violates unique constraint "catalog_sku_key"
-            at Parser.parseErrorMessage (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\parser.ts:369:69)
-            at Parser.handlePacket (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\parser.ts:187:21)
-            at Parser.parse (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\parser.ts:102:30)
-            at Socket.<anonymous> (F:\Dev\eBaySalesTool\backend\node_modules\pg-protocol\src\index.ts:7:48)
+            at Parser.parseErrorMessage (F:\Dev\ListFlowHQ\backend\node_modules\pg-protocol\src\parser.ts:369:69)
+            at Parser.handlePacket (F:\Dev\ListFlowHQ\backend\node_modules\pg-protocol\src\parser.ts:187:21)
+            at Parser.parse (F:\Dev\ListFlowHQ\backend\node_modules\pg-protocol\src\parser.ts:102:30)
+            at Socket.<anonymous> (F:\Dev\ListFlowHQ\backend\node_modules\pg-protocol\src\index.ts:7:48)
             at Socket.emit (node:events:517:28)
             at addChunk (node:internal/streams/readable:368:12)
             at readableAddChunk (node:internal/streams/readable:341:9)
@@ -111,8 +188,8 @@ PASS tests/itemApi.test.js
             'T1000',
             'SKU-DUPLICATE-TEST',
             'SKU-DUPLICATE-TESTB',
-            '2025-08-15 12:53:09.548 +00:00',
-            '2025-08-15 12:53:09.548 +00:00'
+            '2025-08-23 14:21:53.864 +00:00',
+            '2025-08-23 14:21:53.864 +00:00'
           ]
         },
         fields: { sku: 'SKU-DUPLICATE-TEST' },
@@ -129,24 +206,901 @@ PASS tests/itemApi.test.js
 
       at error (src/controllers/itemController.js:27:17)
 
-PASS tests/listingDetailsChangeHistory.test.js
-PASS tests/listingApi.test.js
-PASS tests/customerApi.test.js
-PASS tests/historyEndpoint.test.js
-PASS tests/ownershipApi.test.js
-PASS tests/listingOwnershipHistory.test.js
-PASS tests/listingDefaultStatusConfig.test.js
-PASS tests/listingAudit.test.js
-PASS tests/listingItemIdImmutable.test.js
-PASS tests/ebayInfoApi.test.js
-PASS tests/listingStatusDefault.test.js
-PASS src/tests/customerApi.test.js
-PASS tests/listingStatusWorkflowAdmin.test.js
-PASS tests/entityConstants.test.js
-PASS tests/auditLoggerNumericNormalization.test.js
+PASS src/integration/ebay/__tests__/changeDetector.test.js
+PASS src/integration/ebay/__tests__/adminRoutes.test.js
+PASS src/integration/ebay/__tests__/alertClearing.test.js
+  ● Console
 
-Test Suites: 18 passed, 18 total
-Tests:       72 passed, 72 total
+    console.log
+      2025-08-23T14:21:55.392Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:21:55.393Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/publishFlow.e2e.test.js
+PASS src/integration/ebay/__tests__/idempotency.test.js
+PASS src/integration/ebay/__tests__/alertSuppression.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:21:56.424Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:21:56.428Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS tests/listingDetailsChangeHistory.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:21:56.928Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:21:56.930Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/descriptionHistory.test.js
+PASS src/integration/ebay/__tests__/adapter.test.js
+PASS src/integration/ebay/__tests__/queueLatencyBurnRate.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:21:58.152Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:21:58.155Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS tests/customerApi.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:21:58.595Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:21:58.597Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS tests/listingStatusWorkflow.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:21:59.069Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:21:59.072Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/alertHistoryRetention.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:21:59.684Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:21:59.686Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS tests/listingOwnershipHistory.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:00.211Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:00.213Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/alertSuppressionPerKeyOverride.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:00.714Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:00.716Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/alertsQueueLatency.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:01.180Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:01.181Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS tests/listingAudit.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:01.563Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:01.565Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/alertMetricsCounters.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:02.022Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:02.024Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/snapshotService.test.js
+PASS src/integration/ebay/__tests__/alertsQueueBurn.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:02.639Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:02.641Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS tests/ownershipApi.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:03.033Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:03.035Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/queueWorker.test.js
+PASS src/integration/ebay/__tests__/queueMaxWaitLog.test.js
+PASS src/integration/ebay/__tests__/snapshotService.dedupIndex.test.js
+PASS tests/listingApi.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:04.136Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:04.141Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/snapshotService.diffContent.test.js
+PASS src/integration/ebay/__tests__/reconciliationJob.test.js
+PASS tests/historyEndpoint.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:05.139Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:05.141Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/publisherFlow.test.js
+PASS src/integration/ebay/__tests__/alertsHistoryEndpoint.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:05.847Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:05.849Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+[DRY-RUN] Would insert FAKE_ITEM_1 3e124be0603e1ed8df874cc79799721eb660da3e3bcd4047f4c904fd64e0d1ec
+[DRY-RUN] Would insert FAKE_ITEM_2 b306a32bfff9a4cd489081e4ec8d4bc9f0eb2ee3add583c4c445719f54390aa2
+[DRY-RUN] Would insert FAKE_ITEM_3 a65e84cba9b38e13a019aee930efe22b94ac8c46f874338cd4b214b6fd25bf04
+[DRY-RUN] Would insert FAKE_ITEM_4 87419def6819f60e05206a606fd9403aad5d5b4129541919adf7e9f4d9ecbf9d
+[DRY-RUN] Would insert FAKE_ITEM_5 e35a2689ce3fc1972336a0c847ee32f4b710d023dc65d89184b47b8d9dd37e7b
+[DRY-RUN] Would insert FAKE_ITEM_6 120f95d9d807280caadae3a6e51026c6aa5f7bc4bdaa9b6a737c07f2c9e7211b
+[DRY-RUN] Would insert FAKE_ITEM_7 3482c087b403f1fbd49fcd085baf3ff2d5a00e2238222960db0b9735f8e6ae1a
+[DRY-RUN] Would insert FAKE_ITEM_8 4265a67dad1e19c38da8ac945aab78970d89c2a022c987c7a7cfc0f4f4f1f04e
+[DRY-RUN] Would insert FAKE_ITEM_9 548a8701afe232e3b964af328941ab533e351d7e58b2596e201f216a68460ce6
+[DRY-RUN] Would insert FAKE_ITEM_10 049f5ff65de8d43a033f8fef696a552099ad6b1e6e9b37c9ddea4bffe806d0b6
+Ingestion complete { dryRun: true, attempted: 10, inserted: 0, duplicates: 0 }
+PASS tests/importRawPipeline.test.js
+PASS src/integration/ebay/__tests__/queueMaxWaitDecay.test.js
+PASS src/integration/ebay/__tests__/alertsQueueItemWaitP99.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:08.234Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:08.235Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/alertsHistoryPersistence.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:08.638Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:08.641Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS tests/listingStatusDefault.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:09.095Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:09.097Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/alertHistoryRetentionScheduler.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:09.544Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:09.546Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/internalStateMetrics.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:10.149Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:10.151Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/classification.test.js
+PASS src/integration/ebay/__tests__/policyService.test.js
+PASS tests/listingItemIdImmutable.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:11.055Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:11.058Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/queueItemWaitMetrics.test.js
+PASS src/integration/ebay/__tests__/alertsHistoryDbQuery.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:11.746Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:11.748Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/adaptiveThrottling.test.js
+PASS tests/ebayInfoApi.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:12.785Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:12.787Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/metricsRoutes.test.js
+PASS src/integration/ebay/__tests__/driftClassification.test.js
+PASS src/integration/ebay/__tests__/deadLetter.test.js
+PASS src/integration/ebay/__tests__/authFailureRatioThreshold.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:13.835Z [WARN] {"event":"auth_failure_ratio_threshold","ratio":1,"ema":1,"threshold":0.1,"authFailures":1,"httpCalls":0,"cooldownMs":60000}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/alertsReadinessFlapping.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:14.139Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:14.141Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:14.230Z [WARN] {"event":"readiness_transition","from":null,"to":"not_ready","ts":1755958934230,"issues":["oauth_degraded"]}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:14.245Z [INFO] {"event":"readiness_transition","from":"not_ready","to":"ready","ts":1755958934245}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:14.273Z [WARN] {"event":"readiness_transition","from":"ready","to":"not_ready","ts":1755958934273,"issues":["oauth_degraded"]}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:14.290Z [INFO] {"event":"readiness_transition","from":"not_ready","to":"ready","ts":1755958934290}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:14.303Z [WARN] {"event":"readiness_transition","from":"ready","to":"not_ready","ts":1755958934303,"issues":["oauth_degraded"]}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:14.316Z [INFO] {"event":"readiness_transition","from":"not_ready","to":"ready","ts":1755958934316}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:14.325Z [WARN] {"event":"readiness_transition","from":"ready","to":"not_ready","ts":1755958934325,"issues":["oauth_degraded"]}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:14.334Z [INFO] {"event":"readiness_transition","from":"not_ready","to":"ready","ts":1755958934334}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:14.343Z [WARN] {"event":"readiness_transition","from":"ready","to":"not_ready","ts":1755958934343,"issues":["oauth_degraded"]}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:14.351Z [INFO] {"event":"readiness_transition","from":"not_ready","to":"ready","ts":1755958934351}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/integrityAuditJob.test.js
+PASS src/integration/ebay/__tests__/alertsDbUnreachable.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:14.899Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:14.901Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:14.947Z [WARN] {"event":"readiness_transition","from":null,"to":"not_ready","ts":1755958934947,"issues":["db_unreachable"]}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/queueOldestPendingAge.test.js
+PASS src/integration/ebay/__tests__/tokenManager.test.js
+PASS src/integration/ebay/__tests__/oauthDegradedDebounce.test.js
+PASS src/integration/ebay/__tests__/alertSuppressionGauges.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:17.069Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:17.072Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/policyImpactHandler.test.js
+PASS src/integration/ebay/__tests__/projectionBuilder.test.js
+PASS src/integration/ebay/__tests__/readinessFlapMetrics.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:18.121Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:18.124Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:18.185Z [INFO] {"event":"readiness_transition","from":null,"to":"ready","ts":1755958938184}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/oauthRecoveryReadiness.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:18.410Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:18.410Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:18.410Z [WARN] {"event":"oauth_degraded_enter","consecutiveFailures":1,"failureThreshold":1,"lastError":"token_endpoint_error:500","ts":1755958938410,"cooldownMs":60000}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:18.410Z [WARN] {"event":"readiness_transition","from":null,"to":"not_ready","ts":1755958938410,"issues":["oauth_degraded"]}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:18.410Z [INFO] {"event":"readiness_transition","from":"not_ready","to":"ready","ts":1755958938410}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS tests/listingStatusWorkflowAdmin.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:18.877Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:18.879Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/mockEbayServer.test.js
+PASS src/integration/ebay/__tests__/alertsQueueBacklog.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:19.838Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:19.841Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/oauthShortCircuitMetric.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:20.104Z [WARN] {"event":"oauth_degraded_enter","consecutiveFailures":1,"failureThreshold":1,"lastError":"token_endpoint_error:500","ts":1755958940104,"cooldownMs":60000}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/oauthAuthFailureClassification.test.js
+PASS tests/listingDefaultStatusConfig.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:20.604Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:20.606Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/authFailureRatioMetric.test.js
+PASS src/integration/ebay/__tests__/readinessDbCheck.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:21.224Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:21.226Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:21.273Z [WARN] {"event":"readiness_transition","from":null,"to":"not_ready","ts":1755958941273,"issues":["db_unreachable"]}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS tests/swagger.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:21.573Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:21.575Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/alertsPreview.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:21.954Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:21.956Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:22.011Z [WARN] {"event":"oauth_degraded_enter","consecutiveFailures":1,"failureThreshold":1,"lastError":"token_endpoint_error:500","ts":1755958942011,"cooldownMs":60000}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/readinessQueueBacklog.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:22.359Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:22.360Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:22.419Z [WARN] {"event":"readiness_transition","from":null,"to":"not_ready","ts":1755958942419,"issues":["queue_backlog"]}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/adminAuth.test.js
+PASS src/integration/ebay/__tests__/adapterFailureCounters.test.js
+PASS src/integration/ebay/__tests__/readiness.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:23.236Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:23.242Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:23.319Z [WARN] {"event":"oauth_degraded_enter","consecutiveFailures":1,"failureThreshold":1,"lastError":"token_endpoint_error:500","ts":1755958943319,"cooldownMs":60000}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:23.336Z [WARN] {"event":"readiness_transition","from":null,"to":"not_ready","ts":1755958943336,"issues":["oauth_degraded"]}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS tests/ebayIngestMetrics.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:23.635Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:23.636Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/oauthHealth.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:24.043Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:24.045Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:24.081Z [WARN] {"event":"oauth_degraded_enter","consecutiveFailures":1,"failureThreshold":1,"lastError":"token_endpoint_error:500","ts":1755958944081,"cooldownMs":60000}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/driftAdminRoutes.test.js
+PASS tests/ebayHealthAdapterIngestionSummary.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:24.700Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:24.702Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS tests/ebayRetrieveEndpoint.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:25.310Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:25.312Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/queueBacklogGauge.test.js
+PASS tests/ebayRetrieveAdapterRetry.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:25.885Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:25.888Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/oauthDegradedDurationGauge.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:26.203Z [WARN] {"event":"oauth_degraded_enter","consecutiveFailures":1,"failureThreshold":1,"lastError":"token_endpoint_error:500","ts":1755958946203,"cooldownMs":60000}
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS tests/auditLoggerNumericNormalization.test.js
+PASS tests/ebayMapRunEndpoint.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:26.682Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:26.683Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/metricsInstrumentation.test.js
+PASS tests/ebayRetrieveAttemptsHistogram.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:27.763Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:27.765Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS tests/ebayRetrieveAdapterPermanentFail.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:28.215Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:28.217Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/circuitBreakerAdapter.test.js
+PASS tests/ebayRateLimiterIntegration.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:28.822Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:28.824Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/driftSummary.test.js
+PASS src/integration/ebay/__tests__/ingestBackpressure.test.js
+PASS src/integration/ebay/__tests__/queueItemWaitBucketsConfig.test.js
+PASS src/integration/ebay/__tests__/hashUtil.test.js
+PASS tests/ebayRawImport.test.js
+PASS tests/ebayMapRunEndpointTimeout.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:30.738Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:30.740Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/transactionRoutes.test.js
+PASS tests/entityConstants.test.js
+PASS src/integration/ebay/__tests__/diffUtil.test.js
+PASS src/integration/ebay/__tests__/rateLimiter.test.js
+PASS src/integration/ebay/__tests__/httpAdapterMode.test.js
+PASS tests/ebayRetrieveInvalidIds.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:32.264Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:32.266Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS tests/ebayRetrieveEndpointMissingIds.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:32.663Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:32.665Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/redactUtil.test.js
+PASS src/integration/ebay/__tests__/transactionLogger.test.js
+PASS tests/ebayMapRunEndpointInvalidMaxItems.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:33.375Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:33.377Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/integration/ebay/__tests__/metrics.test.js
+PASS src/integration/ebay/__tests__/oauthTokenLifecycle.test.js
+PASS src/tests/authApi.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:34.109Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:34.112Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      DEBUG: Created role for user test: {
+        created_at: 2025-08-23T18:22:34.751Z,
+        updated_at: 2025-08-23T18:22:34.751Z,
+        role_id: 4,
+        name: 'user_role_243120',
+        description: null
+      } role_id: 4
+
+      at Object.log (src/tests/authApi.test.js:208:15)
+
+PASS src/tests/customerApi.test.js
+  ● Console
+
+    console.log
+      2025-08-23T14:22:35.153Z [INFO] Swagger spec loaded (openapi=3.0.0, paths=28)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      2025-08-23T14:22:35.155Z [WARN] Using manual swagger-ui-dist fallback (reason: serve() missing)
+
+      at Console.log (node_modules/winston/lib/winston/transports/console.js:87:23)
+
+
+Test Suites: 109 passed, 109 total
+Tests:       211 passed, 211 total
 Snapshots:   0 total
-Time:        10.87 s
+Time:        44.446 s
 Ran all test suites matching /tests/i.

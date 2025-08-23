@@ -5,7 +5,7 @@
     "host_local": "localhost",
     "user": "postgres",
     "password": "password",
-    "database": "ebay_sales_tool",
+  "database": "listflowhq",
     "port": 5432
   },
   "constants": {
@@ -15,10 +15,10 @@
     "healthCheckDelay": 10000
   },
   "paths": {
-    "backend": "f:/Dev/eBaySalesTool/backend",
-    "frontend": "f:/Dev/eBaySalesTool/frontend",
-    "buildScripts": "f:/Dev/eBaySalesTool/build/scripts",
-    "dockerComposeFile": "f:/Dev/eBaySalesTool/docker-compose.yml"
+  "backend": "f:/Dev/ListFlowHQ/backend",
+  "frontend": "f:/Dev/ListFlowHQ/frontend",
+  "buildScripts": "f:/Dev/ListFlowHQ/build/scripts",
+  "dockerComposeFile": "f:/Dev/ListFlowHQ/docker-compose.yml"
   },
   "testdata": true,
   "network": {

@@ -19,20 +19,20 @@ echo "Docker is running. Checking for running containers..."
 
 :: Ensure external DB volume exists (persists data across down -v)
 echo "Ensuring external DB volume exists..."
-powershell -NoProfile -ExecutionPolicy Bypass -File "f:\Dev\eBaySalesTool\scripts\init_db_volume.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File "f:\Dev\ListFlowHQ\scripts\init_db_volume.ps1"
 
 :: Check if any containers are running
 for /f "tokens=*" %%i in ('docker ps -q') do set CONTAINERS_RUNNING=1
 if defined CONTAINERS_RUNNING (
     echo "Running containers found. Stopping and removing containers..."
-    docker compose -f f:\Dev\eBaySalesTool\docker-compose.yml down -v
+    docker compose -f f:\Dev\ListFlowHQ\docker-compose.yml down -v
 ) else (
     echo "No running containers found. Pruning Docker system..."
     docker system prune -f --volumes
 )
 
 :: Build Docker images including backend
-docker compose -f f:\Dev\eBaySalesTool\docker-compose.yml up -d --build
+docker compose -f f:\Dev\ListFlowHQ\docker-compose.yml up -d --build
 
 echo "Docker build process completed successfully."
 exit /b 0

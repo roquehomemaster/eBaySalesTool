@@ -11,12 +11,12 @@ if %ERRORLEVEL% neq 0 (
 )
 
 echo "Rebuilding and restarting only the frontend container..."
-docker compose -f f:\Dev\eBaySalesTool\docker-compose.yml build frontend
+docker compose -f f:\Dev\ListFlowHQ\docker-compose.yml build frontend
 if %ERRORLEVEL% neq 0 (
     echo "Frontend build failed."
     exit /b 1
 )
-docker compose -f f:\Dev\eBaySalesTool\docker-compose.yml up -d frontend
+docker compose -f f:\Dev\ListFlowHQ\docker-compose.yml up -d frontend
 if %ERRORLEVEL% neq 0 (
     echo "Frontend container restart failed."
     exit /b 1

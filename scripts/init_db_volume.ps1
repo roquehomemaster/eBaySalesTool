@@ -1,6 +1,6 @@
 # Initializes an external Docker volume for Postgres persistence
 param(
-  [string]$VolumeName = "ebaysalestool-db"
+  [string]$VolumeName = "listflowhq-db"
 )
 
 # Check if volume exists

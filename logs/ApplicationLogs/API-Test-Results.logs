@@ -152,13 +152,13 @@ PASS tests/listingApi.test.js
       at Object.log (src/app.js:28:13)
 
 Error in createItem: Error: 
-    at Query.run (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\dialects\postgres\query.js:76:25)
-    at F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\sequelize.js:650:28
+  at Query.run (F:\Dev\ListFlowHQ\backend\node_modules\sequelize\src\dialects\postgres\query.js:76:25)
+  at F:\Dev\ListFlowHQ\backend\node_modules\sequelize\src\sequelize.js:650:28
     at processTicksAndRejections (node:internal/process/task_queues:95:5)
-    at PostgresQueryInterface.insert (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\dialects\abstract\query-interface.js:795:21)
-    at model.save (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\model.js:4154:35)
-    at Function.create (F:\Dev\eBaySalesTool\backend\node_modules\sequelize\src\model.js:2305:12)
-    at Object.<anonymous>.exports.createItem (F:\Dev\eBaySalesTool\backend\src\controllers\itemController.js:14:25)
+  at PostgresQueryInterface.insert (F:\Dev\ListFlowHQ\backend\node_modules\sequelize\src\dialects\abstract\query-interface.js:795:21)
+  at model.save (F:\Dev\ListFlowHQ\backend\node_modules\sequelize\src\model.js:4154:35)
+  at Function.create (F:\Dev\ListFlowHQ\backend\node_modules\sequelize\src\model.js:2305:12)
+  at Object.<anonymous>.exports.createItem (F:\Dev\ListFlowHQ\backend\src\controllers\itemController.js:14:25)
 PASS tests/itemApi.test.js
   ● Console
 

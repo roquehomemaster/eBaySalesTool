@@ -11,7 +11,7 @@ const Layout = ({ children }) => {
   return (
     <div className="app-layout">
       <header className="app-header">
-        <div className="app-logo">eBay Sales Tool</div>
+  <div className="app-logo">ListFlowHQ</div>
         <NavTabs />
       </header>
       <main className="app-main">
@@ -19,7 +19,7 @@ const Layout = ({ children }) => {
         {children}
       </main>
       <footer className="app-footer">
-        &copy; {new Date().getFullYear()} eBay Sales Tool | Version 1.0
+  &copy; {new Date().getFullYear()} ListFlowHQ | Version 1.0
       </footer>
     </div>
   );

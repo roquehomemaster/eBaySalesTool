@@ -1,6 +1,6 @@
 services:
   backend:
-    container_name: ebaysalestool-backend
+    container_name: listflowhq-backend
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -8,10 +8,10 @@ services:
       - "5000:5000"
     environment:
       - NODE_ENV=development
-      - PG_HOST=postgres_db
+      - PG_HOST=listflowhq-db
       - PG_USER=postgres
       - PG_PASSWORD=password
-      - PG_DATABASE=ebay_sales_tool
+      - PG_DATABASE=listflowhq
       - PG_PORT=5432
     working_dir: /usr/src/app
     command: ["node", "src/app.js"]
@@ -32,11 +32,11 @@ services:
         ipv4_address: 192.168.0.221
 
   database:
-    container_name: postgres_db
+    container_name: listflowhq-db
     image: postgres:15-alpine
     restart: always
     environment:
-      - POSTGRES_DB=ebay_sales_tool
+      - POSTGRES_DB=listflowhq
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_HOST_AUTH_METHOD=trust
@@ -44,6 +44,7 @@ services:
       - "5432:5432"
     volumes:
       - ./database/migrations:/docker-entrypoint-initdb.d:ro
+      - f:/Dev/ListFlowHQ/backend/database/recreate_schema.sql:/docker-entrypoint-initdb.d/recreate_schema.sql:ro
       - db_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -76,7 +77,6 @@ services:
 volumes:
   db_data:
     external: true
-    name: ebaysalestool-db
 
 networks:
   default:

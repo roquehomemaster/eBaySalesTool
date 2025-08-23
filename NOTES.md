@@ -9,7 +9,7 @@
 - Ensure that the `f:\` drive is accessible in WSL under `/mnt/f`.
 
 ### Key Points
-- File sharing is handled via WSL 2, and paths like `f:\Dev\eBaySalesTool` are accessible as `/mnt/f/Dev/eBaySalesTool` in WSL.
+- File sharing is handled via WSL 2, and paths like `f:\Dev\ListFlowHQ` are accessible as `/mnt/f/Dev/ListFlowHQ` in WSL.
 - Volume mounts in `docker-compose.yml` should use WSL-compatible paths (e.g., `/mnt/f/...`).
 
 ### Troubleshooting

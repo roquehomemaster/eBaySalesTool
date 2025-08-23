@@ -1,7 +1,7 @@
 # Backend Build & Logging Refactor (June 2025)
 
 ## Summary
-This document outlines the changes made to the eBaySalesTool backend build, database, and logging environment to improve reliability, transparency, and maintainability.
+This document outlines the changes made to the ListFlowHQ backend build, database, and logging environment to improve reliability, transparency, and maintainability.
 
 ## Key Changes
 

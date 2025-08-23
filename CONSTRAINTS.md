@@ -45,7 +45,7 @@ To ensure effective collaboration and avoid repeated mistakes, the following pra
 ## Additional Guidelines for Scripts
 
 - **Use Fully Qualified Paths**:
-  - Always use fully qualified paths instead of relative paths (e.g., `cd f:\Dev\eBaySalesTool\backend` instead of `cd ../backend`).
+   - Always use fully qualified paths instead of relative paths (e.g., `cd f:\Dev\ListFlowHQ\backend` instead of `cd ../backend`).
   - This ensures clarity, avoids potential directory context issues, and improves script reliability across different environments.
 
 ## Guidelines for Code Changes

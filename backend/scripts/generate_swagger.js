@@ -84,9 +84,9 @@ if (!mainSwagger.openapi && !mainSwagger.swagger) {
 }
 if (!mainSwagger.info) {
   mainSwagger.info = {
-    title: 'eBay Sales Tool API',
+    title: 'ListFlowHQ API',
     version: process.env.APP_VERSION || '1.0.0',
-    description: 'Automatically merged API specification. Edit fragment *.swagger.json files in backend/src/swagger and rerun generator.'
+    description: 'Automatically merged API specification for ListFlowHQ. Edit fragment *.swagger.json files in backend/src/swagger and rerun generator.'
   };
 }
 if (!mainSwagger.servers) {

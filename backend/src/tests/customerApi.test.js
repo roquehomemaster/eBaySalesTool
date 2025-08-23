@@ -1,5 +1,6 @@
 const request = require('supertest');
 const app = require('../../src/app');
+const { sequelize, pool } = require('../../src/utils/database');
 
 describe('Customer API (smoke)', () => {
   it('health endpoint responds', async () => {
@@ -18,5 +19,9 @@ describe('Customer API (smoke)', () => {
       expect(typeof res.body.page).toBe('number');
       expect(typeof res.body.pageSize).toBe('number');
     }
+  });
+
+  afterAll(async () => {
+    try { await pool.end(); } catch(_) { /* ignore */ }
   });
 });

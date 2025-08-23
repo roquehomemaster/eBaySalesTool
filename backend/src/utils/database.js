@@ -14,47 +14,57 @@ const fs = require('fs');
 const path = require('path');
 const logger = require('./logger');
 
+// Normalize environment variables to support both PGUSER/PG_USER and PGDATABASE/PG_DATABASE
+const PG_DB = process.env.PGDATABASE || process.env.PG_DATABASE || process.env.PG_DB || process.env.PG_DATABASE_NAME;
+const PG_USER = process.env.PGUSER || process.env.PG_USER || process.env.PG_USERNAME || 'postgres';
+const PG_PASSWORD = process.env.PGPASSWORD || process.env.PG_PASSWORD || 'password';
+const PG_HOST = process.env.PGHOST || process.env.PG_HOST || 'localhost';
+const PG_PORT = process.env.PGPORT || process.env.PG_PORT || 5432;
+
 // Use only environment variables or rely on Sequelize config loading
 if ((process.env.LOG_LEVEL || 'info') === 'debug') {
     console.log('Sequelize config:', {
-    database: process.env.PG_DATABASE || 'ebay_sales_tool',
-    user: process.env.PG_USER || 'postgres',
-    password: process.env.PG_PASSWORD || 'password',
-    host: process.env.PG_HOST || 'localhost',
-    port: process.env.PG_PORT || 5432,
-    dialect: 'postgres',
-    NODE_ENV: process.env.NODE_ENV
+        database: PG_DB || 'ebay_sales_tool',
+        user: PG_USER,
+        password: PG_PASSWORD,
+        host: PG_HOST,
+        port: PG_PORT,
+        dialect: 'postgres',
+        NODE_ENV: process.env.NODE_ENV
     });
 }
 
-// Sequelize instance for ORM
-const sequelize = new Sequelize(
-    process.env.PG_DATABASE || 'ebay_sales_tool',
-    process.env.PG_USER || 'postgres',
-    process.env.PG_PASSWORD || 'password',
-    {
-        host: process.env.PG_HOST || 'localhost',
-        port: process.env.PG_PORT || 5432,
-        dialect: 'postgres',
-        logging: false // Disable SQL logging for production
-    }
-);
 
-// Lazy pg Pool instance for raw queries (initialized on first access)
-let poolInstance;
-function getPool() {
-    if (!poolInstance) {
-        poolInstance = new Pool({
-            host: process.env.PG_HOST || 'localhost',
-            max: 10,
-            user: process.env.PG_USER || 'postgres',
-            password: process.env.PG_PASSWORD || 'password',
-            database: process.env.PG_DATABASE || 'ebay_sales_tool',
-            port: process.env.PG_PORT || 5432
-        });
-    }
-    return poolInstance;
+// Always create a fresh Sequelize and Pool instance based on current env vars
+function getSequelize() {
+    return new Sequelize(
+        PG_DB || 'ebay_sales_tool',
+        PG_USER,
+        PG_PASSWORD,
+        {
+            host: PG_HOST,
+            port: PG_PORT,
+            dialect: 'postgres',
+            logging: false
+        }
+    );
 }
+
+// Create a single shared Pool instance so callers (app/tests) operate on the same pool
+function getPool() {
+    return pool;
+}
+
+// For legacy code, export a default Sequelize instance and a single shared Pool
+const sequelize = getSequelize();
+const pool = new Pool({
+    host: PG_HOST,
+    max: 10,
+    user: PG_USER,
+    password: PG_PASSWORD,
+    database: PG_DB || 'ebay_sales_tool',
+    port: PG_PORT
+});
 
 /**
  * Seed the database with test data if the test flag is set in AppConfig.
@@ -78,10 +88,12 @@ async function seedDatabaseIfTestFlag() {
     }
 }
 
+// Consolidated exports
 module.exports = {
     sequelize,
-    // For existing imports expecting 'pool', provide getter property
-    get pool() { return getPool(); },
+    getSequelize,
     getPool,
+    // For existing imports expecting 'pool', provide getter property
+    pool,
     seedDatabaseIfTestFlag
 };

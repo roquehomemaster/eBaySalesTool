@@ -1,8 +1,7 @@
 // Auth API contract tests: enforce snake_case PKs and robust error logging
 const request = require('supertest');
-const app = require('../../src/app');
-const { sequelize } = require('../../src/utils/database');
-const { Role, Page, User, RolePageAccess } = require('../../src/models/authModels');
+let app, sequelize, Role, Page, User, RolePageAccess;
+const { pool } = require('../../src/utils/database');
 
 // Utility to check PK presence in all objects of a list
 function checkPK(list, pkName, entity) {
@@ -17,6 +16,11 @@ describe('Auth API Endpoints', () => {
   // Ensure DB is ready before tests
   beforeAll(async () => {
     jest.setTimeout(60000);
+  // Use the app exported by src/app and the shared sequelize instance so models are registered on the same instance
+  app = require('../../src/app');
+  const { sequelize: sharedSequelize } = require('../../src/utils/database');
+  sequelize = sharedSequelize;
+    ({ Role, Page, User, RolePageAccess } = require('../../src/models/authModels'));
     // Use API endpoint to seed and reset the database inside the container
     const res = await request(app).post('/api/populate-database');
     if (res.statusCode !== 200) {
@@ -25,12 +29,12 @@ describe('Auth API Endpoints', () => {
     if (process.env.VERBOSE_TESTS === '1') {
       console.log('Registered models:', Object.keys(sequelize.models));
     }
-  // Log all tables in public schema (robust via pg_tables)
-  const [pgTables] = await sequelize.query("SELECT tablename FROM pg_tables WHERE schemaname = 'public'");
-  const tableNames = pgTables.map(r => r.tablename);
-  if (process.env.VERBOSE_TESTS === '1') {
-    console.log('Tables in public schema (pg_tables):', tableNames);
-  }
+    // Log all tables in public schema (robust via pg_tables)
+    const [pgTables] = await sequelize.query("SELECT tablename FROM pg_tables WHERE schemaname = 'public'");
+    const tableNames = pgTables.map(r => r.tablename);
+    if (process.env.VERBOSE_TESTS === '1') {
+      console.log('Tables in public schema (pg_tables):', tableNames);
+    }
     // Check for required tables
     const requiredTables = ['ownership', 'listing', 'ebayinfo', 'application_account', 'roles', 'customer', 'catalog'];
     requiredTables.forEach(tbl => {
@@ -42,7 +46,8 @@ describe('Auth API Endpoints', () => {
 
   // Close DB connection after tests
   afterAll(async () => {
-    await sequelize.close();
+  await sequelize.close();
+  try { await pool.end(); } catch(_) { /* ignore */ }
   });
 
   describe('Role CRUD', () => {

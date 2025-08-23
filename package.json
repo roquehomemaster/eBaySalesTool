@@ -21,6 +21,7 @@
   "homepage": "https://github.com/roquehomemaster/ListFlowHQ#readme",
   "devDependencies": {
     "concurrently": "^9.1.2",
+    "jest": "^30.0.5",
     "sharp": "^0.33.4"
   },
   "dependencies": {

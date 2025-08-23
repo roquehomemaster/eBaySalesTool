@@ -508,7 +508,7 @@ scripts/
 1. Clone the repository:
    ```bash
    git clone <repository-url>
-   cd eBaySalesTool
+   cd ListFlowHQ
    ```
 
 2. Install dependencies:

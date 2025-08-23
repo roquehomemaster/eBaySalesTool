@@ -1,4 +1,4 @@
-# Paths and Learnings for `eBaySalesTool`
+# Paths and Learnings for `ListFlowHQ`
 
 ## Key Paths
 1. **SQL Scripts**:
@@ -32,7 +32,7 @@
    - SQL scripts in `database/migrations` must be validated for syntax and execution errors.
 
 3. **Volume Management**:
-   - The `ebaysalestool_db_data` volume must be correctly initialized and have proper permissions.
+   - The `listflowhq_db_data` volume must be correctly initialized and have proper permissions.
 
 4. **Logs**:
    - Container logs are often empty, making debugging difficult. Enabling verbose logging in PostgreSQL is recommended.
@@ -59,4 +59,4 @@
 
 ---
 
-This document serves as a reference for paths and learnings in the `eBaySalesTool` project. It should be updated as new insights are gained.
+This document serves as a reference for paths and learnings in the `ListFlowHQ` project. It should be updated as new insights are gained.
