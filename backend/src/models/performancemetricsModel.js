@@ -2,9 +2,10 @@
 // Sequelize model for PerformanceMetrics table (matches new schema)
 
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../utils/database');
+const db = require('../utils/database');
 
-const PerformanceMetrics = sequelize.define('performancemetrics', {
+function initModel(sequelizeInstance) {
+  return sequelizeInstance.define('performancemetrics', {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   user_account_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'application_account', key: 'user_account_id' } },
   metric_date: { type: DataTypes.DATE, allowNull: false },
@@ -17,7 +18,15 @@ const PerformanceMetrics = sequelize.define('performancemetrics', {
   tableName: 'performancemetrics',
   timestamps: false
 });
+}
 
-// For backward compatibility, export as both names for now
-module.exports = PerformanceMetrics;
-module.exports.PerformanceMetrics = PerformanceMetrics;
+module.exports = (function () {
+  try {
+    return initModel(db.sequelize);
+  } catch (e) {
+    return initModel;
+  }
+})();
+
+module.exports.initModel = initModel;
+module.exports.PerformanceMetrics = module.exports;

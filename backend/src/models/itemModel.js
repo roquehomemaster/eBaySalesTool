@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const db = require('../utils/database');
 
-function defineCatalog(sequelizeInstance) {
+function initModel(sequelizeInstance) {
   return sequelizeInstance.define('catalog', {
     item_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     description: { type: DataTypes.STRING },
@@ -19,10 +19,13 @@ function defineCatalog(sequelizeInstance) {
   });
 }
 
-// Initialize using the currently exported sequelize for backwards compatibility
-const Catalog = defineCatalog(db.sequelize);
+// Backward compatibility: try to instantiate using shared sequelize, otherwise export the init function
+module.exports = (function () {
+  try {
+    return initModel(db.sequelize);
+  } catch (e) {
+    return initModel;
+  }
+})();
 
-// Attach init helper so DI code can re-create models on a provided sequelize
-Catalog.initModel = defineCatalog;
-
-module.exports = Catalog;
+module.exports.initModel = initModel;

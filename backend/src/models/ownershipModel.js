@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const db = require('../utils/database');
 
-function defineOwnership(sequelizeInstance) {
+function initModel(sequelizeInstance) {
   return sequelizeInstance.define('ownership', {
   ownership_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   ownership_type: { type: DataTypes.STRING },
@@ -30,7 +30,12 @@ function defineOwnership(sequelizeInstance) {
   });
 }
 
-const Ownership = defineOwnership(db.sequelize);
-Ownership.initModel = defineOwnership;
+module.exports = (function () {
+  try {
+    return initModel(db.sequelize);
+  } catch (e) {
+    return initModel;
+  }
+})();
 
-module.exports = Ownership;
+module.exports.initModel = initModel;

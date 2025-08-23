@@ -12,7 +12,7 @@
 const { DataTypes } = require('sequelize');
 const db = require('../utils/database');
 
-function defineListing(sequelizeInstance) {
+function initModel(sequelizeInstance) {
   return sequelizeInstance.define('listing', {
     listing_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     title: { type: DataTypes.STRING, allowNull: false },
@@ -56,7 +56,12 @@ function defineListing(sequelizeInstance) {
   });
 }
 
-const Listing = defineListing(db.sequelize);
-Listing.initModel = defineListing;
+module.exports = (function () {
+  try {
+    return initModel(db.sequelize);
+  } catch (e) {
+    return initModel;
+  }
+})();
 
-module.exports = Listing;
+module.exports.initModel = initModel;

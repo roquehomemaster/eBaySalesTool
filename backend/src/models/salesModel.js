@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const db = require('../utils/database');
 
-function defineSales(sequelizeInstance) {
+function initModel(sequelizeInstance) {
   return sequelizeInstance.define('sales', {
   sale_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   listing_id: { type: DataTypes.INTEGER, references: { model: 'listing', key: 'listing_id' } },
@@ -20,7 +20,13 @@ function defineSales(sequelizeInstance) {
   });
 }
 
-const Sales = defineSales(db.sequelize);
-Sales.initModel = defineSales;
+// Attempt to initialize using the shared sequelize for backward compatibility
+module.exports = (function () {
+  try {
+    return initModel(db.sequelize);
+  } catch (e) {
+    return initModel;
+  }
+})();
 
-module.exports = Sales;
+module.exports.initModel = initModel;

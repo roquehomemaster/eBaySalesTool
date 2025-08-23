@@ -2,7 +2,7 @@
 const { DataTypes } = require('sequelize');
 const db = require('../utils/database');
 
-function defineApplicationAccount(sequelizeInstance) {
+function initModel(sequelizeInstance) {
   return sequelizeInstance.define('application_account', {
   user_account_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   username: { type: DataTypes.STRING, allowNull: false, unique: true },
@@ -20,9 +20,14 @@ function defineApplicationAccount(sequelizeInstance) {
   });
 }
 
-const ApplicationAccount = defineApplicationAccount(db.sequelize);
-ApplicationAccount.initModel = defineApplicationAccount;
+// Backward compatibility: try to instantiate using shared sequelize
+module.exports = (function () {
+  try {
+    return initModel(db.sequelize);
+  } catch (e) {
+    return initModel;
+  }
+})();
 
-// For backward compatibility, export as both names for now
-module.exports = ApplicationAccount;
-module.exports.ApplicationAccount = ApplicationAccount;
+module.exports.initModel = initModel;
+module.exports.ApplicationAccount = module.exports;

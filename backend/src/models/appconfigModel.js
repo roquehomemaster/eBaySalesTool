@@ -2,15 +2,25 @@
 // Sequelize model for appconfig table (config_key PK, value and type only)
 
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../utils/database');
+const db = require('../utils/database');
 
-const AppConfig = sequelize.define('appconfig', {
-  config_key: { type: DataTypes.STRING, primaryKey: true },
-  config_value: { type: DataTypes.TEXT, allowNull: false },
-  data_type: { type: DataTypes.STRING, allowNull: false, defaultValue: 'string' }
-}, {
-  tableName: 'appconfig',
-  timestamps: false
-});
+  function initModel(sequelize) {
+    return sequelize.define('app_config', {
+      key: { type: DataTypes.STRING, primaryKey: true },
+      value: { type: DataTypes.TEXT }
+    }, {
+      tableName: 'app_config',
+      timestamps: false
+    });
+  }
 
-module.exports = AppConfig;
+  try {
+    const db = require('../utils/database');
+    if (db && db.sequelize) {
+      module.exports = initModel(db.sequelize);
+      module.exports.initModel = initModel;
+    }
+  } catch (e) { /* noop */ }
+
+module.exports.initModel = initModel;
+module.exports.initModel = initModel;
