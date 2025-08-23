@@ -1,5 +1,4 @@
 const { DataTypes } = require('sequelize');
-const db = require('../utils/database');
 
 function initModel(sequelizeInstance) {
     return sequelizeInstance.define('role_page_access', {
@@ -34,8 +33,8 @@ function initModel(sequelizeInstance) {
 }
 
 try {
-    const RolePageAccess = initModel(db.sequelize);
-    module.exports = RolePageAccess;
+    const { sequelize } = require('../utils/database');
+    module.exports = initModel(sequelize);
 } catch (e) {
     module.exports = initModel;
 }

@@ -2,7 +2,6 @@
 // Sequelize model for OrderDetails table (matches new schema)
 
 const { DataTypes } = require('sequelize');
-const db = require('../utils/database');
 
 function initModel(sequelizeInstance) {
   return sequelizeInstance.define('orderdetails', {
@@ -23,8 +22,8 @@ function initModel(sequelizeInstance) {
 }
 
 try {
-  const OrderDetails = initModel(db.sequelize);
-  module.exports = OrderDetails;
+  const { sequelize } = require('../utils/database');
+  module.exports = initModel(sequelize);
 } catch (e) {
   module.exports = initModel;
 }

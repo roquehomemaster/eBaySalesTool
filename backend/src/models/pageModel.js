@@ -1,5 +1,4 @@
 const { DataTypes } = require('sequelize');
-const db = require('../utils/database');
 
 function initModel(sequelizeInstance) {
     return sequelizeInstance.define('page', {
@@ -25,8 +24,8 @@ function initModel(sequelizeInstance) {
 }
 
 try {
-    const Page = initModel(db.sequelize);
-    module.exports = Page;
+    const { sequelize } = require('../utils/database');
+    module.exports = initModel(sequelize);
 } catch (e) {
     module.exports = initModel;
 }

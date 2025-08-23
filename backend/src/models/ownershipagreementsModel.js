@@ -1,5 +1,4 @@
 const { DataTypes } = require('sequelize');
-const db = require('../utils/database');
 
 function initModel(sequelizeInstance) {
   return sequelizeInstance.define('ownershipagreements', {
@@ -28,8 +27,8 @@ function initModel(sequelizeInstance) {
 }
 
 try {
-  const OwnershipAgreements = initModel(db.sequelize);
-  module.exports = OwnershipAgreements;
+  const { sequelize } = require('../utils/database');
+  module.exports = initModel(sequelize);
 } catch (e) {
   module.exports = initModel;
 }
