@@ -1,9 +1,9 @@
 
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../utils/database');
+const db = require('../utils/database');
 
-
-const ApplicationAccount = sequelize.define('application_account', {
+function defineApplicationAccount(sequelizeInstance) {
+  return sequelizeInstance.define('application_account', {
   user_account_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   username: { type: DataTypes.STRING, allowNull: false, unique: true },
   password_hash: { type: DataTypes.STRING, allowNull: false },
@@ -14,10 +14,14 @@ const ApplicationAccount = sequelize.define('application_account', {
   status: { type: DataTypes.STRING },
   created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
   updated_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
-}, {
-  tableName: 'application_account',
-  timestamps: false
-});
+  }, {
+    tableName: 'application_account',
+    timestamps: false
+  });
+}
+
+const ApplicationAccount = defineApplicationAccount(db.sequelize);
+ApplicationAccount.initModel = defineApplicationAccount;
 
 // For backward compatibility, export as both names for now
 module.exports = ApplicationAccount;

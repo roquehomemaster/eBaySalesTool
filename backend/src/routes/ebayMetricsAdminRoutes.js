@@ -397,7 +397,13 @@ if (process.env.NODE_ENV === 'test') {
     const { key, severity, payload } = req.body || {};
   if (!key || !severity) { return res.status(400).json({ error:'missing_fields' }); }
     const entry = [{ key, severity, ...payload }];
+    // Fire internal recording (which persists asynchronously in production).
+    // In tests we need the DB table to exist synchronously, so ensure it here
+    // before returning so callers can immediately perform DB queries.
     recordAlerts(entry);
+    try {
+      await ensureAlertHistoryTable();
+    } catch(_) { /* best-effort */ }
     res.json({ ok: true });
   });
 }

@@ -1,6 +1,6 @@
 const request = require('supertest');
-const app = require('../src/app');
-const { sequelize } = require('../src/utils/database');
+const createInjectedApp = require('./testHelpers/createInjectedApp');
+let app; let sequelize; let pool;
 const Listing = require('../src/models/listingModel');
 const Catalog = require('../src/models/itemModel'); // Use itemModel.js for catalog
 
@@ -9,9 +9,11 @@ describe('Listing API', () => {
   let listingId;
   beforeAll(async () => {
     jest.setTimeout(60000);
+    const injected = await createInjectedApp({ database: process.env.PGDATABASE || 'listflowhq_test' });
+    app = injected.app; sequelize = injected.sequelize; pool = injected.pool;
     // Global seed already executed; create isolated catalog entry for this suite
     const uniqueSku = 'SKU' + Date.now();
-  const catalogEntry = await Catalog.create({ description: 'Test Item', manufacturer: 'TestCo', model: 'T1000', serial_number: 'SN123', sku: uniqueSku, barcode: uniqueSku + 'B' });
+    const catalogEntry = await Catalog.create({ description: 'Test Item', manufacturer: 'TestCo', model: 'T1000', serial_number: 'SN123', sku: uniqueSku, barcode: uniqueSku + 'B' });
     catalogItemId = catalogEntry.item_id;
   }, 60000);
 
@@ -56,5 +58,9 @@ describe('Listing API', () => {
     const res = await request(app).delete(`/api/listings/${listingId}`);
     expect(res.statusCode).toBe(200);
     expect(res.body.message).toMatch(/deleted/i);
+  });
+  afterAll(async () => {
+    try { if (sequelize && sequelize.close) await sequelize.close(); } catch(_){}
+    try { if (pool && pool.end) await pool.end(); } catch(_){}
   });
 });

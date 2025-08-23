@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../utils/database');
+const db = require('../utils/database');
 
-// Match DB schema: primary key is ownership_id, table name is 'ownership'
-const Ownership = sequelize.define('ownership', {
+function defineOwnership(sequelizeInstance) {
+  return sequelizeInstance.define('ownership', {
   ownership_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   ownership_type: { type: DataTypes.STRING },
   first_name: { type: DataTypes.STRING },
@@ -21,12 +21,16 @@ const Ownership = sequelize.define('ownership', {
   assigned_contact_email: { type: DataTypes.STRING },
   created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
   updated_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
-}, {
-  tableName: 'ownership',
-  freezeTableName: true,
-  timestamps: true,
-  createdAt: 'created_at',
-  updatedAt: 'updated_at'
-});
+  }, {
+    tableName: 'ownership',
+    freezeTableName: true,
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
+  });
+}
+
+const Ownership = defineOwnership(db.sequelize);
+Ownership.initModel = defineOwnership;
 
 module.exports = Ownership;

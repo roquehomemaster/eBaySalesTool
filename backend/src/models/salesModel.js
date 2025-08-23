@@ -1,7 +1,8 @@
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../utils/database');
+const db = require('../utils/database');
 
-const Sales = sequelize.define('sales', {
+function defineSales(sequelizeInstance) {
+  return sequelizeInstance.define('sales', {
   sale_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   listing_id: { type: DataTypes.INTEGER, references: { model: 'listing', key: 'listing_id' } },
   sold_price: { type: DataTypes.DECIMAL },
@@ -13,9 +14,13 @@ const Sales = sequelize.define('sales', {
   negotiated_terms_calculation: { type: DataTypes.DECIMAL },
   sales_channel: { type: DataTypes.STRING },
   customer_feedback: { type: DataTypes.TEXT }
-}, {
-  tableName: 'sales',
-  timestamps: false
-});
+  }, {
+    tableName: 'sales',
+    timestamps: false
+  });
+}
+
+const Sales = defineSales(db.sequelize);
+Sales.initModel = defineSales;
 
 module.exports = Sales;

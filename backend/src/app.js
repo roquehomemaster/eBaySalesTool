@@ -13,6 +13,18 @@
 
 const express = require('express');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
+const logger = require('./utils/logger');
+// Initialize DB and models early so routes/controllers can rely on registered models
+const db = require('./utils/database');
+try {
+    const { initModels } = require('./models');
+    initModels(db.sequelize);
+} catch (e) {
+    // If model initializer fails, continue; models may still be registered via their defaults
+}
+// Now require routes, controllers and model convenience exports
 // Use shared Pool instance from utils/database to avoid duplicate open handles in tests
 const listingRoutes = require('./routes/listingRoutes');
 const catalogRoutes = require('./routes/itemRoutes');
@@ -35,14 +47,11 @@ const ebayInfoRoutes = require('./routes/ebayInfoRoutes');
 const authRoutes = require('./routes/authRoutes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
-const { sequelize, pool } = require('./utils/database');
+const { sequelize, pool } = db;
 const listingController = require('./controllers/listingController');
 const Catalog = require('./models/itemModel');
 const Ownership = require('./models/ownershipModel');
 const Sales = require('./models/salesModel');
-const fs = require('fs');
-const path = require('path');
-const logger = require('./utils/logger');
 // Optional metrics (used for readiness instrumentation)
 let metrics; try { metrics = require('./integration/ebay/metrics'); } catch(_) { /* optional */ }
 // Auth models (roles, users, pages, access matrix)

@@ -55,9 +55,9 @@ function getPool() {
     return pool;
 }
 
-// For legacy code, export a default Sequelize instance and a single shared Pool
-const sequelize = getSequelize();
-const pool = new Pool({
+// For legacy code, create a default Sequelize instance and a single shared Pool
+let sequelize = getSequelize();
+let pool = new Pool({
     host: PG_HOST,
     max: 10,
     user: PG_USER,
@@ -65,6 +65,17 @@ const pool = new Pool({
     database: PG_DB || 'ebay_sales_tool',
     port: PG_PORT
 });
+
+// Allow test code or factory to override the internal sequelize/pool before models are required
+function setSequelize(newSequelize) {
+    if (!newSequelize) throw new Error('setSequelize requires a Sequelize instance');
+    sequelize = newSequelize;
+}
+
+function setPool(newPool) {
+    if (!newPool) throw new Error('setPool requires a pg Pool instance');
+    pool = newPool;
+}
 
 /**
  * Seed the database with test data if the test flag is set in AppConfig.
@@ -90,10 +101,19 @@ async function seedDatabaseIfTestFlag() {
 
 // Consolidated exports
 module.exports = {
-    sequelize,
+    // Expose current instances (note: if you plan to override, call setSequelize/setPool before requiring models)
+    get sequelize() { return sequelize; },
     getSequelize,
     getPool,
     // For existing imports expecting 'pool', provide getter property
-    pool,
+    get pool() { return pool; },
+    // Allow overriding instances (useful for tests and DI-style factories)
+    setSequelize,
+    setPool,
+    // Close both Sequelize and pg Pool (useful for global teardown)
+    async closeAll() {
+        try { if (sequelize && sequelize.close) await sequelize.close(); } catch (e) { /* ignore */ }
+        try { if (pool && pool.end) await pool.end(); } catch (e) { /* ignore */ }
+    },
     seedDatabaseIfTestFlag
 };

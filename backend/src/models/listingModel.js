@@ -10,50 +10,53 @@
  */
 
 const { DataTypes } = require('sequelize');
-const sequelize = require('../utils/database').sequelize;
+const db = require('../utils/database');
 
+function defineListing(sequelizeInstance) {
+  return sequelizeInstance.define('listing', {
+    listing_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    title: { type: DataTypes.STRING, allowNull: false },
+    listing_price: { type: DataTypes.DECIMAL },
+    item_id: { type: DataTypes.INTEGER, references: { model: 'catalog', key: 'item_id' } },
+    ownership_id: { type: DataTypes.INTEGER, allowNull: true, references: { model: 'ownership', key: 'ownership_id' } },
+    status: { type: DataTypes.STRING, defaultValue: 'draft' },
+    watchers: { type: DataTypes.INTEGER },
+    item_condition_description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      field: 'item_condition_description'
+    },
+    payment_method: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      field: 'payment_method'
+    },
+    shipping_method: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      field: 'shipping_method'
+    },
+    serial_number: { type: DataTypes.STRING },
+    manufacture_date: { type: DataTypes.DATEONLY },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      field: 'created_at'
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      field: 'updated_at'
+    }
+  }, {
+    freezeTableName: true, // Prevent Sequelize from pluralizing table name
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
+  });
+}
 
-// Listing model definition (fixed syntax)
-const Listing = sequelize.define('listing', {
-  listing_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  title: { type: DataTypes.STRING, allowNull: false },
-  listing_price: { type: DataTypes.DECIMAL },
-  item_id: { type: DataTypes.INTEGER, references: { model: 'catalog', key: 'item_id' } },
-  ownership_id: { type: DataTypes.INTEGER, allowNull: true, references: { model: 'ownership', key: 'ownership_id' } },
-  status: { type: DataTypes.STRING, defaultValue: 'draft' },
-  watchers: { type: DataTypes.INTEGER },
-  item_condition_description: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-    field: 'item_condition_description'
-  },
-  payment_method: {
-    type: DataTypes.STRING,
-    allowNull: true,
-    field: 'payment_method'
-  },
-  shipping_method: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-    field: 'shipping_method'
-  },
-  serial_number: { type: DataTypes.STRING },
-  manufacture_date: { type: DataTypes.DATEONLY },
-  created_at: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-    field: 'created_at'
-  },
-  updated_at: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-    field: 'updated_at'
-  }
-}, {
-  freezeTableName: true, // Prevent Sequelize from pluralizing table name
-  timestamps: true,
-  createdAt: 'created_at',
-  updatedAt: 'updated_at'
-});
+const Listing = defineListing(db.sequelize);
+Listing.initModel = defineListing;
 
 module.exports = Listing;
